@@ -36,7 +36,6 @@
 |---|---|
 | ![](assets/ui.png) | ![](assets/strength.png) |
 
-*(Note: Add your actual screenshots to `assets/ui.png`, `assets/strength.png`, and a hero image to `assets/preview.png`)*
 
 ## Tech Stack
 
