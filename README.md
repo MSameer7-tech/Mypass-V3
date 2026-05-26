@@ -25,9 +25,7 @@ MyPass was built to explore how modern desktop software aesthetics can be achiev
 
 ## Demo
 
-<p align="center">
-  <video src="assets/demo.mp4" autoplay loop muted playsinline width="900"></video>
-</p>
+https://github.com/MSameer7-tech/Password-Manager-App/raw/main/assets/demo.mp4
 
 ## Features
 
