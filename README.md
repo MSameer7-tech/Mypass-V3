@@ -29,7 +29,6 @@ MyPass was built to explore how modern desktop software aesthetics can be achiev
 
 ## Demo
 
-![Demo](assets/demo.mp4)
 https://github.com/user-attachments/assets/7a45c9c2-e02a-480b-ad06-52973c082034
 
 ## Features
