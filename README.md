@@ -13,29 +13,47 @@
 <img src="https://img.shields.io/badge/CustomTkinter-Modern_UI-black?style=for-the-badge">
 <img src="https://img.shields.io/badge/Platform-macOS%20%7C%20Windows-black?style=for-the-badge">
 <img src="https://img.shields.io/badge/Encryption-AES256-success?style=for-the-badge">
+<img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge">
 </p>
 
 <p align="center">
   <img src="assets/preview.png" width="900">
 </p>
 
+## Why MyPass?
+MyPass was built to explore how modern desktop software aesthetics can be achieved using pure Python and CustomTkinter while maintaining strong local-first security and a polished native experience.
+
+## Demo
+
+![Demo](assets/demo.gif)
+
 ## Features
 
 - 🔐 **AES-encrypted local password vault**
+
 - ⚡ **Real-time password strength analysis**
+
 - 🎨 **Premium SaaS-inspired matte UI**
+
 - 📋 **One-click password copy**
+
 - 👁️ **Show / hide password toggle**
+
 - ⌨️ **Keyboard shortcuts for power users**
+
 - 💾 **SQLite-backed secure local storage**
+
 - 📦 **Native macOS DMG packaging**
 
 ## Screenshots
 
-| Vault UI | Password Strength |
-|---|---|
-| ![](assets/ui.png) | ![](assets/strength.png) |
+<p align="center">
+  <img src="assets/ui.png" width="800">
+</p>
 
+<p align="center">
+  <img src="assets/strength.png" width="800">
+</p>
 
 ## Tech Stack
 
@@ -50,12 +68,18 @@
 
 ## Architecture
 
-```plaintext
-UI Layer (CustomTkinter)
-        ↓
-Encryption Layer (cryptography)
-        ↓
-SQLite Secure Vault
+```text
+┌────────────────────────────┐
+│  UI Layer (CustomTkinter)  │
+└─────────────┬──────────────┘
+              ↓
+┌────────────────────────────┐
+│ Encryption (Cryptography)  │
+└─────────────┬──────────────┘
+              ↓
+┌────────────────────────────┐
+│     SQLite Secure Vault    │
+└────────────────────────────┘
 ```
 
 ## 📥 Download & Install
@@ -110,6 +134,10 @@ All vault data is stored safely in `~/.password_manager_data/` on your local mac
 - [ ] Password categories
 - [ ] Secure notes
 - [ ] TOTP / 2FA support
+
+## License
+
+This project is licensed under the MIT License.
 
 ---
 *Built with Python, CustomTkinter, and 🩵.*
