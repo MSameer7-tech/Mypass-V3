@@ -48,7 +48,7 @@
 </p>
 
 ### Password Generation
-![Demo](assets/demo.mp4)
+▶️ **[Click here to watch the Demo Video](https://github.com/MSameer7-tech/Password-Manager-App/blob/main/assets/demo.mp4)**
 
 ### Search Functionality
 <p align="center">
