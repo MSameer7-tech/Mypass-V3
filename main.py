@@ -18,6 +18,16 @@ import string
 #    Windows: pyinstaller --windowed --name MyPass --icon assets/icon.ico --add-data "assets;assets" ... main.py
 
 # ---------------------------- CONFIG ------------------------------- #
+import platform
+
+os_name = platform.system()
+if os_name == "Darwin":
+    APP_FONT = "SF Pro"
+elif os_name == "Windows":
+    APP_FONT = "Segoe UI"
+else:
+    APP_FONT = "Arial"
+
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("blue")
 
@@ -94,12 +104,15 @@ class PasswordManagerApp(ctk.CTk):
         
         # Load Window Icon if exists
         try:
-            # Tkinter standard iconphoto
-            icon_img = ctk.CTkImage(Image.open(resource_path("assets/app_icon.png")))._light_image
-            import tkinter as tk
-            from PIL import ImageTk
-            photo = ImageTk.PhotoImage(icon_img)
-            self.wm_iconphoto(True, photo)
+            if os_name == "Windows":
+                self.iconbitmap(resource_path("assets/icon.ico"))
+            else:
+                # Tkinter standard iconphoto for Linux/macOS
+                icon_img = Image.open(resource_path("assets/logo.png"))
+                import tkinter as tk
+                from PIL import ImageTk
+                photo = ImageTk.PhotoImage(icon_img)
+                self.wm_iconphoto(True, photo)
         except Exception:
             pass
             
@@ -149,9 +162,9 @@ class PasswordManagerApp(ctk.CTk):
         self.title_frame = ctk.CTkFrame(self.header_frame, fg_color="transparent")
         self.title_frame.pack(side="left")
         
-        self.title_lbl = ctk.CTkLabel(self.title_frame, text="MyPass", font=("SF Pro", 22, "bold"), text_color="white")
+        self.title_lbl = ctk.CTkLabel(self.title_frame, text="MyPass", font=(APP_FONT, 22, "bold"), text_color="white")
         self.title_lbl.pack(anchor="w")
-        self.subtitle_lbl = ctk.CTkLabel(self.title_frame, text="Secure Password Vault", font=("SF Pro", 12), text_color=MUTED_TEXT)
+        self.subtitle_lbl = ctk.CTkLabel(self.title_frame, text="Secure Password Vault", font=(APP_FONT, 12), text_color=MUTED_TEXT)
         self.subtitle_lbl.pack(anchor="w")
 
         # Focus handler helper
@@ -161,7 +174,7 @@ class PasswordManagerApp(ctk.CTk):
             entry.configure(border_color=BORDER_COLOR)
             
         # Website Section
-        self.web_lbl = ctk.CTkLabel(self.card, text="Website", font=("SF Pro", 12), text_color=MUTED_TEXT)
+        self.web_lbl = ctk.CTkLabel(self.card, text="Website", font=(APP_FONT, 12), text_color=MUTED_TEXT)
         self.web_lbl.pack(anchor="w", padx=40, pady=(10, 2))
         
         self.website_frame = ctk.CTkFrame(self.card, fg_color="transparent")
@@ -176,7 +189,7 @@ class PasswordManagerApp(ctk.CTk):
         self.search_btn.pack(side="right", padx=(8, 0))
         
         # Email Section
-        self.email_lbl = ctk.CTkLabel(self.card, text="Email or Username", font=("SF Pro", 12), text_color=MUTED_TEXT)
+        self.email_lbl = ctk.CTkLabel(self.card, text="Email or Username", font=(APP_FONT, 12), text_color=MUTED_TEXT)
         self.email_lbl.pack(anchor="w", padx=40, pady=(15, 2))
         
         self.email_entry = ctk.CTkEntry(self.card, placeholder_text="john@example.com", height=40, fg_color=INPUT_COLOR, border_color=BORDER_COLOR, corner_radius=8, border_width=1)
@@ -185,7 +198,7 @@ class PasswordManagerApp(ctk.CTk):
         self.email_entry.bind("<FocusOut>", lambda e: on_focus_out(e, self.email_entry))
         
         # Password Section
-        self.pwd_lbl = ctk.CTkLabel(self.card, text="Password", font=("SF Pro", 12), text_color=MUTED_TEXT)
+        self.pwd_lbl = ctk.CTkLabel(self.card, text="Password", font=(APP_FONT, 12), text_color=MUTED_TEXT)
         self.pwd_lbl.pack(anchor="w", padx=40, pady=(15, 2))
         
         self.pwd_frame = ctk.CTkFrame(self.card, fg_color="transparent")
@@ -211,36 +224,36 @@ class PasswordManagerApp(ctk.CTk):
         self.strength_bar.pack(fill="x")
         self.strength_bar.set(0)
         
-        self.strength_lbl = ctk.CTkLabel(self.strength_frame, text="", font=("SF Pro", 11), text_color=MUTED_TEXT, height=14)
+        self.strength_lbl = ctk.CTkLabel(self.strength_frame, text="", font=(APP_FONT, 11), text_color=MUTED_TEXT, height=14)
         self.strength_lbl.pack(anchor="w", pady=(4, 0))
         
         # Buttons
         self.btn_frame = ctk.CTkFrame(self.card, fg_color="transparent")
         self.btn_frame.pack(fill="x", padx=40, pady=(20, 20))
         
-        self.gen_btn = ctk.CTkButton(self.btn_frame, text="Generate", height=40, fg_color=INPUT_COLOR, hover_color=BORDER_COLOR, text_color="white", border_width=1, border_color=BORDER_COLOR, corner_radius=8, cursor="hand2", font=("SF Pro", 13, "bold"), command=self.generate_password)
+        self.gen_btn = ctk.CTkButton(self.btn_frame, text="Generate", height=40, fg_color=INPUT_COLOR, hover_color=BORDER_COLOR, text_color="white", border_width=1, border_color=BORDER_COLOR, corner_radius=8, cursor="hand2", font=(APP_FONT, 13, "bold"), command=self.generate_password)
         self.gen_btn.pack(side="left", expand=True, fill="x", padx=(0, 6))
         
-        self.save_btn = ctk.CTkButton(self.btn_frame, text="Save", height=40, fg_color=ACCENT_COLOR, hover_color="#2563EB", text_color="white", corner_radius=8, cursor="hand2", font=("SF Pro", 13, "bold"), command=self.save_password)
+        self.save_btn = ctk.CTkButton(self.btn_frame, text="Save", height=40, fg_color=ACCENT_COLOR, hover_color="#2563EB", text_color="white", corner_radius=8, cursor="hand2", font=(APP_FONT, 13, "bold"), command=self.save_password)
         self.save_btn.pack(side="right", expand=True, fill="x", padx=(6, 0))
         
         # Helper Text
-        self.helper_lbl = ctk.CTkLabel(self.card, text="Passwords are securely stored locally.", font=("SF Pro", 11), text_color=MUTED_TEXT)
+        self.helper_lbl = ctk.CTkLabel(self.card, text="Passwords are securely stored locally.", font=(APP_FONT, 11), text_color=MUTED_TEXT)
         self.helper_lbl.pack(side="bottom", pady=(0, 25))
 
         # Footer Metadata & Empty State
         self.footer = ctk.CTkFrame(self, fg_color="transparent", height=40)
         self.footer.pack(fill="x", side="bottom", padx=20, pady=10)
         
-        self.version_lbl = ctk.CTkLabel(self.footer, text="MyPass v1.0", font=("SF Pro", 11), text_color=MUTED_TEXT)
+        self.version_lbl = ctk.CTkLabel(self.footer, text="MyPass v1.0", font=(APP_FONT, 11), text_color=MUTED_TEXT)
         self.version_lbl.pack(side="left")
         
-        self.empty_state_lbl = ctk.CTkLabel(self.footer, text="", font=("SF Pro", 12), text_color=MUTED_TEXT)
+        self.empty_state_lbl = ctk.CTkLabel(self.footer, text="", font=(APP_FONT, 12), text_color=MUTED_TEXT)
         self.empty_state_lbl.pack(side="right")
         
         # Toast Container (Hidden initially)
         self.toast_frame = ctk.CTkFrame(self, fg_color=CARD_COLOR, border_width=1, border_color=BORDER_COLOR, corner_radius=16)
-        self.toast_lbl = ctk.CTkLabel(self.toast_frame, text="", font=("SF Pro", 13, "bold"), text_color="white")
+        self.toast_lbl = ctk.CTkLabel(self.toast_frame, text="", font=(APP_FONT, 13, "bold"), text_color="white")
         self.toast_lbl.pack(padx=20, pady=8)
 
     def check_empty_state(self):

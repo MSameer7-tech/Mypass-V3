@@ -127,6 +127,20 @@ cd dist
 create-dmg --volname "MyPass" --volicon "../assets/icon.icns" --window-pos 200 120 --window-size 800 400 --icon-size 100 --icon "MyPass.app" 200 190 --hide-extension "MyPass.app" --app-drop-link 600 185 "MyPass.dmg" "MyPass.app/"
 ```
 
+### Packaging for Windows
+We use PyInstaller directly from the command prompt:
+```cmd
+pyinstaller ^
+--windowed ^
+--name "MyPass" ^
+--icon assets\icon.ico ^
+--add-data "assets;assets" ^
+--hidden-import=PIL ^
+--hidden-import=customtkinter ^
+--hidden-import=cryptography ^
+-y main.py
+```
+
 ## 🔒 Security Notes
 All vault data is stored safely in `~/.password_manager_data/` on your local machine. No data is transmitted to the cloud. Do not lose your `vault.key`, or your data will be permanently irretrievable.
 
