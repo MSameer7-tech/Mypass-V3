@@ -1,119 +1,126 @@
-
-
-
-
-<h1 align="center">MyPass</h1>
+<h1 align="center">🔐 MyPass</h1>
 
 <p align="center">
-  Premium AES-Encrypted Password Vault for macOS & Windows
+  <b>Modern AES-encrypted Password Manager for macOS & Windows</b>
 </p>
 
 <p align="center">
-  Built with Python, CustomTkinter & SQLite
+  <img src="https://img.shields.io/badge/Python-3.10+-blue?style=for-the-badge&logo=python" alt="Python">
+  <img src="https://img.shields.io/badge/CustomTkinter-Modern_UI-black?style=for-the-badge" alt="CustomTkinter">
+  <img src="https://img.shields.io/badge/Database-SQLite-003B57?style=for-the-badge&logo=sqlite" alt="SQLite">
+  <img src="https://img.shields.io/badge/Encryption-AES256-success?style=for-the-badge" alt="AES">
+  <br>
+  <img src="https://img.shields.io/badge/macOS-Native-black?style=for-the-badge&logo=apple" alt="macOS">
+  <img src="https://img.shields.io/badge/Windows-Native-blue?style=for-the-badge&logo=windows" alt="Windows">
+  <img src="https://img.shields.io/badge/Platform-Cross_Platform-8A2BE2?style=for-the-badge" alt="Cross Platform">
+  <img src="https://img.shields.io/github/v/release/MSameer7-tech/Password-Manager-App?style=for-the-badge" alt="Release">
+  <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" alt="MIT License">
 </p>
 
+---
+
+## ✨ Features
+
+- [x] **AES encrypted local password storage**
+- [x] **Local SQLite database**
+- [x] **Modern CustomTkinter premium UI**
+- [x] **Random secure password generator**
+- [x] **Password strength indicator**
+- [x] **Password search functionality**
+- [x] **Show / Hide password toggle**
+- [x] **One-click password copy**
+- [x] **Real-time UI interactions**
+- [x] **Modern matte dark interface**
+- [x] **Local-only storage (no cloud)**
+- [x] **Cross-platform support**
+- [x] **Native macOS DMG installer**
+- [x] **Native Windows executable**
+- [x] **Automated Windows builds using GitHub Actions**
+- [x] **GitHub Releases support**
+
+---
+
+## 📸 Screenshots
+
+### Desktop Preview
 <p align="center">
-<img src="https://img.shields.io/badge/Python-3.10+-blue?style=for-the-badge&logo=python">
-<img src="https://img.shields.io/badge/CustomTkinter-Modern_UI-black?style=for-the-badge">
-<img src="https://img.shields.io/badge/Platform-macOS%20%7C%20Windows-black?style=for-the-badge">
-<img src="https://img.shields.io/badge/Encryption-AES256-success?style=for-the-badge">
-<img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge">
+  <img src="assets/preview.png" width="900" alt="Desktop Preview">
 </p>
 
+### Password Generation
+![Demo](assets/demo.mp4)
+
+### Search Functionality
 <p align="center">
-  <img src="assets/preview.png" width="900">
+  <img src="assets/ui.png" width="800" alt="Search Functionality">
 </p>
 
-## Why MyPass?
-MyPass was built to explore how modern desktop software aesthetics can be achieved using pure Python and CustomTkinter while maintaining strong local-first security and a polished native experience.
-
-## Demo
-
-https://github.com/user-attachments/assets/7a45c9c2-e02a-480b-ad06-52973c082034
-
-## Features
-
-- 🔐 **AES-encrypted local password vault**
-
-- ⚡ **Real-time password strength analysis**
-
-- 🎨 **Premium SaaS-inspired matte UI**
-
-- 📋 **One-click password copy**
-
-- 👁️ **Show / hide password toggle**
-
-- ⌨️ **Keyboard shortcuts for power users**
-
-- 💾 **SQLite-backed secure local storage**
-
-- 📦 **Native macOS DMG packaging**
-
-## Screenshots
-
+### Password Strength
 <p align="center">
-  <img src="assets/ui.png" width="800">
+  <img src="assets/strength.png" width="800" alt="Password Strength">
 </p>
 
-<p align="center">
-  <img src="assets/strength.png" width="800">
-</p>
+---
 
-## Tech Stack
+## 🛠 Tech Stack
 
 | Technology | Purpose |
 |---|---|
-| Python | Core application |
-| CustomTkinter | Modern desktop UI |
-| SQLite | Local database |
-| Cryptography | AES encryption |
-| PyInstaller | Desktop packaging |
-| create-dmg | macOS installer generation |
+| **Python** | Core application |
+| **CustomTkinter** | Modern desktop UI |
+| **SQLite** | Local database |
+| **Cryptography** | AES encryption |
+| **PyInstaller** | Packaging |
+| **GitHub Actions** | Automated Windows builds |
+| **create-dmg** | macOS installer generation |
 
-## Architecture
+---
+
+## 🏗 Architecture
 
 ```text
-┌────────────────────────────┐
-│  UI Layer (CustomTkinter)  │
-└─────────────┬──────────────┘
-              ↓
-┌────────────────────────────┐
-│ Encryption (Cryptography)  │
-└─────────────┬──────────────┘
-              ↓
-┌────────────────────────────┐
-│     SQLite Secure Vault    │
-└────────────────────────────┘
+       User Interface (CustomTkinter)
+                    ↓
+            Application Logic
+                    ↓
+          AES Encryption Layer
+                    ↓
+          SQLite Secure Vault
 ```
 
-## 📥 Download & Install
+---
 
-1. Navigate to the `dist/` folder in this repository.
-2. Download `MyPass.dmg`.
-3. Double-click the `.dmg` and drag `MyPass.app` into your Applications folder.
+## 📥 Installation
 
-*(Note: As this is an indie unsigned utility, you may need to Right-Click -> Open the app the first time to bypass macOS Gatekeeper, or run `xattr -cr /Applications/MyPass.app` in your terminal).*
+### 🍎 macOS
+1. Download `MyPass.dmg` from the **[Releases](../../releases)** page.
+2. Open the `.dmg` and drag `MyPass.app` into your Applications folder.
+3. If macOS Gatekeeper blocks execution (since this is an unsigned indie app), open your terminal and run:
+   ```bash
+   xattr -cr /Applications/MyPass.app
+   ```
 
-## 🛠️ Build it Yourself
+### 🪟 Windows
+1. Download `MyPass.exe` from the **[Releases](../../releases)** page.
+2. Run the executable.
+3. If Windows SmartScreen appears, click **More Info** -> **Run Anyway** because the application is currently unsigned.
 
-### Prerequisites
-- Python 3.10+
-- macOS (for `.app` and `.dmg` generation) or Windows.
+---
 
-### Setup
+## 💻 Build from Source
+
 ```bash
-# Clone the repo
 git clone https://github.com/MSameer7-tech/Password-Manager-App.git
 cd Password-Manager-App
-
-# Install requirements
 pip install -r requirements.txt
-
-# Run locally
 python main.py
 ```
 
-### Packaging for macOS
+---
+
+## 📦 Packaging
+
+### Build macOS
 We use PyInstaller and `create-dmg`:
 ```bash
 pyinstaller --windowed --name "MyPass" --icon assets/icon.icns --add-data "assets:assets" --hidden-import=PIL --hidden-import=customtkinter --hidden-import=cryptography -y main.py
@@ -127,7 +134,7 @@ cd dist
 create-dmg --volname "MyPass" --volicon "../assets/icon.icns" --window-pos 200 120 --window-size 800 400 --icon-size 100 --icon "MyPass.app" 200 190 --hide-extension "MyPass.app" --app-drop-link 600 185 "MyPass.dmg" "MyPass.app/"
 ```
 
-### Packaging for Windows
+### Build Windows
 We use PyInstaller directly from the command prompt:
 ```cmd
 pyinstaller ^
@@ -140,22 +147,62 @@ pyinstaller ^
 --hidden-import=cryptography ^
 -y main.py
 ```
-
-## 🔒 Security Notes
-All vault data is stored safely in `~/.password_manager_data/` on your local machine. No data is transmitted to the cloud. Do not lose your `vault.key`, or your data will be permanently irretrievable.
-
-## Roadmap
-
-- [ ] Biometric unlock
-- [ ] Cloud sync
-- [ ] Browser extension
-- [ ] Password categories
-- [ ] Secure notes
-- [ ] TOTP / 2FA support
-
-## License
-
-This project is licensed under the MIT License.
+*Note: GitHub Actions can automatically build the Windows executable on every release.*
 
 ---
-*Built with Python, CustomTkinter, and 🩵.*
+
+## 🤖 GitHub Actions
+
+The repository automatically generates a Windows executable whenever a new GitHub Release is published. 
+
+This ensures every release contains both:
+* `MyPass.dmg`
+* `MyPass.exe`
+
+without requiring a Windows machine.
+
+---
+
+## 🚀 Releases
+
+Official installers are available from [GitHub Releases](../../releases).
+* 🍎 **macOS** (`.dmg`)
+* 🪟 **Windows** (`.exe`)
+
+---
+
+## 🔒 Security
+
+* **Data never leaves the device.**
+* **No cloud synchronization.**
+* **Passwords remain stored locally.**
+* **AES encryption protects sensitive information.**
+* **SQLite acts as the secure vault backend.**
+
+---
+
+## 🗺 Roadmap
+
+- [ ] Master Password
+- [ ] Touch ID support
+- [ ] Auto-lock vault
+- [ ] Import / Export
+- [ ] Password health dashboard
+- [ ] Categories
+- [ ] Favorites
+- [ ] Secure notes
+- [ ] Cloud backup (optional)
+- [ ] Android version (future consideration)
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License**.
+
+---
+
+<p align="center">
+  Built with ❤️ using Python & CustomTkinter<br><br>
+  ⭐ If you like this project, consider starring the repository.
+</p>
