@@ -4,8 +4,15 @@ from database.database import DatabaseManager
 from database.repository import VaultRepository
 from services.master_password_service import MasterPasswordService
 from services.password_generator import PasswordGenerator
+from services.session_lock import SessionLockService
 from ui.dashboard import DashboardWindow
-from utils.constants import DATA_DIR_NAME, DB_FILE_NAME, LEGACY_KEY_FILE_NAME
+from utils.constants import (
+    CLIPBOARD_CLEAR_SECONDS,
+    DATA_DIR_NAME,
+    DB_FILE_NAME,
+    DEFAULT_AUTO_LOCK_SECONDS,
+    LEGACY_KEY_FILE_NAME,
+)
 from utils.helpers import build_data_path
 
 
@@ -18,13 +25,15 @@ def create_app() -> DashboardWindow:
         repository,
         legacy_key_file=build_data_path(DATA_DIR_NAME, LEGACY_KEY_FILE_NAME),
     )
-    clipboard_service = ClipboardService()
+    clipboard_service = ClipboardService(clear_after_seconds=CLIPBOARD_CLEAR_SECONDS)
     password_generator = PasswordGenerator()
+    session_lock_service = SessionLockService(timeout_seconds=DEFAULT_AUTO_LOCK_SECONDS)
 
     return DashboardWindow(
         master_password_service=master_password_service,
         password_generator=password_generator,
         clipboard_service=clipboard_service,
+        session_lock_service=session_lock_service,
     )
 
 

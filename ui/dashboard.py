@@ -18,10 +18,10 @@ from config import (
     WARNING_COLOR,
 )
 from services.master_password_service import InvalidMasterPasswordError, MasterPasswordService
-from services.password_generator import PasswordGenerator
+from services.password_generator import PasswordGenerator, PasswordGeneratorOptions
 from services.validation import CredentialInput, validate_credential_input
 from services.vault_service import VaultService
-from ui.dialogs import ToastManager, flash_entry_error
+from ui.dialogs import PasswordGeneratorDialog, ToastManager, flash_entry_error
 from ui.login import LoginView
 from utils.constants import APP_NAME, APP_VERSION, WINDOW_HEIGHT, WINDOW_WIDTH
 from utils.helpers import resource_path
@@ -33,16 +33,19 @@ class DashboardWindow(ctk.CTk):
         master_password_service: MasterPasswordService,
         password_generator: PasswordGenerator,
         clipboard_service,
+        session_lock_service,
     ):
         super().__init__(fg_color=BG_COLOR)
         self.master_password_service = master_password_service
         self.vault_service: VaultService | None = None
         self.password_generator = password_generator
         self.clipboard_service = clipboard_service
+        self.session_lock_service = session_lock_service
         self.show_password_value = False
         self.card = None
         self.footer = None
         self.empty_state_label = None
+        self.auto_lock_job = None
 
         self._configure_window()
         self.password_var = ctk.StringVar()
@@ -51,6 +54,8 @@ class DashboardWindow(ctk.CTk):
         self.icons = self._load_icons()
         self.logo_image = self._load_logo()
         self.toast_manager = ToastManager(self, APP_FONT)
+        self.bind_all("<KeyPress>", self._record_activity, add="+")
+        self.bind_all("<ButtonPress>", self._record_activity, add="+")
         self._show_login_view()
 
     def _configure_window(self) -> None:
@@ -101,6 +106,9 @@ class DashboardWindow(ctk.CTk):
                 child.destroy()
 
     def _show_login_view(self) -> None:
+        if self.auto_lock_job is not None:
+            self.after_cancel(self.auto_lock_job)
+            self.auto_lock_job = None
         self._clear_main_content()
         self.vault_service = None
         login_view = LoginView(
@@ -137,6 +145,8 @@ class DashboardWindow(ctk.CTk):
             raise error
 
         self._build_ui()
+        self.session_lock_service.unlock()
+        self._monitor_auto_lock()
 
     def _build_header(self) -> None:
         header_frame = ctk.CTkFrame(self.card, fg_color="transparent")
@@ -155,6 +165,32 @@ class DashboardWindow(ctk.CTk):
             font=(APP_FONT, 22, "bold"),
             text_color="white",
         ).pack(anchor="w")
+
+        controls = ctk.CTkFrame(header_frame, fg_color="transparent")
+        controls.pack(side="right", padx=(60, 0))
+        auto_lock_var = ctk.StringVar(value="5 min")
+        ctk.CTkOptionMenu(
+            controls,
+            values=["1 min", "5 min", "10 min", "15 min", "30 min"],
+            variable=auto_lock_var,
+            width=100,
+            height=30,
+            fg_color=INPUT_COLOR,
+            button_color=BORDER_COLOR,
+            button_hover_color=FOCUS_BORDER,
+            command=self._set_auto_lock_timeout,
+        ).pack(side="left", padx=(0, 8))
+        ctk.CTkButton(
+            controls,
+            text="Lock Now",
+            width=82,
+            height=30,
+            fg_color=INPUT_COLOR,
+            hover_color=BORDER_COLOR,
+            border_width=1,
+            border_color=BORDER_COLOR,
+            command=self.lock_vault,
+        ).pack(side="left")
         ctk.CTkLabel(
             title_frame,
             text="Secure Password Vault",
@@ -334,6 +370,21 @@ class DashboardWindow(ctk.CTk):
 
         ctk.CTkButton(
             button_frame,
+            text="Options",
+            height=40,
+            width=78,
+            fg_color=INPUT_COLOR,
+            hover_color=BORDER_COLOR,
+            text_color="white",
+            border_width=1,
+            border_color=BORDER_COLOR,
+            corner_radius=8,
+            cursor="hand2",
+            command=self.open_generator_options,
+        ).pack(side="left", padx=(0, 6))
+
+        ctk.CTkButton(
+            button_frame,
             text="Save",
             height=40,
             fg_color=ACCENT_COLOR,
@@ -397,8 +448,8 @@ class DashboardWindow(ctk.CTk):
         if not password:
             self.flash_error(self.password_entry)
             return
-        self.clipboard_service.copy(password)
-        self.toast_manager.show("Password Copied")
+        self.clipboard_service.copy(password, scheduler=self)
+        self.toast_manager.show("Password copied. Clears in 20 seconds.")
 
     def update_strength_bar(self, *args) -> None:
         strength = self.password_generator.evaluate_strength(self.password_entry.get())
@@ -417,10 +468,47 @@ class DashboardWindow(ctk.CTk):
         )
 
     def generate_password(self) -> None:
-        generated_password = self.password_generator.generate()
+        self._insert_generated_password(PasswordGeneratorOptions())
+
+    def open_generator_options(self) -> None:
+        PasswordGeneratorDialog(self, self._insert_generated_password)
+
+    def _insert_generated_password(self, options: PasswordGeneratorOptions) -> None:
+        try:
+            generated_password = self.password_generator.generate(options)
+        except ValueError as error:
+            self.toast_manager.show(str(error), is_error=True)
+            return
         self.password_entry.delete(0, "end")
         self.password_entry.insert(0, generated_password)
         self.copy_password()
+
+    def _set_auto_lock_timeout(self, selection: str) -> None:
+        minutes = int(selection.split()[0])
+        self.session_lock_service.set_timeout(minutes * 60)
+        self.toast_manager.show(f"Auto-lock set to {minutes} minutes")
+
+    def _record_activity(self, _event=None) -> None:
+        if self.vault_service is not None:
+            if self.session_lock_service.should_lock():
+                self.lock_vault(message="Vault locked due to inactivity")
+                return
+            self.session_lock_service.record_activity()
+
+    def _monitor_auto_lock(self) -> None:
+        if self.vault_service is None:
+            return
+        if self.session_lock_service.should_lock():
+            self.lock_vault(message="Vault locked due to inactivity")
+            return
+        self.auto_lock_job = self.after(1000, self._monitor_auto_lock)
+
+    def lock_vault(self, message: str = "Vault locked") -> None:
+        self.session_lock_service.lock()
+        self.clipboard_service.clear_now()
+        self.password_var.set("")
+        self._show_login_view()
+        self.toast_manager.show(message)
 
     def save_password(self) -> None:
         if self.vault_service is None:
