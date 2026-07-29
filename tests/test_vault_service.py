@@ -5,6 +5,7 @@ import unittest
 from database.database import DatabaseManager
 from database.repository import VaultRepository
 from services.vault_service import VaultService
+from utils.constants import SCHEMA_VERSION
 
 
 class FakeEncryptionService:
@@ -82,7 +83,7 @@ class VaultServiceTests(unittest.TestCase):
     def test_metadata_is_initialized(self):
         metadata = self.service.get_metadata()
 
-        self.assertEqual(metadata.version, "3.0")
+        self.assertEqual(metadata.version, SCHEMA_VERSION)
         self.assertTrue(metadata.created)
         self.assertTrue(metadata.vault_id)
 

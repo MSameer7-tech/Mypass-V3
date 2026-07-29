@@ -1,6 +1,7 @@
 import os
 import uuid
 
+from crypto.encryption import FernetEncryptionService
 from crypto.key_derivation import Argon2KeyDerivationService
 from database.repository import VaultRepository
 from services.vault_service import VaultService
@@ -23,6 +24,7 @@ class MasterPasswordService:
         self.repository = repository
         self.key_derivation_service = key_derivation_service or Argon2KeyDerivationService()
         self.encryption_service_factory = encryption_service_factory or self._default_encryption_factory()
+        self.legacy_encryption_service_factory = FernetEncryptionService
         self.legacy_key_file = legacy_key_file
 
     def is_configured(self) -> bool:
@@ -53,7 +55,16 @@ class MasterPasswordService:
         encryption_service = self._build_encryption_service(master_password, salt, parameters)
 
         try:
-            encryption_service.decrypt(metadata.vault_id)
+            if self._uses_legacy_fernet(metadata.version):
+                legacy_encryption_service = self._build_legacy_encryption_service(
+                    master_password,
+                    salt,
+                    parameters,
+                )
+                legacy_encryption_service.decrypt(metadata.vault_id)
+                self._upgrade_legacy_vault(legacy_encryption_service, encryption_service)
+            else:
+                encryption_service.decrypt(metadata.vault_id)
         except Exception as error:
             raise InvalidMasterPasswordError("Wrong master password.") from error
 
@@ -63,11 +74,17 @@ class MasterPasswordService:
         key = self.key_derivation_service.derive_key(master_password, salt, parameters)
         return self.encryption_service_factory(key)
 
+    def _build_legacy_encryption_service(self, master_password: str, salt: bytes, parameters):
+        key = self.key_derivation_service.derive_key(master_password, salt, parameters)
+        return self.legacy_encryption_service_factory(key)
+
     def _migrate_legacy_key_if_present(self, new_encryption_service) -> None:
         if not self.legacy_key_file or not os.path.exists(self.legacy_key_file):
             return
 
-        legacy_encryption_service = self.encryption_service_factory.from_key_file(self.legacy_key_file)
+        legacy_encryption_service = self.legacy_encryption_service_factory.from_key_file(
+            self.legacy_key_file
+        )
         for entry in self.repository.list_all_entries():
             decrypted_password = legacy_encryption_service.decrypt(entry.password)
             reencrypted_password = new_encryption_service.encrypt(decrypted_password)
@@ -75,6 +92,28 @@ class MasterPasswordService:
         os.remove(self.legacy_key_file)
 
     def _default_encryption_factory(self):
-        from crypto.encryption import FernetEncryptionService
+        from crypto.encryption import AesGcmEncryptionService
 
-        return FernetEncryptionService
+        return AesGcmEncryptionService
+
+    def _upgrade_legacy_vault(self, legacy_encryption_service, new_encryption_service) -> None:
+        metadata = self.repository.get_metadata()
+        decrypted_vault_id = legacy_encryption_service.decrypt(metadata.vault_id)
+        encrypted_vault_id = new_encryption_service.encrypt(decrypted_vault_id)
+        for entry in self.repository.list_all_entries():
+            decrypted_password = legacy_encryption_service.decrypt(entry.password)
+            reencrypted_password = new_encryption_service.encrypt(decrypted_password)
+            self.repository.update_entry_password(entry.id, reencrypted_password)
+        self.repository.update_metadata_security(
+            version=SCHEMA_VERSION,
+            vault_id=encrypted_vault_id,
+            argon_parameters=metadata.argon_parameters,
+            salt=metadata.salt,
+        )
+
+    def _uses_legacy_fernet(self, version: str) -> bool:
+        try:
+            major_version = int(version.split(".", 1)[0])
+        except (ValueError, AttributeError):
+            return True
+        return major_version < 4
