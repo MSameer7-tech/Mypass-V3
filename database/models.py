@@ -25,3 +25,11 @@ class AppMetadataRecord:
     vault_id: str
     argon_parameters: str
     salt: str
+
+
+@dataclass(frozen=True)
+class PasswordHistoryRecord:
+    id: Optional[int]
+    entry_id: int
+    password: str
+    created_at: str

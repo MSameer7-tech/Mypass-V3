@@ -1,7 +1,7 @@
 from typing import Optional
 
 from database.database import DatabaseManager
-from database.models import AppMetadataRecord, VaultEntryRecord
+from database.models import AppMetadataRecord, PasswordHistoryRecord, VaultEntryRecord
 from datetime import datetime, UTC
 
 
@@ -214,6 +214,49 @@ class VaultRepository:
                 "UPDATE vault_entries SET notes = ?, updated_at = ? WHERE id = ?",
                 (notes, self._timestamp(), entry_id),
             )
+
+    def add_password_history(self, entry_id: int, password: str) -> PasswordHistoryRecord:
+        created_at = self._timestamp()
+        with self.database_manager.connect() as connection:
+            cursor = connection.cursor()
+            cursor.execute(
+                "INSERT INTO password_history (entry_id, password, created_at) VALUES (?, ?, ?)",
+                (entry_id, password, created_at),
+            )
+            return PasswordHistoryRecord(cursor.lastrowid, entry_id, password, created_at)
+
+    def list_password_history(self, entry_id: int) -> list[PasswordHistoryRecord]:
+        with self.database_manager.connect() as connection:
+            cursor = connection.cursor()
+            cursor.execute(
+                "SELECT id, entry_id, password, created_at FROM password_history WHERE entry_id = ? "
+                "ORDER BY created_at DESC, id DESC",
+                (entry_id,),
+            )
+            return [PasswordHistoryRecord(*row) for row in cursor.fetchall()]
+
+    def replace_all_entries(self, entries: list[VaultEntryRecord]) -> dict[int, int]:
+        with self.database_manager.connect() as connection:
+            cursor = connection.cursor()
+            cursor.execute("DELETE FROM password_history")
+            cursor.execute("DELETE FROM vault_entries")
+        restored_ids = {}
+        for entry in entries:
+            restored = self.create_entry(entry)
+            if entry.id is not None and restored.id is not None:
+                restored_ids[entry.id] = restored.id
+        return restored_ids
+
+    def restore_password_history(self, history: list[PasswordHistoryRecord], entry_ids: dict[int, int]) -> None:
+        for item in history:
+            restored_entry_id = entry_ids.get(item.entry_id)
+            if restored_entry_id is None:
+                continue
+            with self.database_manager.connect() as connection:
+                connection.execute(
+                    "INSERT INTO password_history (entry_id, password, created_at) VALUES (?, ?, ?)",
+                    (restored_entry_id, item.password, item.created_at),
+                )
 
     def find_by_website_and_username(
         self,

@@ -48,6 +48,17 @@ class DatabaseManager:
             )
             cursor.execute(
                 """
+                CREATE TABLE IF NOT EXISTS password_history (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    entry_id INTEGER NOT NULL,
+                    password TEXT NOT NULL,
+                    created_at TEXT NOT NULL,
+                    FOREIGN KEY (entry_id) REFERENCES vault_entries(id) ON DELETE CASCADE
+                )
+                """
+            )
+            cursor.execute(
+                """
                 CREATE TABLE IF NOT EXISTS app_metadata (
                     id INTEGER PRIMARY KEY CHECK (id = 1),
                     version TEXT NOT NULL,
