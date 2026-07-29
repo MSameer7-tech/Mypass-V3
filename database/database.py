@@ -38,6 +38,8 @@ class DatabaseManager:
                     password TEXT NOT NULL,
                     notes TEXT NOT NULL DEFAULT '',
                     category TEXT NOT NULL DEFAULT '',
+                    tags TEXT NOT NULL DEFAULT '',
+                    icon TEXT NOT NULL DEFAULT '',
                     favorite INTEGER NOT NULL DEFAULT 0,
                     created_at TEXT NOT NULL,
                     updated_at TEXT NOT NULL
@@ -56,8 +58,18 @@ class DatabaseManager:
                 )
                 """
             )
+            self._ensure_entry_columns(cursor)
             self._migrate_legacy_credentials(cursor)
             self._ensure_metadata(cursor)
+
+    def _ensure_entry_columns(self, cursor: sqlite3.Cursor) -> None:
+        cursor.execute("PRAGMA table_info(vault_entries)")
+        column_names = {row[1] for row in cursor.fetchall()}
+        for name in ("tags", "icon"):
+            if name not in column_names:
+                cursor.execute(
+                    f"ALTER TABLE vault_entries ADD COLUMN {name} TEXT NOT NULL DEFAULT ''"
+                )
 
     def _migrate_legacy_credentials(self, cursor: sqlite3.Cursor) -> None:
         cursor.execute(
@@ -81,10 +93,10 @@ class DatabaseManager:
             cursor.execute(
                 """
                 INSERT INTO vault_entries (
-                    title, website, username, password, notes, category, favorite,
+                    title, website, username, password, notes, category, tags, icon, favorite,
                     created_at, updated_at
                 )
-                VALUES (?, ?, ?, ?, '', '', 0, ?, ?)
+                VALUES (?, ?, ?, ?, '', '', '', '', 0, ?, ?)
                 """,
                 (website, website, email, password, now, now),
             )

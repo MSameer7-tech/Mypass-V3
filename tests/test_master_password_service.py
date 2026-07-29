@@ -113,6 +113,8 @@ class MasterPasswordServiceTests(unittest.TestCase):
                 "password": FakeLegacyEncryptionService(b"legacy").encrypt("Secret123!"),
                 "notes": "",
                 "category": "",
+                "tags": "",
+                "icon": "",
                 "favorite": False,
                 "created_at": "",
                 "updated_at": "",
@@ -142,6 +144,8 @@ class MasterPasswordServiceTests(unittest.TestCase):
                 "password": FakeLegacyEncryptionService(b"MySecurePassword123:ssssssss").encrypt("Secret123!"),
                 "notes": "",
                 "category": "",
+                "tags": "",
+                "icon": "",
                 "favorite": False,
                 "created_at": "",
                 "updated_at": "",
@@ -171,6 +175,36 @@ class MasterPasswordServiceTests(unittest.TestCase):
 
         with self.assertRaises(Exception):
             vault_service.find_credential("gmail.com")
+
+    def test_existing_plaintext_notes_are_encrypted_on_unlock(self):
+        self.repository.update_metadata_security(
+            version="4.0",
+            vault_id=FakeEncryptionService(b"MySecurePassword123:ssssssss").encrypt("vault-id"),
+            argon_parameters="salt_length=8",
+            salt="ssssssss",
+        )
+        self.repository.create_entry(
+            type("Entry", (), {
+                "id": None,
+                "title": "WiFi",
+                "website": "local-network",
+                "username": "router",
+                "password": FakeEncryptionService(b"MySecurePassword123:ssssssss").encrypt("Secret123!"),
+                "notes": "Network key: secure-note",
+                "category": "Personal",
+                "tags": "wifi",
+                "icon": "globe",
+                "favorite": False,
+                "created_at": "",
+                "updated_at": "",
+            })()
+        )
+
+        vault_service = self.service.unlock_vault("MySecurePassword123")
+        stored_entry = self.repository.get_latest_entry_by_website("local-network")
+
+        self.assertNotEqual(stored_entry.notes, "Network key: secure-note")
+        self.assertEqual(vault_service.find_credential("local-network").notes, "Network key: secure-note")
 
 
 if __name__ == "__main__":

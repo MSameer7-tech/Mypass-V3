@@ -52,7 +52,7 @@ class VaultRepository:
             cursor = connection.cursor()
             cursor.execute(
                 """
-                SELECT id, title, website, username, password, notes, category, favorite,
+                SELECT id, title, website, username, password, notes, category, tags, icon, favorite,
                        created_at, updated_at
                 FROM vault_entries
                 WHERE id = ?
@@ -69,7 +69,7 @@ class VaultRepository:
             cursor = connection.cursor()
             cursor.execute(
                 """
-                SELECT id, title, website, username, password, notes, category, favorite,
+                SELECT id, title, website, username, password, notes, category, tags, icon, favorite,
                        created_at, updated_at
                 FROM vault_entries
                 WHERE website = ?
@@ -88,7 +88,7 @@ class VaultRepository:
             cursor = connection.cursor()
             cursor.execute(
                 """
-                SELECT id, title, website, username, password, notes, category, favorite,
+                SELECT id, title, website, username, password, notes, category, tags, icon, favorite,
                        created_at, updated_at
                 FROM vault_entries
                 WHERE website = ?
@@ -103,7 +103,7 @@ class VaultRepository:
             cursor = connection.cursor()
             cursor.execute(
                 """
-                SELECT id, title, website, username, password, notes, category, favorite,
+                SELECT id, title, website, username, password, notes, category, tags, icon, favorite,
                        created_at, updated_at
                 FROM vault_entries
                 ORDER BY id ASC
@@ -118,10 +118,10 @@ class VaultRepository:
             cursor.execute(
                 """
                 INSERT INTO vault_entries (
-                    title, website, username, password, notes, category, favorite,
+                    title, website, username, password, notes, category, tags, icon, favorite,
                     created_at, updated_at
                 )
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     entry.title,
@@ -130,6 +130,8 @@ class VaultRepository:
                     entry.password,
                     entry.notes,
                     entry.category,
+                    entry.tags,
+                    entry.icon,
                     int(entry.favorite),
                     timestamp,
                     timestamp,
@@ -143,6 +145,8 @@ class VaultRepository:
                 password=entry.password,
                 notes=entry.notes,
                 category=entry.category,
+                tags=entry.tags,
+                icon=entry.icon,
                 favorite=entry.favorite,
                 created_at=timestamp,
                 updated_at=timestamp,
@@ -159,7 +163,7 @@ class VaultRepository:
                 """
                 UPDATE vault_entries
                 SET title = ?, website = ?, username = ?, password = ?, notes = ?,
-                    category = ?, favorite = ?, updated_at = ?
+                    category = ?, tags = ?, icon = ?, favorite = ?, updated_at = ?
                 WHERE id = ?
                 """,
                 (
@@ -169,6 +173,8 @@ class VaultRepository:
                     entry.password,
                     entry.notes,
                     entry.category,
+                    entry.tags,
+                    entry.icon,
                     int(entry.favorite),
                     updated_at,
                     entry.id,
@@ -182,6 +188,8 @@ class VaultRepository:
             password=entry.password,
             notes=entry.notes,
             category=entry.category,
+            tags=entry.tags,
+            icon=entry.icon,
             favorite=entry.favorite,
             created_at=entry.created_at,
             updated_at=updated_at,
@@ -199,6 +207,14 @@ class VaultRepository:
                 (password, self._timestamp(), entry_id),
             )
 
+    def update_entry_notes(self, entry_id: int, notes: str) -> None:
+        with self.database_manager.connect() as connection:
+            cursor = connection.cursor()
+            cursor.execute(
+                "UPDATE vault_entries SET notes = ?, updated_at = ? WHERE id = ?",
+                (notes, self._timestamp(), entry_id),
+            )
+
     def find_by_website_and_username(
         self,
         website: str,
@@ -208,7 +224,7 @@ class VaultRepository:
             cursor = connection.cursor()
             cursor.execute(
                 """
-                SELECT id, title, website, username, password, notes, category, favorite,
+                SELECT id, title, website, username, password, notes, category, tags, icon, favorite,
                        created_at, updated_at
                 FROM vault_entries
                 WHERE website = ? AND username = ?
@@ -231,9 +247,11 @@ class VaultRepository:
             password=row[4],
             notes=row[5],
             category=row[6],
-            favorite=bool(row[7]),
-            created_at=row[8],
-            updated_at=row[9],
+            tags=row[7],
+            icon=row[8],
+            favorite=bool(row[9]),
+            created_at=row[10],
+            updated_at=row[11],
         )
 
     def _timestamp(self) -> str:

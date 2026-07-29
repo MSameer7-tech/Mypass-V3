@@ -69,6 +69,8 @@ class VaultServiceTests(unittest.TestCase):
             password="Secret123!",
             notes="Recovery codes stored offline",
             category="Personal",
+            tags="email, recovery",
+            icon="mail",
             favorite=True,
         )
 
@@ -78,7 +80,26 @@ class VaultServiceTests(unittest.TestCase):
         self.assertEqual(len(entries), 1)
         self.assertEqual(entries[0].notes, "Recovery codes stored offline")
         self.assertEqual(entries[0].category, "Personal")
+        self.assertEqual(entries[0].tags, "email, recovery")
+        self.assertEqual(entries[0].icon, "mail")
         self.assertTrue(entries[0].favorite)
+
+    def test_notes_are_encrypted_and_search_normalizes_websites(self):
+        entry = self.service.save_entry(
+            title="Amazon Shopping",
+            website="https://amazon.com",
+            username="user@example.com",
+            password="StrongPassword123!",
+            notes="Recovery code: 1234",
+            category="Shopping",
+            tags="retail, orders",
+        )
+        stored = self.service.repository.get_entry_by_id(entry.id)
+
+        self.assertNotEqual(stored.notes, "Recovery code: 1234")
+        self.assertEqual(self.service.search_entries("AMAZON")[0].id, entry.id)
+        self.assertEqual(self.service.search_entries("amazon.com")[0].id, entry.id)
+        self.assertEqual(self.service.search_entries("https://amazon.com")[0].id, entry.id)
 
     def test_metadata_is_initialized(self):
         metadata = self.service.get_metadata()
