@@ -54,6 +54,7 @@ class MasterPasswordService:
         salt = self.key_derivation_service.decode_salt(metadata.salt)
         encryption_service = self._build_encryption_service(master_password, salt, parameters)
 
+        upgraded_legacy_vault = False
         try:
             if self._uses_legacy_fernet(metadata.version):
                 legacy_encryption_service = self._build_legacy_encryption_service(
@@ -63,11 +64,20 @@ class MasterPasswordService:
                 )
                 legacy_encryption_service.decrypt(metadata.vault_id)
                 self._upgrade_legacy_vault(legacy_encryption_service, encryption_service)
+                upgraded_legacy_vault = True
             else:
                 encryption_service.decrypt(metadata.vault_id)
         except Exception as error:
             raise InvalidMasterPasswordError("Wrong master password.") from error
 
+        if not upgraded_legacy_vault and self._needs_secure_notes_upgrade(metadata.version):
+            self._encrypt_existing_notes(encryption_service)
+            self.repository.update_metadata_security(
+                version=SCHEMA_VERSION,
+                vault_id=metadata.vault_id,
+                argon_parameters=metadata.argon_parameters,
+                salt=metadata.salt,
+            )
         return VaultService(self.repository, encryption_service)
 
     def _build_encryption_service(self, master_password: str, salt: bytes, parameters):
@@ -89,6 +99,8 @@ class MasterPasswordService:
             decrypted_password = legacy_encryption_service.decrypt(entry.password)
             reencrypted_password = new_encryption_service.encrypt(decrypted_password)
             self.repository.update_entry_password(entry.id, reencrypted_password)
+            if entry.notes:
+                self.repository.update_entry_notes(entry.id, new_encryption_service.encrypt(entry.notes))
         os.remove(self.legacy_key_file)
 
     def _default_encryption_factory(self):
@@ -104,6 +116,8 @@ class MasterPasswordService:
             decrypted_password = legacy_encryption_service.decrypt(entry.password)
             reencrypted_password = new_encryption_service.encrypt(decrypted_password)
             self.repository.update_entry_password(entry.id, reencrypted_password)
+            if entry.notes:
+                self.repository.update_entry_notes(entry.id, new_encryption_service.encrypt(entry.notes))
         self.repository.update_metadata_security(
             version=SCHEMA_VERSION,
             vault_id=encrypted_vault_id,
@@ -117,3 +131,15 @@ class MasterPasswordService:
         except (ValueError, AttributeError):
             return True
         return major_version < 4
+
+    def _needs_secure_notes_upgrade(self, version: str) -> bool:
+        try:
+            major_version = int(version.split(".", 1)[0])
+        except (ValueError, AttributeError):
+            return False
+        return major_version < 5
+
+    def _encrypt_existing_notes(self, encryption_service) -> None:
+        for entry in self.repository.list_all_entries():
+            if entry.notes:
+                self.repository.update_entry_notes(entry.id, encryption_service.encrypt(entry.notes))

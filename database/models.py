@@ -11,6 +11,8 @@ class VaultEntryRecord:
     password: str
     notes: str
     category: str
+    tags: str
+    icon: str
     favorite: bool
     created_at: str
     updated_at: str

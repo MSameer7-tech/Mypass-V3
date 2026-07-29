@@ -49,10 +49,13 @@ class VaultService:
         password: str,
         notes: str = "",
         category: str = "",
+        tags: str = "",
+        icon: str = "",
         favorite: bool = False,
         entry_id: Optional[int] = None,
     ) -> VaultEntryRecord:
         encrypted_password = self.encryption_service.encrypt(password)
+        encrypted_notes = self.encryption_service.encrypt(notes) if notes else ""
         existing_entry = self.repository.get_entry_by_id(entry_id) if entry_id is not None else None
         base_entry = VaultEntryRecord(
             id=entry_id,
@@ -60,8 +63,10 @@ class VaultService:
             website=website,
             username=username,
             password=encrypted_password,
-            notes=notes,
+            notes=encrypted_notes,
             category=category,
+            tags=tags,
+            icon=icon,
             favorite=favorite,
             created_at=existing_entry.created_at if existing_entry else "",
             updated_at=existing_entry.updated_at if existing_entry else "",
@@ -82,16 +87,44 @@ class VaultService:
     def list_entries_by_website(self, website: str) -> list[VaultEntryRecord]:
         return [self._decrypt_entry(entry) for entry in self.repository.list_entries_by_website(website)]
 
+    def list_all_entries(self) -> list[VaultEntryRecord]:
+        return [self._decrypt_entry(entry) for entry in self.repository.list_all_entries()]
+
+    def search_entries(self, query: str) -> list[VaultEntryRecord]:
+        normalized_query = self._normalize_search_value(query)
+        if not normalized_query:
+            return self.list_all_entries()
+        matches = []
+        for entry in self.list_all_entries():
+            searchable_values = (entry.title, entry.website, entry.username, entry.category, entry.tags)
+            if any(normalized_query in self._normalize_search_value(value) for value in searchable_values):
+                matches.append(entry)
+        return matches
+
+    @staticmethod
+    def _normalize_search_value(value: str) -> str:
+        normalized = value.strip().lower()
+        for prefix in ("https://", "http://"):
+            if normalized.startswith(prefix):
+                normalized = normalized[len(prefix) :]
+        normalized = normalized.removeprefix("www.").rstrip("/")
+        return "".join(character for character in normalized if character.isalnum())
+
     def _decrypt_entry(self, stored_record: VaultEntryRecord) -> VaultEntryRecord:
         decrypted_password = self.encryption_service.decrypt(stored_record.password)
+        decrypted_notes = (
+            self.encryption_service.decrypt(stored_record.notes) if stored_record.notes else ""
+        )
         return VaultEntryRecord(
             id=stored_record.id,
             title=stored_record.title,
             website=stored_record.website,
             username=stored_record.username,
             password=decrypted_password,
-            notes=stored_record.notes,
+            notes=decrypted_notes,
             category=stored_record.category,
+            tags=stored_record.tags,
+            icon=stored_record.icon,
             favorite=stored_record.favorite,
             created_at=stored_record.created_at,
             updated_at=stored_record.updated_at,

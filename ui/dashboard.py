@@ -32,6 +32,7 @@ class DashboardWindow(ctk.CTk):
         self,
         master_password_service: MasterPasswordService,
         password_generator: PasswordGenerator,
+        password_health_service,
         clipboard_service,
         session_lock_service,
     ):
@@ -39,6 +40,7 @@ class DashboardWindow(ctk.CTk):
         self.master_password_service = master_password_service
         self.vault_service: VaultService | None = None
         self.password_generator = password_generator
+        self.password_health_service = password_health_service
         self.clipboard_service = clipboard_service
         self.session_lock_service = session_lock_service
         self.show_password_value = False
@@ -199,10 +201,15 @@ class DashboardWindow(ctk.CTk):
         ).pack(anchor="w")
 
     def _build_form(self) -> None:
+        self.title_entry = self._build_labeled_entry(
+            "Title",
+            "Amazon Shopping",
+            pady=(10, 2),
+        )
         self.website_entry = self._build_labeled_entry(
             "Website",
             "amazon.com",
-            pady=(10, 2),
+            pady=(15, 2),
             with_search=True,
         )
         self.email_entry = self._build_labeled_entry(
@@ -212,6 +219,7 @@ class DashboardWindow(ctk.CTk):
         )
         self.password_entry = self._build_password_section()
         self._build_strength_section()
+        self._build_entry_metadata()
         self._build_button_row()
         ctk.CTkLabel(
             self.card,
@@ -219,6 +227,44 @@ class DashboardWindow(ctk.CTk):
             font=(APP_FONT, 11),
             text_color=MUTED_TEXT,
         ).pack(side="bottom", pady=(0, 25))
+
+    def _build_entry_metadata(self) -> None:
+        self.category_var = ctk.StringVar(value="Personal")
+        ctk.CTkLabel(
+            self.card, text="Category", font=(APP_FONT, 12), text_color=MUTED_TEXT
+        ).pack(anchor="w", padx=40, pady=(14, 2))
+        ctk.CTkOptionMenu(
+            self.card,
+            values=["Personal", "Social", "Banking", "Development", "Work", "Gaming", "Shopping"],
+            variable=self.category_var,
+            height=38,
+            fg_color=INPUT_COLOR,
+            button_color=BORDER_COLOR,
+            button_hover_color=FOCUS_BORDER,
+        ).pack(fill="x", padx=40)
+        self.tags_entry = self._build_labeled_entry("Tags", "shopping, retail", pady=(12, 2))
+        self.icon_entry = self._build_labeled_entry("Icon", "globe", pady=(12, 2))
+        ctk.CTkLabel(
+            self.card, text="Secure Notes", font=(APP_FONT, 12), text_color=MUTED_TEXT
+        ).pack(anchor="w", padx=40, pady=(12, 2))
+        self.notes_entry = ctk.CTkTextbox(
+            self.card,
+            height=72,
+            fg_color=INPUT_COLOR,
+            border_color=BORDER_COLOR,
+            border_width=1,
+            corner_radius=8,
+        )
+        self.notes_entry.pack(fill="x", padx=40)
+        self.favorite_var = ctk.BooleanVar(value=False)
+        ctk.CTkCheckBox(
+            self.card,
+            text="Favorite",
+            variable=self.favorite_var,
+            font=(APP_FONT, 12),
+            fg_color=ACCENT_COLOR,
+            hover_color=HOVER_ACCENT_COLOR,
+        ).pack(anchor="w", padx=40, pady=(10, 0))
 
     def _build_labeled_entry(
         self,
@@ -433,7 +479,13 @@ class DashboardWindow(ctk.CTk):
                 text="No passwords saved yet. Start by adding your first credential."
             )
             return
-        self.empty_state_label.configure(text=f"{count} credentials securely stored.")
+        report = self.password_health_service.analyze(self.vault_service.list_all_entries())
+        self.empty_state_label.configure(
+            text=(
+                f"Security {report.score}/100 | Weak {report.weak_passwords} | "
+                f"Duplicates {report.duplicate_passwords} | Old {report.old_passwords}"
+            )
+        )
 
     def toggle_password_visibility(self) -> None:
         self.show_password_value = not self.show_password_value
@@ -513,12 +565,13 @@ class DashboardWindow(ctk.CTk):
     def save_password(self) -> None:
         if self.vault_service is None:
             return
+        title = self.title_entry.get().strip()
         website = self.website_entry.get().strip()
         username = self.email_entry.get().strip()
         password = self.password_entry.get()
         validation = validate_credential_input(
             CredentialInput(
-                title=website,
+                title=title,
                 website=website,
                 username=username,
                 password=password,
@@ -526,7 +579,7 @@ class DashboardWindow(ctk.CTk):
         )
 
         if not validation["title"]:
-            self.flash_error(self.website_entry)
+            self.flash_error(self.title_entry)
         if not validation["website"]:
             self.flash_error(self.website_entry)
         if not validation["username"]:
@@ -537,14 +590,27 @@ class DashboardWindow(ctk.CTk):
             self.toast_manager.show("Please fill all fields", is_error=True)
             return
 
-        action = self.vault_service.save_credential(website, username, password)
-        if action == "updated":
-            self.toast_manager.show("Updated Securely")
-        else:
-            self.toast_manager.show("Saved Securely")
+        self.vault_service.save_entry(
+            title=title,
+            website=website,
+            username=username,
+            password=password,
+            notes=self.notes_entry.get("1.0", "end-1c"),
+            category=self.category_var.get(),
+            tags=self.tags_entry.get().strip(),
+            icon=self.icon_entry.get().strip(),
+            favorite=self.favorite_var.get(),
+        )
+        self.toast_manager.show("Saved Securely")
 
+        self.title_entry.delete(0, "end")
         self.website_entry.delete(0, "end")
+        self.email_entry.delete(0, "end")
         self.password_entry.delete(0, "end")
+        self.tags_entry.delete(0, "end")
+        self.icon_entry.delete(0, "end")
+        self.notes_entry.delete("1.0", "end")
+        self.favorite_var.set(False)
         self.password_var.set("")
         self.refresh_credential_count()
 
@@ -557,18 +623,29 @@ class DashboardWindow(ctk.CTk):
             self.toast_manager.show("Enter website to search", is_error=True)
             return
 
-        credential = self.vault_service.find_credential(website)
-        if credential is None:
+        matches = self.vault_service.search_entries(website)
+        if not matches:
             self.toast_manager.show("No Saved Credentials", is_error=True)
             self.email_entry.delete(0, "end")
             self.password_entry.delete(0, "end")
             return
+        credential = matches[0]
 
+        self.title_entry.delete(0, "end")
+        self.title_entry.insert(0, credential.title)
         self.email_entry.delete(0, "end")
         self.email_entry.insert(0, credential.username)
         self.password_entry.delete(0, "end")
         self.password_entry.insert(0, credential.password)
-        self.toast_manager.show("Entry Found")
+        self.category_var.set(credential.category or "Personal")
+        self.tags_entry.delete(0, "end")
+        self.tags_entry.insert(0, credential.tags)
+        self.icon_entry.delete(0, "end")
+        self.icon_entry.insert(0, credential.icon)
+        self.notes_entry.delete("1.0", "end")
+        self.notes_entry.insert("1.0", credential.notes)
+        self.favorite_var.set(credential.favorite)
+        self.toast_manager.show(f"{len(matches)} matching entries")
 
     def flash_error(self, entry) -> None:
         flash_entry_error(entry, ERROR_COLOR, BORDER_COLOR)
