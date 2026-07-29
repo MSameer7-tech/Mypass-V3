@@ -30,7 +30,16 @@ class Argon2KeyDerivationService:
             lanes=parameters.lanes,
             memory_cost=parameters.memory_cost,
         )
-        return base64.urlsafe_b64encode(kdf.derive(master_password.encode()))
+        # AES-256-GCM requires exactly 32 raw bytes, not a base64-encoded representation.
+        return kdf.derive(master_password.encode())
+
+    def derive_legacy_fernet_key(
+        self,
+        master_password: str,
+        salt: bytes,
+        parameters: ArgonParameters,
+    ) -> bytes:
+        return base64.urlsafe_b64encode(self.derive_key(master_password, salt, parameters))
 
     def serialize_parameters(self, parameters: ArgonParameters) -> str:
         return json.dumps(asdict(parameters))
