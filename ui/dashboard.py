@@ -102,6 +102,7 @@ class DashboardWindow(ctk.CTk):
 
     def _show_login_view(self) -> None:
         self._clear_main_content()
+        self.vault_service = None
         login_view = LoginView(
             self,
             is_first_launch=not self.master_password_service.is_configured(),

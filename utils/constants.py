@@ -5,4 +5,4 @@ WINDOW_HEIGHT = 760
 DATA_DIR_NAME = ".password_manager_data"
 DB_FILE_NAME = "vault.db"
 LEGACY_KEY_FILE_NAME = "vault.key"
-SCHEMA_VERSION = "3.0"
+SCHEMA_VERSION = "4.0"

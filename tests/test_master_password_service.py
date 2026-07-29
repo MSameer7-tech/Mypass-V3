@@ -1,10 +1,12 @@
 import os
 import tempfile
 import unittest
+import json
 
 from database.database import DatabaseManager
 from database.repository import VaultRepository
 from services.master_password_service import InvalidMasterPasswordError, MasterPasswordService
+from utils.constants import SCHEMA_VERSION
 
 
 class FakeArgonParameters:
@@ -41,18 +43,29 @@ class FakeEncryptionService:
         self.key = key.decode()
 
     def encrypt(self, value: str) -> str:
-        return f"{self.key}|{value}"
+        return json.dumps(
+            {
+                "key": self.key,
+                "value": value,
+                "tag": f"tag::{self.key}::{value}",
+            }
+        )
 
     def decrypt(self, value: str) -> str:
-        prefix = f"{self.key}|"
-        if not value.startswith(prefix):
+        payload = json.loads(value)
+        expected_tag = f"tag::{self.key}::{payload['value']}"
+        if payload["key"] != self.key or payload["tag"] != expected_tag:
             raise ValueError("invalid key")
-        return value[len(prefix):]
+        return payload["value"]
 
     @classmethod
     def from_key_file(cls, key_file: str):
         with open(key_file, "rb") as file_handle:
             return cls(file_handle.read())
+
+
+class FakeLegacyEncryptionService(FakeEncryptionService):
+    pass
 
 
 class MasterPasswordServiceTests(unittest.TestCase):
@@ -67,6 +80,7 @@ class MasterPasswordServiceTests(unittest.TestCase):
             encryption_service_factory=FakeEncryptionService,
             legacy_key_file=self.legacy_key_file,
         )
+        self.service.legacy_encryption_service_factory = FakeLegacyEncryptionService
 
     def tearDown(self):
         self.temp_dir.cleanup()
@@ -78,6 +92,7 @@ class MasterPasswordServiceTests(unittest.TestCase):
         self.assertTrue(metadata.salt)
         self.assertNotEqual(metadata.salt, "MySecurePassword123")
         self.assertIn("salt_length=", metadata.argon_parameters)
+        self.assertEqual(metadata.version, SCHEMA_VERSION)
 
     def test_wrong_password_cannot_unlock_vault(self):
         self.service.create_vault_service("MySecurePassword123")
@@ -95,7 +110,7 @@ class MasterPasswordServiceTests(unittest.TestCase):
                 "title": "example.com",
                 "website": "example.com",
                 "username": "user@example.com",
-                "password": "legacy|Secret123!",
+                "password": FakeLegacyEncryptionService(b"legacy").encrypt("Secret123!"),
                 "notes": "",
                 "category": "",
                 "favorite": False,
@@ -109,6 +124,53 @@ class MasterPasswordServiceTests(unittest.TestCase):
 
         self.assertFalse(os.path.exists(self.legacy_key_file))
         self.assertEqual(migrated_entry.password, "Secret123!")
+
+    def test_legacy_fernet_vault_is_upgraded_on_unlock(self):
+        metadata = self.repository.get_metadata()
+        self.repository.update_metadata_security(
+            version="3.0",
+            vault_id=FakeLegacyEncryptionService(b"MySecurePassword123:ssssssss").encrypt("vault-id"),
+            argon_parameters="salt_length=8",
+            salt="ssssssss",
+        )
+        self.repository.create_entry(
+            type("Entry", (), {
+                "id": None,
+                "title": "example.com",
+                "website": "example.com",
+                "username": "user@example.com",
+                "password": FakeLegacyEncryptionService(b"MySecurePassword123:ssssssss").encrypt("Secret123!"),
+                "notes": "",
+                "category": "",
+                "favorite": False,
+                "created_at": "",
+                "updated_at": "",
+            })()
+        )
+
+        vault_service = self.service.unlock_vault("MySecurePassword123")
+        upgraded_metadata = self.repository.get_metadata()
+        upgraded_entry = vault_service.find_credential("example.com")
+
+        self.assertEqual(upgraded_metadata.version, SCHEMA_VERSION)
+        self.assertEqual(upgraded_entry.password, "Secret123!")
+
+    def test_tampered_ciphertext_is_rejected(self):
+        vault_service = self.service.create_vault_service("MySecurePassword123")
+        saved_entry = vault_service.save_entry(
+            title="Personal Gmail",
+            website="gmail.com",
+            username="sameer@gmail.com",
+            password="Secret123!",
+        )
+        stored_entry = self.repository.get_entry_by_id(saved_entry.id)
+        tampered_password = stored_entry.password[:-1] + (
+            "x" if stored_entry.password[-1] != "x" else "y"
+        )
+        self.repository.update_entry_password(saved_entry.id, tampered_password)
+
+        with self.assertRaises(Exception):
+            vault_service.find_credential("gmail.com")
 
 
 if __name__ == "__main__":
