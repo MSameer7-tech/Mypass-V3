@@ -1,0 +1,8 @@
+APP_NAME = "MyPass"
+APP_VERSION = "1.0"
+WINDOW_WIDTH = 720
+WINDOW_HEIGHT = 760
+DATA_DIR_NAME = ".password_manager_data"
+DB_FILE_NAME = "vault.db"
+LEGACY_KEY_FILE_NAME = "vault.key"
+SCHEMA_VERSION = "3.0"
