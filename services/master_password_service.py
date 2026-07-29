@@ -85,7 +85,12 @@ class MasterPasswordService:
         return self.encryption_service_factory(key)
 
     def _build_legacy_encryption_service(self, master_password: str, salt: bytes, parameters):
-        key = self.key_derivation_service.derive_key(master_password, salt, parameters)
+        derive_legacy_key = getattr(
+            self.key_derivation_service,
+            "derive_legacy_fernet_key",
+            self.key_derivation_service.derive_key,
+        )
+        key = derive_legacy_key(master_password, salt, parameters)
         return self.legacy_encryption_service_factory(key)
 
     def _migrate_legacy_key_if_present(self, new_encryption_service) -> None:
