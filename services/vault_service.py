@@ -1,6 +1,6 @@
 from typing import Optional
 
-from database.models import AppMetadataRecord, VaultEntryRecord
+from database.models import AppMetadataRecord, PasswordHistoryRecord, VaultEntryRecord
 from database.repository import VaultRepository
 
 
@@ -57,6 +57,11 @@ class VaultService:
         encrypted_password = self.encryption_service.encrypt(password)
         encrypted_notes = self.encryption_service.encrypt(notes) if notes else ""
         existing_entry = self.repository.get_entry_by_id(entry_id) if entry_id is not None else None
+        if (
+            existing_entry is not None
+            and self.encryption_service.decrypt(existing_entry.password) != password
+        ):
+            self.repository.add_password_history(existing_entry.id, existing_entry.password)
         base_entry = VaultEntryRecord(
             id=entry_id,
             title=title,
@@ -100,6 +105,72 @@ class VaultService:
             if any(normalized_query in self._normalize_search_value(value) for value in searchable_values):
                 matches.append(entry)
         return matches
+
+    def get_password_history(self, entry_id: int) -> list[PasswordHistoryRecord]:
+        return [
+            PasswordHistoryRecord(
+                id=item.id,
+                entry_id=item.entry_id,
+                password=self.encryption_service.decrypt(item.password),
+                created_at=item.created_at,
+            )
+            for item in self.repository.list_password_history(entry_id)
+        ]
+
+    def restore_password_from_history(self, entry_id: int, history_id: int) -> VaultEntryRecord:
+        history = next(
+            (item for item in self.get_password_history(entry_id) if item.id == history_id),
+            None,
+        )
+        if history is None:
+            raise ValueError("Password history entry was not found.")
+        entry = self._decrypt_entry(self.repository.get_entry_by_id(entry_id))
+        return self.save_entry(
+            title=entry.title,
+            website=entry.website,
+            username=entry.username,
+            password=history.password,
+            notes=entry.notes,
+            category=entry.category,
+            tags=entry.tags,
+            icon=entry.icon,
+            favorite=entry.favorite,
+            entry_id=entry_id,
+        )
+
+    def replace_vault_contents(
+        self,
+        entries: list[VaultEntryRecord],
+        history: list[PasswordHistoryRecord],
+    ) -> None:
+        encrypted_entries = [
+            VaultEntryRecord(
+                id=entry.id,
+                title=entry.title,
+                website=entry.website,
+                username=entry.username,
+                password=self.encryption_service.encrypt(entry.password),
+                notes=self.encryption_service.encrypt(entry.notes) if entry.notes else "",
+                category=entry.category,
+                tags=entry.tags,
+                icon=entry.icon,
+                favorite=entry.favorite,
+                created_at=entry.created_at,
+                updated_at=entry.updated_at,
+            )
+            for entry in entries
+        ]
+        entry_ids = self.repository.replace_all_entries(encrypted_entries)
+        encrypted_history = [
+            PasswordHistoryRecord(
+                id=None,
+                entry_id=item.entry_id,
+                password=self.encryption_service.encrypt(item.password),
+                created_at=item.created_at,
+            )
+            for item in history
+        ]
+        self.repository.restore_password_history(encrypted_history, entry_ids)
 
     @staticmethod
     def _normalize_search_value(value: str) -> str:

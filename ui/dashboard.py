@@ -1,4 +1,5 @@
 import platform
+from tkinter import filedialog, messagebox
 
 import customtkinter as ctk
 from PIL import Image, ImageTk
@@ -33,6 +34,8 @@ class DashboardWindow(ctk.CTk):
         master_password_service: MasterPasswordService,
         password_generator: PasswordGenerator,
         password_health_service,
+        backup_service,
+        import_service,
         clipboard_service,
         session_lock_service,
     ):
@@ -41,6 +44,8 @@ class DashboardWindow(ctk.CTk):
         self.vault_service: VaultService | None = None
         self.password_generator = password_generator
         self.password_health_service = password_health_service
+        self.backup_service = backup_service
+        self.import_service = import_service
         self.clipboard_service = clipboard_service
         self.session_lock_service = session_lock_service
         self.show_password_value = False
@@ -48,6 +53,7 @@ class DashboardWindow(ctk.CTk):
         self.footer = None
         self.empty_state_label = None
         self.auto_lock_job = None
+        self.current_entry_id = None
 
         self._configure_window()
         self.password_var = ctk.StringVar()
@@ -201,6 +207,7 @@ class DashboardWindow(ctk.CTk):
         ).pack(anchor="w")
 
     def _build_form(self) -> None:
+        self.current_entry_id = None
         self.title_entry = self._build_labeled_entry(
             "Title",
             "Amazon Shopping",
@@ -221,6 +228,7 @@ class DashboardWindow(ctk.CTk):
         self._build_strength_section()
         self._build_entry_metadata()
         self._build_button_row()
+        self._build_vault_actions()
         ctk.CTkLabel(
             self.card,
             text="Passwords are securely stored locally.",
@@ -442,6 +450,26 @@ class DashboardWindow(ctk.CTk):
             command=self.save_password,
         ).pack(side="right", expand=True, fill="x", padx=(6, 0))
 
+    def _build_vault_actions(self) -> None:
+        action_frame = ctk.CTkFrame(self.card, fg_color="transparent")
+        action_frame.pack(fill="x", padx=40, pady=(0, 14))
+        for text, command in (
+            ("History", self.show_password_history),
+            ("Backup", self.create_backup),
+            ("Restore", self.restore_backup),
+            ("Import", self.import_passwords),
+        ):
+            ctk.CTkButton(
+                action_frame,
+                text=text,
+                height=34,
+                fg_color=INPUT_COLOR,
+                hover_color=BORDER_COLOR,
+                border_width=1,
+                border_color=BORDER_COLOR,
+                command=command,
+            ).pack(side="left", expand=True, fill="x", padx=3)
+
     def _build_footer(self) -> None:
         self.footer = ctk.CTkFrame(self, fg_color="transparent", height=40)
         self.footer.pack(fill="x", side="bottom", padx=20, pady=10)
@@ -590,7 +618,8 @@ class DashboardWindow(ctk.CTk):
             self.toast_manager.show("Please fill all fields", is_error=True)
             return
 
-        self.vault_service.save_entry(
+        is_update = self.current_entry_id is not None
+        saved_entry = self.vault_service.save_entry(
             title=title,
             website=website,
             username=username,
@@ -600,8 +629,10 @@ class DashboardWindow(ctk.CTk):
             tags=self.tags_entry.get().strip(),
             icon=self.icon_entry.get().strip(),
             favorite=self.favorite_var.get(),
+            entry_id=self.current_entry_id,
         )
-        self.toast_manager.show("Saved Securely")
+        self.current_entry_id = saved_entry.id
+        self.toast_manager.show("Updated securely" if is_update else "Saved securely")
 
         self.title_entry.delete(0, "end")
         self.website_entry.delete(0, "end")
@@ -611,6 +642,7 @@ class DashboardWindow(ctk.CTk):
         self.icon_entry.delete(0, "end")
         self.notes_entry.delete("1.0", "end")
         self.favorite_var.set(False)
+        self.current_entry_id = None
         self.password_var.set("")
         self.refresh_credential_count()
 
@@ -630,6 +662,7 @@ class DashboardWindow(ctk.CTk):
             self.password_entry.delete(0, "end")
             return
         credential = matches[0]
+        self.current_entry_id = credential.id
 
         self.title_entry.delete(0, "end")
         self.title_entry.insert(0, credential.title)
@@ -646,6 +679,107 @@ class DashboardWindow(ctk.CTk):
         self.notes_entry.insert("1.0", credential.notes)
         self.favorite_var.set(credential.favorite)
         self.toast_manager.show(f"{len(matches)} matching entries")
+
+    def show_password_history(self) -> None:
+        if self.vault_service is None or self.current_entry_id is None:
+            self.toast_manager.show("Find an entry to view its history", is_error=True)
+            return
+        history = self.vault_service.get_password_history(self.current_entry_id)
+        if not history:
+            self.toast_manager.show("No previous passwords", is_error=True)
+            return
+        dialog = ctk.CTkToplevel(self)
+        dialog.title("Password History")
+        dialog.geometry("480x360")
+        dialog.configure(fg_color=CARD_COLOR)
+        dialog.transient(self)
+        selected_history_id = ctk.StringVar(value=str(history[0].id))
+        ctk.CTkLabel(dialog, text="Password History", font=(APP_FONT, 18, "bold")).pack(
+            anchor="w", padx=24, pady=(24, 12)
+        )
+        for item in history:
+            ctk.CTkRadioButton(
+                dialog,
+                text=f"{item.created_at[:10]}    {'*' * min(len(item.password), 16)}",
+                variable=selected_history_id,
+                value=str(item.id),
+            ).pack(anchor="w", padx=24, pady=5)
+
+        def restore_selected() -> None:
+            if not messagebox.askyesno("Restore password", "Restore this password?", parent=dialog):
+                return
+            restored = self.vault_service.restore_password_from_history(
+                self.current_entry_id, int(selected_history_id.get())
+            )
+            self.password_entry.delete(0, "end")
+            self.password_entry.insert(0, restored.password)
+            dialog.destroy()
+            self.refresh_credential_count()
+            self.toast_manager.show("Previous password restored")
+
+        ctk.CTkButton(
+            dialog, text="Restore Selected", command=restore_selected, fg_color=ACCENT_COLOR
+        ).pack(fill="x", padx=24, pady=20)
+
+    def create_backup(self) -> None:
+        if self.vault_service is None:
+            return
+        backup_path = filedialog.asksaveasfilename(
+            parent=self,
+            defaultextension=".backup",
+            filetypes=[("MyPass encrypted backup", "*.backup")],
+        )
+        if not backup_path:
+            return
+        try:
+            self.backup_service.create_backup(self.vault_service, backup_path)
+        except Exception as error:
+            self.toast_manager.show(str(error), is_error=True)
+            return
+        self.toast_manager.show("Encrypted backup created")
+
+    def restore_backup(self) -> None:
+        if self.vault_service is None:
+            return
+        backup_path = filedialog.askopenfilename(
+            parent=self, filetypes=[("MyPass encrypted backup", "*.backup")]
+        )
+        if not backup_path:
+            return
+        if not messagebox.askyesno(
+            "Restore backup", "Replace the current vault with this backup?", parent=self
+        ):
+            return
+        try:
+            self.backup_service.restore_backup(self.vault_service, backup_path)
+        except Exception as error:
+            self.toast_manager.show("Could not restore this backup", is_error=True)
+            return
+        self.current_entry_id = None
+        self.refresh_credential_count()
+        self.toast_manager.show("Backup restored")
+
+    def import_passwords(self) -> None:
+        if self.vault_service is None:
+            return
+        source_prompt = ctk.CTkInputDialog(
+            text="Source: Chrome, Edge, Firefox, Bitwarden, KeePass, or CSV", title="Import Passwords"
+        )
+        source = source_prompt.get_input()
+        if not source:
+            return
+        source_lookup = {item.lower(): item for item in self.import_service.SUPPORTED_SOURCES}
+        source = source_lookup.get(source.strip().lower(), source.strip())
+        csv_path = filedialog.askopenfilename(parent=self, filetypes=[("CSV files", "*.csv")])
+        if not csv_path:
+            return
+        try:
+            count = self.import_service.import_csv(self.vault_service, csv_path, source)
+        except Exception as error:
+            self.toast_manager.show(str(error), is_error=True)
+            return
+        self.refresh_credential_count()
+        self.toast_manager.show(f"Imported {count} encrypted entries")
 
     def flash_error(self, entry) -> None:
         flash_entry_error(entry, ERROR_COLOR, BORDER_COLOR)

@@ -3,6 +3,8 @@ from crypto.clipboard import ClipboardService
 from database.database import DatabaseManager
 from database.repository import VaultRepository
 from services.master_password_service import MasterPasswordService
+from services.backup_service import BackupService
+from services.import_service import ImportService
 from services.password_generator import PasswordGenerator
 from services.password_health import PasswordHealthService
 from services.session_lock import SessionLockService
@@ -29,12 +31,16 @@ def create_app() -> DashboardWindow:
     clipboard_service = ClipboardService(clear_after_seconds=CLIPBOARD_CLEAR_SECONDS)
     password_generator = PasswordGenerator()
     password_health_service = PasswordHealthService()
+    backup_service = BackupService()
+    import_service = ImportService()
     session_lock_service = SessionLockService(timeout_seconds=DEFAULT_AUTO_LOCK_SECONDS)
 
     return DashboardWindow(
         master_password_service=master_password_service,
         password_generator=password_generator,
         password_health_service=password_health_service,
+        backup_service=backup_service,
+        import_service=import_service,
         clipboard_service=clipboard_service,
         session_lock_service=session_lock_service,
     )
