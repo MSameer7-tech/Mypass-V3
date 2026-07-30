@@ -106,6 +106,9 @@ class VaultService:
                 matches.append(entry)
         return matches
 
+    def delete_entry(self, entry_id: int) -> None:
+        self.repository.delete_entry_by_id(entry_id)
+
     def get_password_history(self, entry_id: int) -> list[PasswordHistoryRecord]:
         return [
             PasswordHistoryRecord(

@@ -72,6 +72,7 @@ class DatabaseManager:
             self._ensure_entry_columns(cursor)
             self._migrate_legacy_credentials(cursor)
             self._ensure_metadata(cursor)
+            self._ensure_biometric_metadata(cursor)
 
     def _ensure_entry_columns(self, cursor: sqlite3.Cursor) -> None:
         cursor.execute("PRAGMA table_info(vault_entries)")
@@ -127,6 +128,21 @@ class DatabaseManager:
             """,
             (SCHEMA_VERSION, created, str(uuid.uuid4()), "{}", ""),
         )
+
+    def _ensure_biometric_metadata(self, cursor: sqlite3.Cursor) -> None:
+        cursor.execute("PRAGMA table_info(app_metadata)")
+        column_names = {row[1] for row in cursor.fetchall()}
+        
+        if "biometric_enabled" not in column_names:
+            cursor.execute("ALTER TABLE app_metadata ADD COLUMN biometric_enabled INTEGER NOT NULL DEFAULT 0")
+        if "biometric_platform" not in column_names:
+            cursor.execute("ALTER TABLE app_metadata ADD COLUMN biometric_platform TEXT")
+        if "biometric_enrolled_at" not in column_names:
+            cursor.execute("ALTER TABLE app_metadata ADD COLUMN biometric_enrolled_at REAL")
+        if "biometric_prompt_state" not in column_names:
+            cursor.execute("ALTER TABLE app_metadata ADD COLUMN biometric_prompt_state TEXT NOT NULL DEFAULT 'never'")
+        if "last_master_password_change" not in column_names:
+            cursor.execute("ALTER TABLE app_metadata ADD COLUMN last_master_password_change TEXT")
 
     def _timestamp(self) -> str:
         return datetime.now(UTC).isoformat()

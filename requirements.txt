@@ -14,6 +14,7 @@ macholib==1.16.4
 packaging==26.2
 pillow==12.2.0
 pycparser==3.0
+PySide6>=6.5.0
 pyinstaller==6.20.0
 pyinstaller-hooks-contrib==2026.5
 pyperclip==1.11.0
@@ -22,3 +23,6 @@ setuptools==82.0.1
 tinycss2==1.5.1
 urllib3==2.7.0
 webencodings==0.5.1
+keyring==25.2.1
+pyobjc-framework-LocalAuthentication ; sys_platform == 'darwin'
+winrt-Windows.Security.Credentials.UI ; sys_platform == 'win32'

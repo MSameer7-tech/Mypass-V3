@@ -80,6 +80,70 @@ class MasterPasswordService:
             )
         return VaultService(self.repository, encryption_service)
 
+    def change_master_password(self, current_password: str, new_password: str) -> VaultService:
+        if current_password == new_password:
+            raise ValueError("New password must be different from current password.")
+
+        metadata = self.repository.get_metadata()
+        parameters = self.key_derivation_service.deserialize_parameters(metadata.argon_parameters)
+        salt = self.key_derivation_service.decode_salt(metadata.salt)
+
+        try:
+            old_encryption_service = self._build_encryption_service(current_password, salt, parameters)
+            decrypted_vault_id = old_encryption_service.decrypt(metadata.vault_id)
+        except Exception as error:
+            raise InvalidMasterPasswordError("Wrong current master password.") from error
+
+        # Validate that the derived vault_id is correct (extra safety)
+        try:
+            uuid.UUID(decrypted_vault_id)
+        except ValueError:
+            raise InvalidMasterPasswordError("Vault ID decryption failed. Wrong current master password.")
+
+        new_parameters = self.key_derivation_service.default_parameters()
+        new_salt = self.key_derivation_service.generate_salt(new_parameters.salt_length)
+        new_encryption_service = self._build_encryption_service(new_password, new_salt, new_parameters)
+
+        encrypted_vault_id = new_encryption_service.encrypt(decrypted_vault_id)
+        
+        # Verify the new key works properly before committing
+        verify_decrypted = new_encryption_service.decrypt(encrypted_vault_id)
+        if verify_decrypted != decrypted_vault_id:
+            raise RuntimeError("New encryption service failed validation. Aborting.")
+
+        encrypted_entries_data = []
+        entries = self.repository.list_all_entries()
+        for entry in entries:
+            dec_password = old_encryption_service.decrypt(entry.password)
+            enc_password = new_encryption_service.encrypt(dec_password)
+            
+            enc_notes = ""
+            if entry.notes:
+                dec_notes = old_encryption_service.decrypt(entry.notes)
+                enc_notes = new_encryption_service.encrypt(dec_notes)
+                
+            updated_at = self.repository._timestamp()
+            encrypted_entries_data.append((entry.id, enc_password, enc_notes, updated_at))
+
+        encrypted_history_data = []
+        for entry in entries:
+            history = self.repository.list_password_history(entry.id)
+            for h in history:
+                dec_h_password = old_encryption_service.decrypt(h.password)
+                enc_h_password = new_encryption_service.encrypt(dec_h_password)
+                encrypted_history_data.append((h.id, enc_h_password))
+
+        self.repository.update_vault_crypto_transaction(
+            version=SCHEMA_VERSION,
+            vault_id=encrypted_vault_id,
+            argon_parameters=self.key_derivation_service.serialize_parameters(new_parameters),
+            salt=self.key_derivation_service.encode_salt(new_salt),
+            encrypted_entries_data=encrypted_entries_data,
+            encrypted_history_data=encrypted_history_data,
+        )
+
+        return VaultService(self.repository, new_encryption_service)
+
     def _build_encryption_service(self, master_password: str, salt: bytes, parameters):
         key = self.key_derivation_service.derive_key(master_password, salt, parameters)
         return self.encryption_service_factory(key)
