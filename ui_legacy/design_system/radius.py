@@ -1,0 +1,3 @@
+SMALL = 8
+MEDIUM = 12
+LARGE = 16

@@ -19,7 +19,8 @@ class FakeKeyDerivationService:
         return FakeArgonParameters()
 
     def generate_salt(self, length: int) -> bytes:
-        return b"s" * length
+        import os
+        return os.urandom(length).hex()[:length].encode('utf-8')
 
     def derive_key(self, master_password: str, salt: bytes, parameters) -> bytes:
         return f"{master_password}:{salt.decode()}".encode()
@@ -205,6 +206,58 @@ class MasterPasswordServiceTests(unittest.TestCase):
 
         self.assertNotEqual(stored_entry.notes, "Network key: secure-note")
         self.assertEqual(vault_service.find_credential("local-network").notes, "Network key: secure-note")
+
+    def test_change_master_password_success(self):
+        vault_service = self.service.create_vault_service("MySecurePassword123")
+        saved_entry = vault_service.save_entry(
+            title="Personal Gmail",
+            website="gmail.com",
+            username="sameer@gmail.com",
+            password="Secret123!",
+            notes="Secure notes here"
+        )
+        old_metadata = self.repository.get_metadata()
+        
+        # Change password
+        new_vault_service = self.service.change_master_password("MySecurePassword123", "NewPassword456")
+        
+        # Verify metadata was updated
+        new_metadata = self.repository.get_metadata()
+        self.assertNotEqual(old_metadata.salt, new_metadata.salt)
+        self.assertIsNotNone(new_metadata.last_master_password_change)
+        
+        # Verify entry can be decrypted with new service
+        entry = new_vault_service.find_credential("gmail.com")
+        self.assertEqual(entry.password, "Secret123!")
+        self.assertEqual(entry.notes, "Secure notes here")
+        
+        # Verify old password no longer works
+        with self.assertRaises(InvalidMasterPasswordError):
+            self.service.unlock_vault("MySecurePassword123")
+            
+        # Verify new password works
+        self.assertIsNotNone(self.service.unlock_vault("NewPassword456"))
+
+    def test_change_master_password_wrong_current(self):
+        self.service.create_vault_service("MySecurePassword123")
+        with self.assertRaises(InvalidMasterPasswordError):
+            self.service.change_master_password("WrongPassword", "NewPassword456")
+
+    def test_change_master_password_same_password(self):
+        self.service.create_vault_service("MySecurePassword123")
+        with self.assertRaises(ValueError):
+            self.service.change_master_password("MySecurePassword123", "MySecurePassword123")
+
+    def test_change_master_password_interrupted_reencryption(self):
+        self.service.create_vault_service("MySecurePassword123")
+        # To simulate interruption, we mock the update_vault_crypto_transaction to raise an exception
+        with unittest.mock.patch.object(self.repository, "update_vault_crypto_transaction", side_effect=Exception("Database error")):
+            with self.assertRaises(Exception):
+                self.service.change_master_password("MySecurePassword123", "NewPassword456")
+                
+        # Verify old password still works (i.e. transaction rolled back or never committed)
+        vault_service = self.service.unlock_vault("MySecurePassword123")
+        self.assertIsNotNone(vault_service)
 
 
 if __name__ == "__main__":

@@ -8,8 +8,14 @@ def ensure_directory(path: str) -> str:
 
 
 def build_data_path(*parts: str) -> str:
-    home_dir = os.path.expanduser("~")
-    return os.path.join(home_dir, *parts)
+    base_dir = os.environ.get("MYPASS_DATA_DIR")
+    if not base_dir:
+        home_dir = os.path.expanduser("~")
+        if not os.access(home_dir, os.W_OK):
+            base_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ".local_data")
+        else:
+            base_dir = home_dir
+    return os.path.join(base_dir, *parts)
 
 
 def resource_path(relative_path: str) -> str:

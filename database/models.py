@@ -25,6 +25,11 @@ class AppMetadataRecord:
     vault_id: str
     argon_parameters: str
     salt: str
+    biometric_enabled: bool = False
+    biometric_platform: str | None = None
+    biometric_enrolled_at: float | None = None
+    biometric_prompt_state: str = "never"
+    last_master_password_change: str | None = None
 
 
 @dataclass(frozen=True)

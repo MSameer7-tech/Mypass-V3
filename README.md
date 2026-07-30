@@ -178,6 +178,7 @@ Official installers are available from [GitHub Releases](../../releases).
 * **Passwords remain stored locally.**
 * **AES encryption protects sensitive information.**
 * **SQLite acts as the secure vault backend.**
+* **Breach Detection Privacy:** Passwords are never transmitted for breach checking. Only the first five characters of the SHA-1 hash are sent to HaveIBeenPwned using the k-Anonymity protocol.
 
 ---
 

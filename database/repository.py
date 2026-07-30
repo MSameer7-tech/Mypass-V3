@@ -20,13 +20,26 @@ class VaultRepository:
             cursor = connection.cursor()
             cursor.execute(
                 """
-                SELECT version, created, vault_id, argon_parameters, salt
+                SELECT version, created, vault_id, argon_parameters, salt, 
+                       biometric_enabled, biometric_platform, biometric_enrolled_at,
+                       biometric_prompt_state, last_master_password_change
                 FROM app_metadata
                 WHERE id = 1
                 """
             )
             row = cursor.fetchone()
-            return AppMetadataRecord(*row)
+            return AppMetadataRecord(
+                version=row[0],
+                created=row[1],
+                vault_id=row[2],
+                argon_parameters=row[3],
+                salt=row[4],
+                biometric_enabled=bool(row[5]),
+                biometric_platform=row[6],
+                biometric_enrolled_at=row[7],
+                biometric_prompt_state=row[8],
+                last_master_password_change=row[9],
+            )
 
     def update_metadata_security(
         self,
@@ -45,6 +58,67 @@ class VaultRepository:
                 WHERE id = 1
                 """,
                 (version, vault_id, argon_parameters, salt),
+            )
+
+    def update_biometric_metadata(
+        self,
+        *,
+        enabled: bool,
+        platform: str | None = None,
+        enrolled_at: float | None = None,
+    ) -> None:
+        with self.database_manager.connect() as connection:
+            cursor = connection.cursor()
+            cursor.execute(
+                """
+                UPDATE app_metadata
+                SET biometric_enabled = ?, biometric_platform = ?, biometric_enrolled_at = ?
+                WHERE id = 1
+                """,
+                (int(enabled), platform, enrolled_at),
+            )
+
+    def update_vault_crypto_transaction(self, version, vault_id, argon_parameters, salt, encrypted_entries_data, encrypted_history_data) -> None:
+        with self.database_manager.connect() as connection:
+            cursor = connection.cursor()
+            # 1. Update metadata
+            cursor.execute(
+                """
+                UPDATE app_metadata
+                SET version = ?, vault_id = ?, argon_parameters = ?, salt = ?, last_master_password_change = ?
+                WHERE id = 1
+                """,
+                (version, vault_id, argon_parameters, salt, self._timestamp()),
+            )
+            
+            # 2. Update entries
+            for entry_id, new_password, new_notes, updated_at in encrypted_entries_data:
+                cursor.execute(
+                    "UPDATE vault_entries SET password = ?, notes = ?, updated_at = ? WHERE id = ?",
+                    (new_password, new_notes, updated_at, entry_id),
+                )
+                
+            # 3. Update history
+            for history_id, new_password in encrypted_history_data:
+                cursor.execute(
+                    "UPDATE password_history SET password = ? WHERE id = ?",
+                    (new_password, history_id),
+                )
+
+    def update_biometric_prompt_state(self, state: str) -> None:
+        with self.database_manager.connect() as connection:
+            cursor = connection.cursor()
+            cursor.execute(
+                "UPDATE app_metadata SET biometric_prompt_state = ? WHERE id = 1",
+                (state,),
+            )
+
+    def update_last_master_password_change(self) -> None:
+        with self.database_manager.connect() as connection:
+            cursor = connection.cursor()
+            cursor.execute(
+                "UPDATE app_metadata SET last_master_password_change = ? WHERE id = 1",
+                (self._timestamp(),),
             )
 
     def get_entry_by_id(self, entry_id: int) -> Optional[VaultEntryRecord]:
@@ -214,6 +288,12 @@ class VaultRepository:
                 "UPDATE vault_entries SET notes = ?, updated_at = ? WHERE id = ?",
                 (notes, self._timestamp(), entry_id),
             )
+
+    def delete_entry_by_id(self, entry_id: int) -> None:
+        with self.database_manager.connect() as connection:
+            cursor = connection.cursor()
+            cursor.execute("DELETE FROM password_history WHERE entry_id = ?", (entry_id,))
+            cursor.execute("DELETE FROM vault_entries WHERE id = ?", (entry_id,))
 
     def add_password_history(self, entry_id: int, password: str) -> PasswordHistoryRecord:
         created_at = self._timestamp()
