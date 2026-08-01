@@ -182,3 +182,7 @@ class AssetManager(QObject):
             
         task = FaviconFetchTask(domain, entry_id, self._disk_cache_dir, _on_fetched)
         self._thread_pool.start(task)
+
+    def get_icon(self, entry_id: str, website: str, force_refresh: bool = False):
+        """Backwards-compatible alias for get_favicon."""
+        return self.get_favicon(entry_id, website, force_refresh=force_refresh)
