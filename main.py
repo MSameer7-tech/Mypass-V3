@@ -1,4 +1,4 @@
-from app_legacy import main
+from app_qt import main
 
 
 if __name__ == "__main__":
