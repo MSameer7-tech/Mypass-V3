@@ -8,6 +8,7 @@ from ui.viewmodels.entry_details_viewmodel import EntryDetailsViewModel
 from ui.workspace.entry_details_coordinator import EntryDetailsCoordinator
 from ui.resources.styles.layout_constants import Layout
 from ui.resources.styles.themes import ThemeManager
+from ui.resources.icons import Icons
 from ui.actions.action_manager import ActionManager
 from ui.actions.vault import VaultActions
 
