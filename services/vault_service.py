@@ -109,6 +109,12 @@ class VaultService:
     def delete_entry(self, entry_id: int) -> None:
         self.repository.delete_entry_by_id(entry_id)
 
+    def get_entry(self, entry_id: int) -> Optional[VaultEntryRecord]:
+        stored_record = self.repository.get_entry_by_id(entry_id)
+        if stored_record is None:
+            return None
+        return self._decrypt_entry(stored_record)
+
     def get_password_history(self, entry_id: int) -> list[PasswordHistoryRecord]:
         return [
             PasswordHistoryRecord(

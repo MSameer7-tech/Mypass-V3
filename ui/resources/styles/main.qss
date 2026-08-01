@@ -1,0 +1,185 @@
+/* Global Application Font */
+* {
+    font-family: "{{ font_family }}";
+}
+
+/* -------------------------------------------------------------------------
+   ROOT WINDOW & BASE FRAME
+   ------------------------------------------------------------------------- */
+QMainWindow, QDialog {
+    background-color: {{ background }};
+    color: {{ text_primary }};
+}
+
+QWidget#BaseFrame {
+    background-color: transparent;
+}
+
+/* -------------------------------------------------------------------------
+   TYPOGRAPHY
+   ------------------------------------------------------------------------- */
+QLabel {
+    color: {{ text_primary }};
+}
+
+QLabel#Caption {
+    color: {{ text_secondary }};
+}
+
+QLabel#Overline {
+    color: {{ text_secondary }};
+    text-transform: uppercase;
+}
+
+/* -------------------------------------------------------------------------
+   BUTTONS
+   ------------------------------------------------------------------------- */
+QPushButton {
+    border: none;
+}
+
+QPushButton:disabled {
+    opacity: {{ opacity_disabled }};
+}
+
+/* Primary Button */
+QPushButton#PrimaryButton {
+    background-color: {{ accent }};
+    color: #FFFFFF; /* Primary button text is always white */
+    border-radius: {{ radius_medium }}px;
+    padding: 0px 16px;
+    height: {{ button_height }}px;
+}
+
+QPushButton#PrimaryButton:hover {
+    background-color: {{ accent_hover }};
+}
+
+QPushButton#PrimaryButton:pressed {
+    background-color: {{ accent }}; /* Adjust with overlay in code later if needed */
+}
+
+/* Secondary Button */
+QPushButton#SecondaryButton {
+    background-color: {{ surface_elevated }};
+    color: {{ text_primary }};
+    border: 1px solid {{ border }};
+    border-radius: {{ radius_medium }}px;
+    padding: 0px 16px;
+    height: {{ button_height }}px;
+}
+
+QPushButton#SecondaryButton:hover {
+    background-color: {{ border }};
+}
+
+/* Icon Button */
+QPushButton#IconButton {
+    background-color: transparent;
+    border-radius: 12px;
+}
+
+QPushButton#IconButton:hover {
+    background-color: {{ surface_elevated }};
+}
+
+QPushButton#IconButton:pressed {
+    background-color: {{ accent }}1A; /* 10% opacity hex */
+}
+
+/* -------------------------------------------------------------------------
+   INPUTS
+   ------------------------------------------------------------------------- */
+QLineEdit {
+    background-color: {{ input_bg }};
+    color: {{ text_primary }};
+    border: 1px solid transparent;
+    border-radius: {{ radius_small }}px;
+    padding: 0px 12px;
+    height: {{ input_height }}px;
+}
+
+QLineEdit:hover {
+    border: 1px solid {{ border }};
+}
+
+QLineEdit:focus {
+    border: 1px solid {{ accent }};
+    background-color: {{ surface }};
+}
+
+QLineEdit:disabled {
+    color: {{ text_secondary }};
+}
+
+/* Search Field (Custom overrides if needed) */
+QLineEdit#SearchField {
+    padding-left: 36px;
+}
+
+/* -------------------------------------------------------------------------
+   LAYOUT
+   ------------------------------------------------------------------------- */
+/* Card */
+QFrame#Card {
+    background-color: {{ surface_elevated }};
+    border-radius: {{ radius_large }}px;
+    border: 1px solid {{ border }};
+}
+
+/* Dividers */
+QFrame#DividerH {
+    background-color: {{ border }};
+    max-height: 1px;
+    min-height: 1px;
+}
+
+QFrame#DividerV {
+    background-color: {{ border }};
+    max-width: 1px;
+    min-width: 1px;
+}
+
+/* -------------------------------------------------------------------------
+   INDICATORS
+   ------------------------------------------------------------------------- */
+/* Badges */
+QLabel#Badge {
+    border-radius: {{ radius_small }}px;
+    padding: 2px 8px;
+}
+
+QLabel#Badge[variant="success"] {
+    background-color: {{ success }}33; /* 20% opacity hex approximation */
+    color: {{ success }};
+    border: 1px solid {{ success }};
+}
+
+QLabel#Badge[variant="warning"] {
+    background-color: {{ warning }}33;
+    color: {{ warning }};
+    border: 1px solid {{ warning }};
+}
+
+QLabel#Badge[variant="error"] {
+    background-color: {{ danger }}33;
+    color: {{ danger }};
+    border: 1px solid {{ danger }};
+}
+
+QLabel#Badge[variant="info"] {
+    background-color: {{ accent }}33;
+    color: {{ accent }};
+    border: 1px solid {{ accent }};
+}
+
+QLabel#Badge[variant="primary"] {
+    background-color: {{ accent }};
+    color: #FFFFFF;
+}
+
+QLabel#Badge[variant="neutral"] {
+    background-color: {{ surface_elevated }};
+    color: {{ text_secondary }};
+    border: 1px solid {{ border }};
+}
