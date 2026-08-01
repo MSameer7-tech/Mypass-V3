@@ -83,7 +83,7 @@ class AssetManager(QObject):
         """
         return Resources.icon(identifier, color_hex=color_hex)
         
-    def get_favicon(self, entry_id: int, url: str, fallback_title: str = "", size: int = 24) -> QIcon:
+    def get_favicon(self, entry_id: int, url: str, fallback_title: str = "", size: int = 24, *args, **kwargs) -> QIcon:
         """
         Returns cached favicon if available in Memory or Disk.
         Otherwise immediately returns a monogram QIcon and initiates async fetch.
@@ -112,15 +112,17 @@ class AssetManager(QObject):
             self._pending_fetches.add(domain)
             self._fetch_favicon_async(domain, entry_id)
             
-        # 4. Monogram Fallback Immediately
-        monogram = self.get_monogram_icon(fallback_title or domain, size=size)
-        return monogram
+        # 4. Immediate Fallback Monogram while network loads
+        return self.get_monogram_icon(fallback_title or (domain[0].upper() if domain else "V"), size=size)
         
-    def get_monogram_icon(self, text: str, size: int = 48, color_hex: str = None) -> QIcon:
-        """Generates a crisp monogram QIcon badge with the first letter of text."""
-        if not text:
-            text = "V"
-        letter = text[0].upper()
+    def get_monogram_icon(self, letter: str, size: int = 24, color_hex: str = None) -> QIcon:
+        """
+        Generates a crisp monogram letter badge as a QIcon.
+        Used as instant fallback when website favicons are not yet loaded.
+        """
+        if not letter:
+            letter = "V"
+        letter = letter[0].upper()
         
         try:
             bg_color = QColor(ThemeManager.colors().surface_elevated)
@@ -149,7 +151,7 @@ class AssetManager(QObject):
         font = QFont("SF Pro Display", max(10, size // 2), QFont.Bold)
         painter.setFont(font)
         painter.setPen(fg_color)
-        painter.drawText(0, 0, size, size, Qt.AlignCenter, letter)
+        painter.drawText(pixmap.rect(), Qt.AlignCenter, letter)
         painter.end()
         
         return QIcon(pixmap)
@@ -183,6 +185,6 @@ class AssetManager(QObject):
         task = FaviconFetchTask(domain, entry_id, self._disk_cache_dir, _on_fetched)
         self._thread_pool.start(task)
 
-    def get_icon(self, entry_id: str, website: str, force_refresh: bool = False):
+    def get_icon(self, *args, **kwargs):
         """Backwards-compatible alias for get_favicon."""
-        return self.get_favicon(entry_id, website, force_refresh=force_refresh)
+        return self.get_favicon(*args, **kwargs)
