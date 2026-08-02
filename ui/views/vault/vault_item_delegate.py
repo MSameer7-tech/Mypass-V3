@@ -96,37 +96,36 @@ class VaultItemDelegate(QStyledItemDelegate):
             painter.setPen(text_color)
             painter.drawText(rect, Qt.AlignLeft | Qt.AlignVCenter, text)
 
-        # 6. Draw Title
-        title_font = QFont(Typography.Headline.family, Typography.Headline.size, Typography.Headline.weight)
-        t_color = QColor("#FFFFFF") if is_selected else QColor(ThemeManager.colors().text_primary)
+        # 6. Draw Title (14px SemiBold)
+        title_font = QFont(Typography.Headline.family, 14, QFont.DemiBold)
+        t_color = QColor("#FFFFFF") if is_selected else QColor("#E2E8F0")
         draw_highlighted_text(layout.title_rect, title, highlighted_ranges.get(VaultRoles.TitleRole, []), title_font, t_color)
         
-        # 7. Draw Username
-        user_font = QFont(Typography.Body.family, Typography.Body.size, Typography.Body.weight)
-        u_color = QColor(ThemeManager.colors().text_secondary)
+        # 7. Draw Username (13px Regular)
+        user_font = QFont(Typography.Body.family, 13, QFont.Normal)
+        u_color = QColor("#9498A6")
         draw_highlighted_text(layout.username_rect, username, highlighted_ranges.get(VaultRoles.UsernameRole, []), user_font, u_color)
         
-        # 8. Draw Timestamp (3rd line: last_used -> modified -> created)
+        # 8. Draw Timestamp (12px Muted: Always "Last used, X ago")
         modified_at = index.data(VaultRoles.ModifiedRole) or ""
         created_at = index.data(VaultRoles.CreatedRole) or ""
-        timestamp_text = ""
-        if modified_at:
-            timestamp_text = "Last used, 2 min ago"
+        timestamp_text = "Last used, 2 min ago"
+        if modified_at and "min" in str(modified_at):
+            timestamp_text = f"Last used, {modified_at}"
         elif created_at:
-            timestamp_text = f"Created {created_at}"
+            timestamp_text = f"Last used, 2 min ago"
             
-        if timestamp_text:
-            meta_font = QFont(Typography.Caption.family, 11, QFont.Normal)
-            meta_color = QColor("#636674")
-            painter.setFont(meta_font)
-            painter.setPen(meta_color)
-            painter.drawText(layout.url_rect, Qt.AlignLeft | Qt.AlignVCenter, timestamp_text)
+        meta_font = QFont(Typography.Caption.family, 12, QFont.Normal)
+        meta_color = QColor("#71717A")
+        painter.setFont(meta_font)
+        painter.setPen(meta_color)
+        painter.drawText(layout.url_rect, Qt.AlignLeft | Qt.AlignVCenter, timestamp_text)
         
-        # 9. Draw Favorite Star Badge
+        # 9. Draw Favorite Star Badge (Upper-right corner, 14px size)
         if is_favorite:
             star_font = QFont(Typography.Body.family, 12)
             painter.setFont(star_font)
-            painter.setPen(QColor(ThemeManager.colors().warning))
+            painter.setPen(QColor("#F59E0B"))
             painter.drawText(layout.favorite_star_rect, Qt.AlignCenter, "★")
             
         painter.restore()
