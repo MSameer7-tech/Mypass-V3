@@ -5,19 +5,19 @@ class VaultDelegateMetrics:
     """
     Design constants for rendering the VaultItemDelegate cards.
     """
-    ROW_HEIGHT = 80
-    CARD_MARGIN_X = 16          # 16px margin from pane edges
-    CARD_MARGIN_Y = 4           # Half of card gap (4 top + 4 bottom = 8px gap)
+    ROW_HEIGHT = 74
+    CARD_MARGIN_X = 12          # 12px margin from pane edges
+    CARD_MARGIN_Y = 3           # 3px top/bottom margin
     CARD_RADIUS = 12
-    CARD_PADDING_X = 16
-    CARD_PADDING_Y = 12
+    CARD_PADDING_X = 12
+    CARD_PADDING_Y = 10
     
-    ICON_CONTAINER_SIZE = 40
-    ICON_SIZE = 24
-    ICON_RADIUS = 10
-    ICON_MARGIN_RIGHT = 14
+    ICON_CONTAINER_SIZE = 48
+    ICON_SIZE = 28
+    ICON_RADIUS = 12
+    ICON_MARGIN_RIGHT = 12
     
-    TITLE_TO_SUBTITLE_GAP = 4
+    TITLE_TO_SUBTITLE_GAP = 2
     SUBTITLE_TO_META_GAP = 2
     
     FAVORITE_STAR_SIZE = 16

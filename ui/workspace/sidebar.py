@@ -38,7 +38,7 @@ class SidebarItem(BaseFrame):
         
         colors = ThemeManager.colors()
         self.icon_label = QLabel()
-        self.icon_label.setPixmap(Resources.icon(item.icon, color_hex=colors.text_secondary).pixmap(16, 16))
+        self.icon_label.setPixmap(Resources.icon(item.icon, color_hex="#38BDF8").pixmap(16, 16))
         layout.addWidget(self.icon_label)
         
         self.text_label = BodyLabel(item.label)
@@ -52,16 +52,15 @@ class SidebarItem(BaseFrame):
             
     def set_selected(self, selected: bool):
         self.is_selected = selected
-        colors = ThemeManager.colors()
         if selected:
-            self.setStyleSheet(f"""
-                SidebarItem {{
-                    background-color: {colors.accent}24;
+            self.setStyleSheet("""
+                SidebarItem {
+                    background-color: #1F69FF;
                     border-radius: 8px;
-                }}
+                }
             """)
-            self.text_label.setStyleSheet(f"color: {colors.accent}; font-weight: 600;")
-            self.icon_label.setPixmap(Resources.icon(self.item.icon, color_hex=colors.accent).pixmap(16, 16))
+            self.text_label.setStyleSheet("color: #FFFFFF; font-weight: 600;")
+            self.icon_label.setPixmap(Resources.icon(self.item.icon, color_hex="#FFFFFF").pixmap(16, 16))
         else:
             self.setStyleSheet("""
                 SidebarItem {
@@ -69,11 +68,11 @@ class SidebarItem(BaseFrame):
                     border-radius: 8px;
                 }
                 SidebarItem:hover {
-                    background-color: rgba(255, 255, 255, 0.05);
+                    background-color: rgba(255, 255, 255, 0.06);
                 }
             """)
-            self.text_label.setStyleSheet(f"color: {colors.text_primary}; font-weight: 400;")
-            self.icon_label.setPixmap(Resources.icon(self.item.icon, color_hex=colors.text_secondary).pixmap(16, 16))
+            self.text_label.setStyleSheet("color: #E2E8F0; font-weight: 400;")
+            self.icon_label.setPixmap(Resources.icon(self.item.icon, color_hex="#38BDF8").pixmap(16, 16))
 
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:

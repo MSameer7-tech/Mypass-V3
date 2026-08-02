@@ -16,10 +16,23 @@ class ActionsSection(QWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(12)
         
-        self.add_btn = PrimaryButton("+ New Item")
-        self.add_btn.setIcon(Resources.icon(Icons.NEW, color_hex="#FFFFFF"))
+        self.add_btn = PrimaryButton("+ Add Items")
+        self.add_btn.setIcon(Resources.icon(Icons.NEW, color_hex="#000000"))
         self.add_btn.setIconSize(QSize(Metrics.ICON_16, Metrics.ICON_16))
-        self.add_btn.setToolTip("New Item (⌘N)")
+        self.add_btn.setToolTip("Add Items (⌘N)")
+        self.add_btn.setStyleSheet("""
+            QPushButton#PrimaryButton {
+                background-color: #38BDF8;
+                color: #000000;
+                font-weight: 600;
+                border-radius: 8px;
+                padding: 0px 16px;
+                height: 36px;
+            }
+            QPushButton#PrimaryButton:hover {
+                background-color: #7DD3FC;
+            }
+        """)
         
         self.lock_btn = ToolbarIconButton(Icons.LOCK)
         self.lock_btn.setToolTip("Lock Vault (⌘L)")
