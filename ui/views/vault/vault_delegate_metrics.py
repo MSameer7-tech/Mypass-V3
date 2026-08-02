@@ -5,9 +5,9 @@ class VaultDelegateMetrics:
     """
     Design constants for rendering the VaultItemDelegate cards.
     """
-    ROW_HEIGHT = 74
-    CARD_MARGIN_X = 12          # 12px margin from pane edges
-    CARD_MARGIN_Y = 3           # 3px top/bottom margin
+    ROW_HEIGHT = 76
+    CARD_MARGIN_X = 16          # 16px left & right margins (Task 3)
+    CARD_MARGIN_Y = 4           # 4px top/bottom margin = 8px vertical gap between cards (Task 4)
     CARD_RADIUS = 12
     CARD_PADDING_X = 12
     CARD_PADDING_Y = 10
