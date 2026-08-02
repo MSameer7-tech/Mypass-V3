@@ -100,11 +100,42 @@ class Sidebar(BaseFrame):
         # 2. Vertical layout scaffold with generous internal padding (18px horizontal, 20px top)
         self.layout = QVBoxLayout(self)
         self.layout.setContentsMargins(18, 20, 18, 20)
-        self.layout.setSpacing(16)
+        self.layout.setSpacing(0)
+        
+        # 3. Phase A.2 Logo Header (36x36 circular avatar + "MyPass v2" title)
+        header_box = QHBoxLayout()
+        header_box.setContentsMargins(0, 0, 0, 0)
+        header_box.setSpacing(12)
+        
+        # 36x36 Circular User Avatar
+        self.avatar_label = QLabel()
+        self.avatar_label.setFixedSize(36, 36)
+        self.avatar_label.setAlignment(Qt.AlignCenter)
+        self.avatar_label.setStyleSheet("""
+            QLabel {
+                background-color: #3A3D4A;
+                border-radius: 18px;
+                border: none;
+            }
+        """)
+        self.avatar_label.setPixmap(Resources.icon(Icons.USER, color_hex="#CCCCCC").pixmap(20, 20))
+        
+        # Title "MyPass v2"
+        self.title_label = BodyLabel("MyPass v2")
+        self.title_label.setStyleSheet("color: #FFFFFF; font-size: 15px; font-weight: 600; border: none; background: transparent;")
+        
+        header_box.addWidget(self.avatar_label)
+        header_box.addWidget(self.title_label)
+        header_box.addStretch()
+        
+        self.layout.addLayout(header_box)
+        
+        # 24px Spacing below header before navigation begins
+        self.layout.addSpacing(24)
         
         self.widgets: dict[str, QWidget] = {}
         
-        # 3. Add stretch scaffold for Phase A.1
+        # Stretch scaffold for upcoming Phase A.3
         self.layout.addStretch()
         
         # Connect to statistics provider (no-op until nav items are added in Phase A.2)
