@@ -21,6 +21,7 @@ class Icons:
     HOME = "navigation/home.svg"
     BRIEFCASE = "navigation/briefcase.svg"
     CREDIT_CARD = "navigation/credit-card.svg"
+    TRASH = "navigation/trash.svg"
     CHEVRON_DOWN = "navigation/chevron-down.svg"
     VAULT = "navigation/vault.svg"
     FOLDER = "navigation/folder.svg"
