@@ -44,7 +44,7 @@ class VaultListModel(QAbstractListModel):
         elif role == VaultRoles.UrlRole:
             return entry.display_url
         elif role == VaultRoles.IconRole:
-            return self.icon_service.get_icon(entry.id, entry.display_url)
+            return self.icon_service.request_website_icon(entry.id, entry.display_url, fallback_title=entry.display_title)
         elif role == VaultRoles.CreatedRole:
             return entry.raw_created_at
         elif role == VaultRoles.ModifiedRole:

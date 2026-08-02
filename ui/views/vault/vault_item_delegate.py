@@ -62,10 +62,10 @@ class VaultItemDelegate(QStyledItemDelegate):
         painted_icon = False
 
         if icon_val:
-            if isinstance(icon_val, QIcon):
-                pixmap = icon_val.pixmap(layout.icon_rect.size())
-            elif isinstance(icon_val, QPixmap):
+            if isinstance(icon_val, QPixmap):
                 pixmap = icon_val
+            elif isinstance(icon_val, QIcon):
+                pixmap = icon_val.pixmap(layout.icon_rect.size())
             else:
                 pixmap = None
                 
@@ -74,7 +74,20 @@ class VaultItemDelegate(QStyledItemDelegate):
                 clip_path = QPainterPath()
                 clip_path.addRoundedRect(layout.icon_rect, VaultDelegateMetrics.ICON_RADIUS, VaultDelegateMetrics.ICON_RADIUS)
                 painter.setClipPath(clip_path)
-                painter.drawPixmap(layout.icon_rect, pixmap)
+                
+                # Draw rounded container background
+                painter.setPen(Qt.NoPen)
+                painter.setBrush(QColor(ThemeManager.colors().background))
+                painter.drawRoundedRect(layout.icon_rect, VaultDelegateMetrics.ICON_RADIUS, VaultDelegateMetrics.ICON_RADIUS)
+                
+                scaled_pixmap = pixmap.scaled(layout.icon_rect.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
+                target_rect = QRect(
+                    layout.icon_rect.x() + (layout.icon_rect.width() - scaled_pixmap.width()) // 2,
+                    layout.icon_rect.y() + (layout.icon_rect.height() - scaled_pixmap.height()) // 2,
+                    scaled_pixmap.width(),
+                    scaled_pixmap.height()
+                )
+                painter.drawPixmap(target_rect, scaled_pixmap)
                 painter.restore()
                 painted_icon = True
                 
