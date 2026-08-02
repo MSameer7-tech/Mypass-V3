@@ -87,103 +87,32 @@ class Sidebar(BaseFrame):
         self.sidebar_controller = sidebar_controller
         self.statistics_provider = statistics_provider
         self.setObjectName("Sidebar")
+        
+        # 1. Fixed width 240px & full-height container styling matching reference image
         self.setFixedWidth(240)
+        self.setStyleSheet("""
+            QFrame#Sidebar {
+                background-color: #1B1C21;
+                border: none;
+            }
+        """)
         
+        # 2. Vertical layout scaffold with generous internal padding (18px horizontal, 20px top)
         self.layout = QVBoxLayout(self)
-        self.layout.setContentsMargins(12, 16, 12, 16)
-        self.layout.setSpacing(4)
+        self.layout.setContentsMargins(18, 20, 18, 20)
+        self.layout.setSpacing(16)
         
-        self.widgets: dict[str, SidebarItem] = {}
-        self._build_static_items()
+        self.widgets: dict[str, QWidget] = {}
         
-        # Connect to statistics provider
-        self.statistics_provider.counts_updated.connect(self._on_counts_updated)
-        
-        # Select "all" by default
-        self._set_active_selection("all")
-        
-        # Initial fetch
-        self.statistics_provider.recalculate_all()
+        # 3. Add stretch scaffold for Phase A.1
         self.layout.addStretch()
         
-    def _build_static_items(self):
-        # Section 1: VAULT
-        vault_header = OverlineLabel("VAULT")
-        vault_header.setStyleSheet("color: #636366; font-size: 11px; font-weight: 600; padding: 4px 8px;")
-        self.layout.addWidget(vault_header)
+        # Connect to statistics provider (no-op until nav items are added in Phase A.2)
+        self.statistics_provider.counts_updated.connect(self._on_counts_updated)
+        self.statistics_provider.recalculate_all()
         
-        vault_items = [
-            NavItem("all", Icons.VAULT, "All Items", 0),
-            NavItem("favorites", Icons.STAR, "Favorites", 0),
-        ]
-        
-        for item in vault_items:
-            widget = SidebarItem(item)
-            widget.clicked.connect(self._handle_click)
-            self.layout.addWidget(widget)
-            self.widgets[item.id] = widget
-            
-        self.layout.addSpacing(12)
-        
-        # Divider
-        divider = QFrame()
-        divider.setFrameShape(QFrame.HLine)
-        divider.setStyleSheet("background-color: rgba(255, 255, 255, 0.06); max-height: 1px;")
-        self.layout.addWidget(divider)
-        
-        self.layout.addSpacing(12)
-        
-        # Section 2: CATEGORIES
-        cat_header = OverlineLabel("CATEGORIES")
-        cat_header.setStyleSheet("color: #636366; font-size: 11px; font-weight: 600; padding: 4px 8px;")
-        self.layout.addWidget(cat_header)
-        
-        cat_items = [
-            NavItem("work", Icons.FOLDER, "Work", 0),
-            NavItem("personal", Icons.FOLDER, "Personal", 0),
-            NavItem("social", Icons.FOLDER, "Social", 0),
-            NavItem("finance", Icons.FOLDER, "Finance", 0),
-        ]
-        
-        for item in cat_items:
-            widget = SidebarItem(item)
-            widget.clicked.connect(self._handle_click)
-            self.layout.addWidget(widget)
-            self.widgets[item.id] = widget
-            
-    def _handle_click(self, item_id: str):
-        self._set_active_selection(item_id)
-        self.nav_item_selected.emit(item_id)
-        
-        if item_id == "all":
-            self.sidebar_controller.select_all_items()
-        elif item_id == "favorites":
-            self.sidebar_controller.select_favorites()
-        elif item_id in ["work", "personal", "social", "finance"]:
-            self.sidebar_controller.select_category(item_id.capitalize())
-            
-    def _set_active_selection(self, selected_id: str):
-        for item_id, widget in self.widgets.items():
-            widget.set_selected(item_id == selected_id)
-
     def _on_counts_updated(self, stats: dict):
-        total = stats.get('total', 0)
-        favs = stats.get('favorites', 0)
-        cats = stats.get('categories', {})
-        
-        if "all" in self.widgets:
-            self._update_widget_count("all", total)
-        if "favorites" in self.widgets:
-            self._update_widget_count("favorites", favs)
-            
-        for cat_id in ["work", "personal", "social", "finance"]:
-            if cat_id in self.widgets:
-                self._update_widget_count(cat_id, cats.get(cat_id.capitalize(), 0))
-                
-    def _update_widget_count(self, item_id: str, count: int):
-        widget = self.widgets[item_id]
-        widget.item.count = count
-        
-        if hasattr(widget, 'badge'):
-            widget.badge.setText(str(count))
-            widget.badge.setVisible(count > 0)
+        pass
+
+    def _handle_click(self, item_id: str):
+        self.nav_item_selected.emit(item_id)
