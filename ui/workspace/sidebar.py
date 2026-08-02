@@ -86,12 +86,11 @@ class SidebarItem(BaseFrame):
         if selected:
             if self.item.is_category:
                 bg_color = QColor("#2563EB") # Vibrant reference blue pill
-                icon_hex = "#FFFFFF"
-                chevron_hex = "#FFFFFF"
             else:
                 bg_color = QColor("#2D3039") # Dark reference primary nav pill
-                icon_hex = "#38BDF8"
-                chevron_hex = "#FFFFFF"
+                
+            icon_hex = "#FFFFFF" # Crisp white icon ONLY for active item
+            chevron_hex = "#FFFFFF"
                 
             self.text_label.setStyleSheet("color: #FFFFFF; font-size: 14px; font-weight: 500; border: none; background: transparent;")
             self.icon_label.setPixmap(Resources.icon(self.item.icon, color_hex=icon_hex).pixmap(18, 18))
@@ -104,7 +103,7 @@ class SidebarItem(BaseFrame):
             self.anim.start()
         else:
             self.text_label.setStyleSheet("color: #E2E8F0; font-size: 14px; font-weight: 500; border: none; background: transparent;")
-            self.icon_label.setPixmap(Resources.icon(self.item.icon, color_hex="#38BDF8").pixmap(18, 18))
+            self.icon_label.setPixmap(Resources.icon(self.item.icon, color_hex="#38BDF8").pixmap(18, 18)) # Accent blue for inactive icons
             if self.chevron_label:
                 self.chevron_label.setPixmap(Resources.icon(Icons.CHEVRON_DOWN, color_hex="#71717A").pixmap(14, 14))
                 
