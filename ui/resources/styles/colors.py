@@ -19,21 +19,21 @@ class ColorPalette:
     input_bg: str
 
 DarkColors = ColorPalette(
-    background="#141414",
-    surface="#1E1E1E",
-    surface_elevated="#252525",
-    border="#333333",
+    background="#111214",
+    surface="#16171B",
+    surface_elevated="#1E1F24",
+    border="#282930",
     text_primary="#FFFFFF",
     text_secondary="#8E8E93",
     text_tertiary="#636366",
     text_disabled="#48484A",
-    divider="#38383A",
+    divider="#222328",
     accent="#3B82F6",
     accent_hover="#2563EB",
     success="#10B981",
     warning="#F59E0B",
     danger="#EF4444",
-    input_bg="#2A2A2A",
+    input_bg="#1B1C22",
 )
 
 LightColors = ColorPalette(

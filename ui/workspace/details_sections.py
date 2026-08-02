@@ -112,7 +112,7 @@ class CredentialsCard(CardSection):
         self.username_label = BodyLabel()
         self.username_label.setTextInteractionFlags(Qt.TextSelectableByMouse)
         self.copy_user_btn = PillButton("Copy", icon_identifier=Icons.COPY)
-        self.copy_user_btn.clicked.connect(lambda: self.copy_requested.emit("Username", self.current_username))
+        self.copy_user_btn.clicked.connect(lambda: self._trigger_copy_feedback(self.copy_user_btn, "Username", self.current_username))
         
         self._add_field_box("USERNAME", self.username_label, [self.copy_user_btn])
         
@@ -122,9 +122,22 @@ class CredentialsCard(CardSection):
         self.reveal_pass_btn = PillButton("Show", icon_identifier=Icons.EYE)
         self.reveal_pass_btn.clicked.connect(self._toggle_reveal)
         self.copy_pass_btn = PillButton("Copy", icon_identifier=Icons.COPY)
-        self.copy_pass_btn.clicked.connect(lambda: self.copy_requested.emit("Password", self.current_password))
+        self.copy_pass_btn.clicked.connect(lambda: self._trigger_copy_feedback(self.copy_pass_btn, "Password", self.current_password))
         
         self._add_field_box("PASSWORD", self.password_label, [self.reveal_pass_btn, self.copy_pass_btn])
+
+    def _trigger_copy_feedback(self, button: PillButton, field_name: str, value: str):
+        from PySide6.QtCore import QTimer
+        self.copy_requested.emit(field_name, value)
+        button.setText("✓ Copied")
+        button.setStyleSheet("color: #10B981; font-weight: 600;")
+        
+        def _reset():
+            button.setText("Copy")
+            button.setStyleSheet("")
+            button.setIcon(Resources.icon(Icons.COPY))
+            
+        QTimer.singleShot(1200, _reset)
 
     def _add_field_box(self, caption_text: str, val_widget: QLabel, buttons: list):
         colors = ThemeManager.colors()
