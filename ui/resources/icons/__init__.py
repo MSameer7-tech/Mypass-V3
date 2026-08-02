@@ -18,6 +18,10 @@ class Icons:
     # Navigation
     KEY = "navigation/key.svg"
     CLOCK = "navigation/clock.svg"
+    HOME = "navigation/home.svg"
+    BRIEFCASE = "navigation/briefcase.svg"
+    CREDIT_CARD = "navigation/credit-card.svg"
+    CHEVRON_DOWN = "navigation/chevron-down.svg"
     VAULT = "navigation/vault.svg"
     FOLDER = "navigation/folder.svg"
     SETTINGS = "navigation/settings.svg"

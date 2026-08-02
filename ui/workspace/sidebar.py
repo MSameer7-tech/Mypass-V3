@@ -20,6 +20,8 @@ class NavItem:
     icon: str
     label: str
     count: int = 0
+    has_chevron: bool = False
+    is_category: bool = False
 
 class SidebarItem(BaseFrame):
     clicked = Signal(str) # Emits the nav item ID
@@ -51,18 +53,35 @@ class SidebarItem(BaseFrame):
         self.badge_label.setStyleSheet("color: #9498A6; font-size: 13px; font-weight: 500; border: none; background: transparent;")
         self.badge_label.setVisible(False)
         layout.addWidget(self.badge_label)
+        
+        if item.has_chevron:
+            self.chevron_label = QLabel()
+            self.chevron_label.setFixedSize(14, 14)
+            self.chevron_label.setPixmap(Resources.icon(Icons.CHEVRON_DOWN, color_hex="#71717A").pixmap(14, 14))
+            layout.addWidget(self.chevron_label)
+        else:
+            self.chevron_label = None
             
     def set_selected(self, selected: bool):
         self.is_selected = selected
         if selected:
-            self.setStyleSheet("""
-                SidebarItem {
-                    background-color: #2E313A;
+            if self.item.is_category:
+                bg_color = "#1F69FF" # Bright blue fill for categories matching reference
+                icon_hex = "#FFFFFF"
+            else:
+                bg_color = "#2E313A" # Dark subtle fill for primary nav matching reference
+                icon_hex = "#38BDF8"
+                
+            self.setStyleSheet(f"""
+                SidebarItem {{
+                    background-color: {bg_color};
                     border-radius: 8px;
-                }
+                }}
             """)
             self.text_label.setStyleSheet("color: #FFFFFF; font-size: 14px; font-weight: 500; border: none; background: transparent;")
-            self.icon_label.setPixmap(Resources.icon(self.item.icon, color_hex="#38BDF8").pixmap(18, 18))
+            self.icon_label.setPixmap(Resources.icon(self.item.icon, color_hex=icon_hex).pixmap(18, 18))
+            if self.chevron_label:
+                self.chevron_label.setPixmap(Resources.icon(Icons.CHEVRON_DOWN, color_hex="#FFFFFF").pixmap(14, 14))
         else:
             self.setStyleSheet("""
                 SidebarItem {
@@ -75,6 +94,8 @@ class SidebarItem(BaseFrame):
             """)
             self.text_label.setStyleSheet("color: #E2E8F0; font-size: 14px; font-weight: 500; border: none; background: transparent;")
             self.icon_label.setPixmap(Resources.icon(self.item.icon, color_hex="#38BDF8").pixmap(18, 18))
+            if self.chevron_label:
+                self.chevron_label.setPixmap(Resources.icon(Icons.CHEVRON_DOWN, color_hex="#71717A").pixmap(14, 14))
 
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
@@ -149,9 +170,28 @@ class Sidebar(BaseFrame):
             self.layout.addWidget(w)
             self.widgets[item.id] = w
             
-        self._set_active_selection("all")
+        # 5. Phase A.4 Categories Section
+        self.layout.addSpacing(20)
         
-        # Stretch scaffold for upcoming Phase A.4 Categories
+        cat_hdr = BodyLabel("Categories")
+        cat_hdr.setStyleSheet("color: #9498A6; font-size: 13px; font-weight: 500; padding: 4px 12px; border: none; background: transparent;")
+        self.layout.addWidget(cat_hdr)
+        
+        category_items = [
+            NavItem("personal", Icons.HOME, "Personal", 0, has_chevron=True, is_category=True),
+            NavItem("work", Icons.BRIEFCASE, "Work", 0, has_chevron=True, is_category=True),
+            NavItem("banking", Icons.CREDIT_CARD, "Banking", 0, has_chevron=True, is_category=True),
+        ]
+        
+        for item in category_items:
+            w = SidebarItem(item)
+            w.clicked.connect(self._handle_click)
+            self.layout.addWidget(w)
+            self.widgets[item.id] = w
+            
+        self._set_active_selection("work") # Work category active by default matching reference image
+        
+        # Stretch scaffold for upcoming Phase A.5
         self.layout.addStretch()
         
         # Connect to statistics provider
@@ -166,6 +206,8 @@ class Sidebar(BaseFrame):
             self.sidebar_controller.select_all_items()
         elif item_id == "favorites":
             self.sidebar_controller.select_favorites()
+        elif item_id in ["personal", "work", "banking"]:
+            self.sidebar_controller.select_category(item_id.capitalize())
 
     def _set_active_selection(self, selected_id: str):
         for item_id, widget in self.widgets.items():
@@ -174,11 +216,16 @@ class Sidebar(BaseFrame):
     def _on_counts_updated(self, stats: dict):
         total = stats.get('total', 0)
         favs = stats.get('favorites', 0)
+        cats = stats.get('categories', {})
         
         if "all" in self.widgets:
             self._update_widget_count("all", total)
         if "favorites" in self.widgets:
             self._update_widget_count("favorites", favs)
+            
+        for cat_id in ["personal", "work", "banking"]:
+            if cat_id in self.widgets:
+                self._update_widget_count(cat_id, cats.get(cat_id.capitalize(), 0))
 
     def _update_widget_count(self, item_id: str, count: int):
         widget = self.widgets[item_id]
