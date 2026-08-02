@@ -70,7 +70,7 @@ class ContentRegion(BaseFrame):
         
         from ui.widgets.typography import TitleLabel
         saved_hdr = TitleLabel("Saved Passwords")
-        saved_hdr.setStyleSheet("color: #9498A6; font-size: 14px; font-weight: 600; padding: 16px 16px 8px 16px; background: transparent;")
+        saved_hdr.setStyleSheet("color: #E2E8F0; font-size: 18px; font-weight: 600; padding: 24px 16px 16px 16px; background: transparent;")
         list_container_layout.addWidget(saved_hdr)
         
         self.vault_list_view = VaultListView(self.model_context)
