@@ -1,5 +1,6 @@
 from typing import List, Optional
 from PySide6.QtCore import QAbstractListModel, QModelIndex, Qt, Signal
+from PySide6.QtGui import QIcon, QPixmap
 
 from ui.models.roles import VaultRoles
 from ui.viewmodels.vault_entry_viewmodel import VaultEntryViewModel
