@@ -24,29 +24,26 @@ class FaviconFetchTask(QRunnable):
 
     def run(self):
         pixmap = None
+        real_favicon_downloaded = False
         
         # 1. Primary: Website Provider
         try:
             pixmap = self.website_provider.fetch(self.domain, self.full_url)
+            if pixmap and not pixmap.isNull():
+                real_favicon_downloaded = True
         except Exception:
             pixmap = None
             
         # 2. Fallback: Google S2 Provider
-        if not pixmap or pixmap.isNull():
+        if not real_favicon_downloaded:
             try:
                 pixmap = self.google_provider.fetch(self.domain, self.full_url)
-            except Exception:
-                pixmap = None
-                
-        # 3. Last Resort: Monogram Provider
-        if not pixmap or pixmap.isNull():
-            try:
-                pixmap = self.monogram_provider.fetch(self.domain, self.full_url)
-                self.cache.record_failure(self.domain)
+                if pixmap and not pixmap.isNull():
+                    real_favicon_downloaded = True
             except Exception:
                 pixmap = None
 
-        if pixmap and not pixmap.isNull():
+        if real_favicon_downloaded and pixmap and not pixmap.isNull():
             disk_path = self.cache.save(self.domain, pixmap)
             for eid in self.entry_ids:
                 self.callback(eid, self.domain, disk_path)
