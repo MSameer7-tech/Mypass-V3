@@ -36,6 +36,8 @@ class EntryDetailsCoordinator(QObject):
     def _connect_signals(self):
         self.context.selection_manager.selection_changed.connect(self._on_selection_changed)
         self.session_controller.state_changed.connect(self._on_session_state_changed)
+        self.adapter.entry_updated.connect(self._on_entry_updated)
+        self.adapter.entry_deleted.connect(self._on_entry_deleted)
         
     def _on_selection_changed(self, viewmodel):
         if not viewmodel or not viewmodel.id:
@@ -43,12 +45,22 @@ class EntryDetailsCoordinator(QObject):
             return
             
         self.fetch_details(viewmodel.id)
-        
-    def _on_session_state_changed(self, state, context):
+
+    def _on_session_state_changed(self, state, context=None):
         if state in (SessionState.LOCKED, SessionState.NO_VAULT):
             self.clear()
-            # Clear cache on lock
             self._cache.clear()
+
+    def _on_entry_updated(self, record):
+        if record and record.id:
+            self._cache.pop(record.id, None)
+            if self.context.selection_manager.current_entry and self.context.selection_manager.current_entry.id == record.id:
+                self.fetch_details(record.id)
+
+    def _on_entry_deleted(self, entry_id: int):
+        self._cache.pop(entry_id, None)
+        if self.context.selection_manager.current_entry and self.context.selection_manager.current_entry.id == entry_id:
+            self.clear()
             
     def fetch_details(self, entry_id: int):
         if entry_id in self._cache:

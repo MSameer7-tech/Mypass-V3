@@ -136,12 +136,14 @@ class VaultCoordinator(QObject):
     
     def _on_entry_added(self, record: VaultEntryRecord):
         vm = VaultEntryViewModel.from_record(record)
+        self.icon_service.get_icon(record.id, record.website, record.title)
         self.context.vault_list_model.insert_entry(vm)
         self.context.set_state(LoadingState.READY)
         self.context.selection_manager.select_entry_by_id(record.id, force_emit=True)
         
     def _on_entry_updated(self, record: VaultEntryRecord):
         vm = VaultEntryViewModel.from_record(record)
+        self.icon_service.get_icon(record.id, record.website, record.title)
         self.context.vault_list_model.update_entry(vm)
         if self.context.selection_manager.current_entry and self.context.selection_manager.current_entry.id == record.id:
             self.context.selection_manager.select_entry_by_id(record.id, force_emit=True)
