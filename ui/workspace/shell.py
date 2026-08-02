@@ -24,13 +24,15 @@ class ApplicationShell(BaseWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
         
-        self.toolbar = Toolbar(self.search_controller)
-        self.workspace = Workspace(self.model_context, self.details_coordinator, self.sidebar_controller, self.statistics_provider)
+        self.workspace = Workspace(self.model_context, self.details_coordinator, self.search_controller, self.sidebar_controller, self.statistics_provider)
         self.statusbar = StatusBar()
         self.statusbar.hide()
         
-        layout.addWidget(self.toolbar)
-        layout.addWidget(self.workspace, 1) # Give Workspace all remaining space
+        layout.addWidget(self.workspace, 1)
+        
+    @property
+    def toolbar(self):
+        return self.workspace.toolbar
         
     def save_state(self):
         """Delegate state saving to child components that need it."""

@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QSplitter
+from PySide6.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QSplitter
 from PySide6.QtCore import Qt, QSettings
 
 from ui.widgets.base import BaseWidget
@@ -10,39 +10,56 @@ from ui.workspace.controller import WorkspaceController
 from ui.resources.styles.layout_constants import Layout
 from ui.resources.styles.metrics import Metrics
 
-class Workspace(QSplitter):
+class Workspace(BaseWidget):
     """
-    Central 3-pane layout coordinator.
-    Owns the Sidebar, VaultList (Content), and Details pane.
+    Central layout coordinator for Phase A.10.
+    Full-height Sidebar on the left (240px).
+    Right side contains Toolbar at top and QSplitter (VaultList + Details Inspector) below.
     """
-    def __init__(self, model_context, details_coordinator, sidebar_controller, statistics_provider, parent=None):
-        super().__init__(Qt.Horizontal, parent)
+    def __init__(self, model_context, details_coordinator, search_controller, sidebar_controller, statistics_provider, parent=None):
+        super().__init__(parent)
         self.setObjectName("Workspace")
         
         self.model_context = model_context
         self.details_coordinator = details_coordinator
+        self.search_controller = search_controller
         self.sidebar_controller = sidebar_controller
         self.statistics_provider = statistics_provider
         
-        # Build Panes
+        # 1. Full height Sidebar (Task 1)
         self.sidebar = Sidebar(self.sidebar_controller, self.statistics_provider)
+        self.sidebar.setFixedWidth(240)
+        
+        # 2. Right Side Vertical Container (Toolbar + Splitter)
+        right_container = QWidget()
+        right_layout = QVBoxLayout(right_container)
+        right_layout.setContentsMargins(0, 0, 0, 0)
+        right_layout.setSpacing(0)
+        
+        self.toolbar = Toolbar(self.search_controller)
+        
+        # 3. Horizontal Splitter for Vault List & Details Inspector (Task 4)
+        self.splitter = QSplitter(Qt.Horizontal)
         self.content_region = ContentRegion(self.model_context)
         self.details_pane = DetailsPane(self.details_coordinator)
         
-        # Add to splitter
-        self.addWidget(self.sidebar)
-        self.addWidget(self.content_region)
-        self.addWidget(self.details_pane)
+        self.splitter.addWidget(self.content_region)
+        self.splitter.addWidget(self.details_pane)
+        self.splitter.setStretchFactor(0, 0)
+        self.splitter.setStretchFactor(1, 1)
         
-        # Stretch factors: Sidebar fixed (0), Vault List fixed (0), Inspector expanding (1)
-        self.setStretchFactor(0, 0)
-        self.setStretchFactor(1, 0)
-        self.setStretchFactor(2, 1)
-        
-        # Set constraints
-        self.sidebar.setFixedWidth(240)
         self.content_region.setFixedWidth(320)
         self.details_pane.setMinimumWidth(480)
+        
+        right_layout.addWidget(self.toolbar)
+        right_layout.addWidget(self.splitter, 1)
+        
+        # 4. Main Layout
+        main_layout = QHBoxLayout(self)
+        main_layout.setContentsMargins(0, 0, 0, 0)
+        main_layout.setSpacing(0)
+        main_layout.addWidget(self.sidebar)
+        main_layout.addWidget(right_container, 1)
         
         self.controller = WorkspaceController(self)
         
@@ -53,7 +70,8 @@ class Workspace(QSplitter):
         
     def save_state(self):
         settings = QSettings("MyPass", "MyPassApp")
-        settings.setValue("workspace/splitter_state", self.saveState())
+        settings.setValue("workspace/splitter_state", self.splitter.saveState())
         
     def restore_state(self):
-        self.setSizes([240, 320, 680])
+        # Task 4 Splitter proportions: Vault List 320px (27%), Inspector 960px (55%+)
+        self.splitter.setSizes([320, 960])
