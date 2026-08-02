@@ -56,6 +56,13 @@ class ModelContext(QObject):
         self.workspace_state_changed.emit(self._workspace_state)
         # Notify the filter model that the underlying filter configuration changed
         self.vault_filter_model.invalidateFilter()
+        # Auto-select the first entry in the filtered view if items exist
+        if self.vault_filter_model.rowCount() > 0:
+            first_id = self.vault_filter_model.get_id_for_row(0)
+            if first_id != -1:
+                self.selection_manager.select_entry_by_id(first_id, force_emit=True)
+        else:
+            self.selection_manager.clear_selection()
 
     def clear(self):
         """Reset everything securely."""

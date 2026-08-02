@@ -89,6 +89,10 @@ class VaultCoordinator(QObject):
             self.context.set_state(LoadingState.EMPTY)
         else:
             self.context.set_state(LoadingState.READY)
+            # Auto-select the first item on startup so Inspector opens populated immediately
+            first_id = self.context.vault_filter_model.get_id_for_row(0)
+            if first_id != -1:
+                self.context.selection_manager.select_entry_by_id(first_id, force_emit=True)
         print(f"[VaultCoordinator] Loaded {len(viewmodels)} entries.")
 
     def refresh(self):
