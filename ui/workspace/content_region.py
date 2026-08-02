@@ -62,9 +62,21 @@ class ContentRegion(BaseFrame):
         empty_search_layout.addWidget(self.empty_search_state)
         self.stack.addWidget(empty_search_page)
         
-        # 3. Vault List
+        # 3. Vault List Page with 'Saved Passwords' Header
+        list_container_page = QWidget()
+        list_container_layout = QVBoxLayout(list_container_page)
+        list_container_layout.setContentsMargins(0, 0, 0, 0)
+        list_container_layout.setSpacing(0)
+        
+        from ui.widgets.typography import TitleLabel
+        saved_hdr = TitleLabel("Saved Passwords")
+        saved_hdr.setStyleSheet("color: #9498A6; font-size: 14px; font-weight: 600; padding: 16px 16px 8px 16px; background: transparent;")
+        list_container_layout.addWidget(saved_hdr)
+        
         self.vault_list_view = VaultListView(self.model_context)
-        self.stack.addWidget(self.vault_list_view)
+        list_container_layout.addWidget(self.vault_list_view)
+        
+        self.stack.addWidget(list_container_page)
         
     def _connect_signals(self):
         self.model_context.state_changed.connect(self._on_model_state_changed)

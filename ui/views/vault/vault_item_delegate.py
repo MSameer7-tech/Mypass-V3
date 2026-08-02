@@ -39,28 +39,18 @@ class VaultItemDelegate(QStyledItemDelegate):
         is_hovered = option.state & QStyle.State_MouseOver
         is_focused = option.state & QStyle.State_HasFocus
         
-        card_bg_color = QColor(ThemeManager.colors().surface)
-        border_color = QColor(255, 255, 255, 12)
+        card_bg_color = QColor("#18191F")
+        border_color = Qt.NoPen
         
         if is_selected:
-            card_bg_color = QColor("#282A32")
-            border_color = QColor(ThemeManager.colors().accent)
-            border_color.setAlpha(60)
+            card_bg_color = QColor("#2B2D38")
         elif is_hovered:
-            card_bg_color = QColor(ThemeManager.colors().surface_elevated)
-            border_color = QColor(255, 255, 255, 20)
+            card_bg_color = QColor("#20222B")
             
-        # Draw Card Background and Border
-        painter.setPen(QPen(border_color, 1))
+        # Draw Card Background (Borderless)
+        painter.setPen(Qt.NoPen)
         painter.setBrush(card_bg_color)
         painter.drawRoundedRect(layout.card_rect, VaultDelegateMetrics.CARD_RADIUS, VaultDelegateMetrics.CARD_RADIUS)
-        
-        # 2px Accent strip on Left when selected
-        if is_selected:
-            painter.setPen(Qt.NoPen)
-            painter.setBrush(QColor(ThemeManager.colors().accent))
-            strip_rect = QRect(layout.card_rect.x(), layout.card_rect.y(), 3, layout.card_rect.height())
-            painter.drawRoundedRect(strip_rect, 2, 2)
             
         if is_focused and not is_selected:
             pen = QPen(QColor(ThemeManager.colors().accent), 2)

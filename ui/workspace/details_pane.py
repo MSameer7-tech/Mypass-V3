@@ -48,11 +48,8 @@ class EntryDetailsView(QWidget):
         
         self.layout.addWidget(self.header)
         self.layout.addWidget(self.credentials)
-        self.layout.addWidget(self.security)
-        self.layout.addWidget(self.metadata)
-        self.layout.addWidget(self.totp)
         self.layout.addWidget(self.notes)
-        self.layout.addWidget(self.history)
+        self.layout.addWidget(self.metadata)
         
         # Edit Mode placeholder button (bottom action bar)
         self.edit_bar = QHBoxLayout()
