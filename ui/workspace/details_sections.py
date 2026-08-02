@@ -92,8 +92,11 @@ class HeaderCard(CardSection):
         cat_suffix = f" ({vm.category})" if getattr(vm, 'category', None) else ""
         self.title_label.setText(f"{vm.title or 'Untitled'}{cat_suffix}")
         
-        icon = AssetManager.instance().get_favicon(vm.id, vm.website, vm.title, size=56)
-        self.icon_label.setPixmap(icon.pixmap(56, 56))
+        pixmap = AssetManager.instance().request_website_icon(vm.id, vm.website, fallback_title=vm.title, size=56)
+        if pixmap and not pixmap.isNull():
+            self.icon_label.setPixmap(pixmap.scaled(56, 56, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        else:
+            self.icon_label.setPixmap(QPixmap())
 
 class FieldCard(QFrame):
     """
