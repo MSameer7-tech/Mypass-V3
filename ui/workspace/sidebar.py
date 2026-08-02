@@ -144,28 +144,28 @@ class Sidebar(BaseFrame):
             }
         """)
         
-        # 2. Vertical layout with calibrated margins (16px horizontal, 24px top padding)
+        # 2. Vertical layout with compressed margins (16px horizontal, 16px top padding for Phase A.10)
         self.layout = QVBoxLayout(self)
-        self.layout.setContentsMargins(16, 24, 16, 16)
+        self.layout.setContentsMargins(16, 16, 16, 16)
         self.layout.setSpacing(2)
         
-        # 3. Task 1 & Task 3 Profile Header (42x42 circular avatar + "MyPass v2" title)
+        # 3. Compressed Profile Header (40x40 circular avatar + "MyPass v2" title)
         header_box = QHBoxLayout()
         header_box.setContentsMargins(0, 0, 0, 0)
         header_box.setSpacing(12)
         
-        # 42x42 Circular User Avatar (Task 3)
+        # 40x40 Circular User Avatar (Task 1)
         self.avatar_label = QLabel()
-        self.avatar_label.setFixedSize(42, 42)
+        self.avatar_label.setFixedSize(40, 40)
         self.avatar_label.setAlignment(Qt.AlignCenter)
         self.avatar_label.setStyleSheet("""
             QLabel {
                 background-color: rgba(255, 255, 255, 0.12);
-                border-radius: 21px;
+                border-radius: 20px;
                 border: none;
             }
         """)
-        self.avatar_label.setPixmap(Resources.icon(Icons.USER, color_hex="#CCCCCC").pixmap(22, 22))
+        self.avatar_label.setPixmap(Resources.icon(Icons.USER, color_hex="#CCCCCC").pixmap(20, 20))
         
         # Title "MyPass v2"
         self.title_label = BodyLabel("MyPass v2")
@@ -177,8 +177,8 @@ class Sidebar(BaseFrame):
         
         self.layout.addLayout(header_box)
         
-        # 28px Spacing below header before primary navigation begins (+8px for breathing room, Task 3)
-        self.layout.addSpacing(28)
+        # Compressed 12px Spacing below header so navigation begins immediately (Task 1)
+        self.layout.addSpacing(12)
         
         # 4. Primary Navigation Group
         self.widgets: dict[str, SidebarItem] = {}
@@ -194,8 +194,8 @@ class Sidebar(BaseFrame):
             self.layout.addWidget(w)
             self.widgets[item.id] = w
             
-        # 5. Categories Section (Task 2: Simplified, Trash removed)
-        self.layout.addSpacing(24)
+        # 5. Categories Section (Task 2: Compressed gap 16px)
+        self.layout.addSpacing(16)
         
         cat_hdr = BodyLabel("Categories")
         cat_hdr.setStyleSheet("color: #9498A6; font-size: 13px; font-weight: 500; padding: 4px 12px 6px 12px; border: none; background: transparent;")
@@ -215,6 +215,7 @@ class Sidebar(BaseFrame):
             
         self._set_active_selection("work") # Work category active by default matching reference image
         
+        # Task 5: Items pinned to top naturally with stretch at bottom
         self.layout.addStretch()
         
         # Connect to statistics provider
