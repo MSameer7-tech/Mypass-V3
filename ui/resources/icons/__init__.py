@@ -11,7 +11,7 @@ class Icons:
     EYE_OFF = "actions/eye-off.svg"
     NEW = "actions/plus.svg"
     EDIT = "actions/edit.svg"
-    STAR = "actions/star.svg"
+    STAR = "navigation/star.svg"
     STAR_FILLED = "actions/star-filled.svg"
     ZAP = "actions/zap.svg"
     
