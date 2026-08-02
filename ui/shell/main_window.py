@@ -160,6 +160,11 @@ class MainWindow(QMainWindow):
         state = settings.value("window/state")
         if geometry:
             self.restoreGeometry(geometry)
+            # Ensure window prioritizes width (1560x880) and avoids excessive vertical tall aspect ratio
+            if self.width() < 1400 or self.height() > 900:
+                self.resize(Metrics.WINDOW_DEFAULT_WIDTH, Metrics.WINDOW_DEFAULT_HEIGHT)
+        else:
+            self.resize(Metrics.WINDOW_DEFAULT_WIDTH, Metrics.WINDOW_DEFAULT_HEIGHT)
         if state:
             self.restoreState(state)
         self.app_shell.restore_state()

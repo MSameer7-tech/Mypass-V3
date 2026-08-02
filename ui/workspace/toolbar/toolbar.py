@@ -19,12 +19,10 @@ class Toolbar(BaseFrame):
         # We don't need a main layout spacing since we use addStretch between the sections
         main_layout.setSpacing(0)
         
-        self.logo_section = LogoSection()
         self.search_section = SearchSection(self.search_controller)
         self.actions_section = ActionsSection()
         
-        # Logo | Search | Actions with layout spacing (stretches)
-        main_layout.addWidget(self.logo_section)
+        # Search | Actions with layout spacing (stretches)
         main_layout.addStretch(1)
         main_layout.addWidget(self.search_section)
         main_layout.addStretch(1)
