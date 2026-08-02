@@ -34,15 +34,15 @@ class Workspace(QSplitter):
         self.addWidget(self.content_region)
         self.addWidget(self.details_pane)
         
-        # Default stretch factors
-        self.setStretchFactor(0, int(Metrics.DEFAULT_SPLITTER_RATIOS[0] * 100))
-        self.setStretchFactor(1, int(Metrics.DEFAULT_SPLITTER_RATIOS[1] * 100))
-        self.setStretchFactor(2, int(Metrics.DEFAULT_SPLITTER_RATIOS[2] * 100))
+        # Stretch factors: Sidebar fixed (0), Vault List fixed (0), Inspector expanding (1)
+        self.setStretchFactor(0, 0)
+        self.setStretchFactor(1, 0)
+        self.setStretchFactor(2, 1)
         
         # Set constraints
-        self.sidebar.setMinimumWidth(Layout.SIDEBAR_MIN_WIDTH)
-        self.details_pane.setMinimumWidth(Layout.DETAILS_MIN_WIDTH)
-        # Content region expands, but can have a max width if desired
+        self.sidebar.setFixedWidth(240)
+        self.content_region.setFixedWidth(320)
+        self.details_pane.setMinimumWidth(480)
         
         self.controller = WorkspaceController(self)
         
@@ -56,15 +56,4 @@ class Workspace(QSplitter):
         settings.setValue("workspace/splitter_state", self.saveState())
         
     def restore_state(self):
-        settings = QSettings("MyPass", "MyPassApp")
-        state = settings.value("workspace/splitter_state")
-        if state:
-            self.restoreState(state)
-        else:
-            # Set default initial sizes based on ratios and min window width
-            total = Metrics.WINDOW_MIN_WIDTH
-            self.setSizes([
-                int(total * Metrics.DEFAULT_SPLITTER_RATIOS[0]),
-                int(total * Metrics.DEFAULT_SPLITTER_RATIOS[1]),
-                int(total * Metrics.DEFAULT_SPLITTER_RATIOS[2])
-            ])
+        self.setSizes([240, 320, 680])

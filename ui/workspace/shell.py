@@ -27,10 +27,10 @@ class ApplicationShell(BaseWidget):
         self.toolbar = Toolbar(self.search_controller)
         self.workspace = Workspace(self.model_context, self.details_coordinator, self.sidebar_controller, self.statistics_provider)
         self.statusbar = StatusBar()
+        self.statusbar.hide()
         
         layout.addWidget(self.toolbar)
         layout.addWidget(self.workspace, 1) # Give Workspace all remaining space
-        layout.addWidget(self.statusbar)
         
     def save_state(self):
         """Delegate state saving to child components that need it."""

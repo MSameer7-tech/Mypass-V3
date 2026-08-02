@@ -87,6 +87,7 @@ class Sidebar(BaseFrame):
         self.sidebar_controller = sidebar_controller
         self.statistics_provider = statistics_provider
         self.setObjectName("Sidebar")
+        self.setFixedWidth(240)
         
         self.layout = QVBoxLayout(self)
         self.layout.setContentsMargins(12, 16, 12, 16)
