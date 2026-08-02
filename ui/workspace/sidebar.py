@@ -32,15 +32,15 @@ class SidebarItem(BaseFrame):
         self.is_selected = False
         self.setObjectName("SidebarItem")
         self.setCursor(Qt.PointingHandCursor)
-        self.setFixedHeight(36)
+        self.setFixedHeight(34) # Refined 34px pill height matching Task 4
         
         layout = QHBoxLayout(self)
-        layout.setContentsMargins(16, 0, 16, 0)
-        layout.setSpacing(12)
+        layout.setContentsMargins(14, 0, 14, 0)
+        layout.setSpacing(12) # Consistent 12px icon-to-text spacing
         
         self.icon_label = QLabel()
         self.icon_label.setFixedSize(18, 18)
-        self.icon_label.setPixmap(Resources.icon(item.icon, color_hex="#38BDF8").pixmap(18, 18))
+        self.icon_label.setPixmap(Resources.icon(item.icon, color_hex="#2EB5F0").pixmap(18, 18))
         layout.addWidget(self.icon_label)
         
         self.text_label = BodyLabel(item.label)
@@ -49,7 +49,10 @@ class SidebarItem(BaseFrame):
         
         layout.addStretch()
         
+        # Perfectly right-aligned numeric count badge (Task 5)
         self.badge_label = QLabel()
+        self.badge_label.setFixedWidth(24)
+        self.badge_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         self.badge_label.setStyleSheet("color: #9498A6; font-size: 13px; font-weight: 500; border: none; background: transparent;")
         self.badge_label.setVisible(False)
         layout.addWidget(self.badge_label)
@@ -74,7 +77,7 @@ class SidebarItem(BaseFrame):
         self.setStyleSheet(f"""
             SidebarItem {{
                 background-color: rgba({col.red()}, {col.green()}, {col.blue()}, {col.alphaF()});
-                border-radius: 8px;
+                border-radius: 7px;
                 border: none;
             }}
         """)
@@ -103,14 +106,14 @@ class SidebarItem(BaseFrame):
             self.anim.start()
         else:
             self.text_label.setStyleSheet("color: #E2E8F0; font-size: 14px; font-weight: 500; border: none; background: transparent;")
-            self.icon_label.setPixmap(Resources.icon(self.item.icon, color_hex="#38BDF8").pixmap(18, 18)) # Accent blue for inactive icons
+            self.icon_label.setPixmap(Resources.icon(self.item.icon, color_hex="#2EB5F0").pixmap(18, 18)) # Softened inactive icon color (~10% lower brightness)
             if self.chevron_label:
                 self.chevron_label.setPixmap(Resources.icon(Icons.CHEVRON_DOWN, color_hex="#71717A").pixmap(14, 14))
                 
             self.setStyleSheet("""
                 SidebarItem {
                     background-color: transparent;
-                    border-radius: 8px;
+                    border-radius: 7px;
                     border: none;
                 }
                 SidebarItem:hover {
@@ -146,23 +149,23 @@ class Sidebar(BaseFrame):
         self.layout.setContentsMargins(16, 24, 16, 16)
         self.layout.setSpacing(2)
         
-        # 3. Phase A.2 Logo Header (36x36 circular avatar + "MyPass v2" title)
+        # 3. Task 1 & Task 3 Profile Header (42x42 circular avatar + "MyPass v2" title)
         header_box = QHBoxLayout()
         header_box.setContentsMargins(0, 0, 0, 0)
         header_box.setSpacing(12)
         
-        # 36x36 Circular User Avatar
+        # 42x42 Circular User Avatar (Task 3)
         self.avatar_label = QLabel()
-        self.avatar_label.setFixedSize(36, 36)
+        self.avatar_label.setFixedSize(42, 42)
         self.avatar_label.setAlignment(Qt.AlignCenter)
         self.avatar_label.setStyleSheet("""
             QLabel {
                 background-color: rgba(255, 255, 255, 0.12);
-                border-radius: 18px;
+                border-radius: 21px;
                 border: none;
             }
         """)
-        self.avatar_label.setPixmap(Resources.icon(Icons.USER, color_hex="#CCCCCC").pixmap(20, 20))
+        self.avatar_label.setPixmap(Resources.icon(Icons.USER, color_hex="#CCCCCC").pixmap(22, 22))
         
         # Title "MyPass v2"
         self.title_label = BodyLabel("MyPass v2")
@@ -174,10 +177,10 @@ class Sidebar(BaseFrame):
         
         self.layout.addLayout(header_box)
         
-        # 20px Spacing below header before primary navigation begins
-        self.layout.addSpacing(20)
+        # 28px Spacing below header before primary navigation begins (+8px for breathing room, Task 3)
+        self.layout.addSpacing(28)
         
-        # 4. Phase A.3 Primary Navigation Group
+        # 4. Primary Navigation Group
         self.widgets: dict[str, SidebarItem] = {}
         primary_items = [
             NavItem("all", Icons.KEY, "All Items", 0),
@@ -191,7 +194,7 @@ class Sidebar(BaseFrame):
             self.layout.addWidget(w)
             self.widgets[item.id] = w
             
-        # 5. Phase A.4 & A.7 Categories Section (including Trash)
+        # 5. Categories Section (Task 2: Simplified, Trash removed)
         self.layout.addSpacing(24)
         
         cat_hdr = BodyLabel("Categories")
@@ -202,7 +205,6 @@ class Sidebar(BaseFrame):
             NavItem("personal", Icons.HOME, "Personal", 0, has_chevron=True, is_category=True),
             NavItem("work", Icons.BRIEFCASE, "Work", 0, has_chevron=True, is_category=True),
             NavItem("banking", Icons.CREDIT_CARD, "Banking", 0, has_chevron=True, is_category=True),
-            NavItem("trash", Icons.TRASH, "Trash", 0, has_chevron=False, is_category=True),
         ]
         
         for item in category_items:

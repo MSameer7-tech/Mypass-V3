@@ -31,7 +31,7 @@ class MainWindow(QMainWindow):
         self.statistics_provider = statistics_provider
         self.setWindowTitle("MyPass")
         self.setMinimumSize(Metrics.WINDOW_MIN_WIDTH, Metrics.WINDOW_MIN_HEIGHT)
-        self.resize(1240, 820)
+        self.resize(Metrics.WINDOW_DEFAULT_WIDTH, Metrics.WINDOW_DEFAULT_HEIGHT)
         
         self._init_ui()
         self._restore_geometry()
