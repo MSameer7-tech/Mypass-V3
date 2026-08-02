@@ -157,7 +157,7 @@ class Sidebar(BaseFrame):
         self.avatar_label.setAlignment(Qt.AlignCenter)
         self.avatar_label.setStyleSheet("""
             QLabel {
-                background-color: #3A3D4A;
+                background-color: rgba(255, 255, 255, 0.12);
                 border-radius: 18px;
                 border: none;
             }
