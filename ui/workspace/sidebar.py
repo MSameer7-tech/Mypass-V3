@@ -141,10 +141,10 @@ class Sidebar(BaseFrame):
             }
         """)
         
-        # 2. Vertical layout scaffold with generous internal padding (18px horizontal, 20px top)
+        # 2. Vertical layout with calibrated margins (16px horizontal, 24px top padding)
         self.layout = QVBoxLayout(self)
-        self.layout.setContentsMargins(18, 20, 18, 20)
-        self.layout.setSpacing(4)
+        self.layout.setContentsMargins(16, 24, 16, 16)
+        self.layout.setSpacing(2)
         
         # 3. Phase A.2 Logo Header (36x36 circular avatar + "MyPass v2" title)
         header_box = QHBoxLayout()
@@ -174,8 +174,8 @@ class Sidebar(BaseFrame):
         
         self.layout.addLayout(header_box)
         
-        # 24px Spacing below header before primary navigation begins
-        self.layout.addSpacing(24)
+        # 20px Spacing below header before primary navigation begins
+        self.layout.addSpacing(20)
         
         # 4. Phase A.3 Primary Navigation Group
         self.widgets: dict[str, SidebarItem] = {}
@@ -191,17 +191,18 @@ class Sidebar(BaseFrame):
             self.layout.addWidget(w)
             self.widgets[item.id] = w
             
-        # 5. Phase A.4 Categories Section
-        self.layout.addSpacing(20)
+        # 5. Phase A.4 & A.7 Categories Section (including Trash)
+        self.layout.addSpacing(24)
         
         cat_hdr = BodyLabel("Categories")
-        cat_hdr.setStyleSheet("color: #9498A6; font-size: 13px; font-weight: 500; padding: 4px 12px; border: none; background: transparent;")
+        cat_hdr.setStyleSheet("color: #9498A6; font-size: 13px; font-weight: 500; padding: 4px 12px 6px 12px; border: none; background: transparent;")
         self.layout.addWidget(cat_hdr)
         
         category_items = [
             NavItem("personal", Icons.HOME, "Personal", 0, has_chevron=True, is_category=True),
             NavItem("work", Icons.BRIEFCASE, "Work", 0, has_chevron=True, is_category=True),
             NavItem("banking", Icons.CREDIT_CARD, "Banking", 0, has_chevron=True, is_category=True),
+            NavItem("trash", Icons.TRASH, "Trash", 0, has_chevron=False, is_category=True),
         ]
         
         for item in category_items:
@@ -212,7 +213,6 @@ class Sidebar(BaseFrame):
             
         self._set_active_selection("work") # Work category active by default matching reference image
         
-        # Stretch scaffold for upcoming Phase A.5
         self.layout.addStretch()
         
         # Connect to statistics provider
