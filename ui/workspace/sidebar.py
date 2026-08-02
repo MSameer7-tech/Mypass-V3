@@ -30,37 +30,39 @@ class SidebarItem(BaseFrame):
         self.is_selected = False
         self.setObjectName("SidebarItem")
         self.setCursor(Qt.PointingHandCursor)
-        self.setFixedHeight(36)
+        self.setFixedHeight(38)
         
         layout = QHBoxLayout(self)
-        layout.setContentsMargins(10, 0, 10, 0)
-        layout.setSpacing(10)
+        layout.setContentsMargins(12, 0, 12, 0)
+        layout.setSpacing(12)
         
-        colors = ThemeManager.colors()
         self.icon_label = QLabel()
-        self.icon_label.setPixmap(Resources.icon(item.icon, color_hex="#38BDF8").pixmap(16, 16))
+        self.icon_label.setFixedSize(18, 18)
+        self.icon_label.setPixmap(Resources.icon(item.icon, color_hex="#38BDF8").pixmap(18, 18))
         layout.addWidget(self.icon_label)
         
         self.text_label = BodyLabel(item.label)
+        self.text_label.setStyleSheet("color: #E2E8F0; font-size: 14px; font-weight: 500; border: none; background: transparent;")
         layout.addWidget(self.text_label)
         
         layout.addStretch()
         
-        self.badge = Badge("", BadgeVariant.NEUTRAL)
-        self.badge.setVisible(False)
-        layout.addWidget(self.badge)
+        self.badge_label = QLabel()
+        self.badge_label.setStyleSheet("color: #9498A6; font-size: 13px; font-weight: 500; border: none; background: transparent;")
+        self.badge_label.setVisible(False)
+        layout.addWidget(self.badge_label)
             
     def set_selected(self, selected: bool):
         self.is_selected = selected
         if selected:
             self.setStyleSheet("""
                 SidebarItem {
-                    background-color: #1F69FF;
+                    background-color: #2E313A;
                     border-radius: 8px;
                 }
             """)
-            self.text_label.setStyleSheet("color: #FFFFFF; font-weight: 600;")
-            self.icon_label.setPixmap(Resources.icon(self.item.icon, color_hex="#FFFFFF").pixmap(16, 16))
+            self.text_label.setStyleSheet("color: #FFFFFF; font-size: 14px; font-weight: 500; border: none; background: transparent;")
+            self.icon_label.setPixmap(Resources.icon(self.item.icon, color_hex="#38BDF8").pixmap(18, 18))
         else:
             self.setStyleSheet("""
                 SidebarItem {
@@ -68,11 +70,11 @@ class SidebarItem(BaseFrame):
                     border-radius: 8px;
                 }
                 SidebarItem:hover {
-                    background-color: rgba(255, 255, 255, 0.06);
+                    background-color: rgba(255, 255, 255, 0.05);
                 }
             """)
-            self.text_label.setStyleSheet("color: #E2E8F0; font-weight: 400;")
-            self.icon_label.setPixmap(Resources.icon(self.item.icon, color_hex="#38BDF8").pixmap(16, 16))
+            self.text_label.setStyleSheet("color: #E2E8F0; font-size: 14px; font-weight: 500; border: none; background: transparent;")
+            self.icon_label.setPixmap(Resources.icon(self.item.icon, color_hex="#38BDF8").pixmap(18, 18))
 
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
@@ -100,7 +102,7 @@ class Sidebar(BaseFrame):
         # 2. Vertical layout scaffold with generous internal padding (18px horizontal, 20px top)
         self.layout = QVBoxLayout(self)
         self.layout.setContentsMargins(18, 20, 18, 20)
-        self.layout.setSpacing(0)
+        self.layout.setSpacing(4)
         
         # 3. Phase A.2 Logo Header (36x36 circular avatar + "MyPass v2" title)
         header_box = QHBoxLayout()
@@ -130,20 +132,57 @@ class Sidebar(BaseFrame):
         
         self.layout.addLayout(header_box)
         
-        # 24px Spacing below header before navigation begins
+        # 24px Spacing below header before primary navigation begins
         self.layout.addSpacing(24)
         
-        self.widgets: dict[str, QWidget] = {}
+        # 4. Phase A.3 Primary Navigation Group
+        self.widgets: dict[str, SidebarItem] = {}
+        primary_items = [
+            NavItem("all", Icons.KEY, "All Items", 0),
+            NavItem("favorites", Icons.STAR, "Favorites", 0),
+            NavItem("recents", Icons.CLOCK, "Recents", 0),
+        ]
         
-        # Stretch scaffold for upcoming Phase A.3
+        for item in primary_items:
+            w = SidebarItem(item)
+            w.clicked.connect(self._handle_click)
+            self.layout.addWidget(w)
+            self.widgets[item.id] = w
+            
+        self._set_active_selection("all")
+        
+        # Stretch scaffold for upcoming Phase A.4 Categories
         self.layout.addStretch()
         
-        # Connect to statistics provider (no-op until nav items are added in Phase A.2)
+        # Connect to statistics provider
         self.statistics_provider.counts_updated.connect(self._on_counts_updated)
         self.statistics_provider.recalculate_all()
         
-    def _on_counts_updated(self, stats: dict):
-        pass
-
     def _handle_click(self, item_id: str):
+        self._set_active_selection(item_id)
         self.nav_item_selected.emit(item_id)
+        
+        if item_id == "all":
+            self.sidebar_controller.select_all_items()
+        elif item_id == "favorites":
+            self.sidebar_controller.select_favorites()
+
+    def _set_active_selection(self, selected_id: str):
+        for item_id, widget in self.widgets.items():
+            widget.set_selected(item_id == selected_id)
+
+    def _on_counts_updated(self, stats: dict):
+        total = stats.get('total', 0)
+        favs = stats.get('favorites', 0)
+        
+        if "all" in self.widgets:
+            self._update_widget_count("all", total)
+        if "favorites" in self.widgets:
+            self._update_widget_count("favorites", favs)
+
+    def _update_widget_count(self, item_id: str, count: int):
+        widget = self.widgets[item_id]
+        widget.item.count = count
+        if hasattr(widget, 'badge_label'):
+            widget.badge_label.setText(str(count))
+            widget.badge_label.setVisible(count > 0)

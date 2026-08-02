@@ -16,6 +16,8 @@ class Icons:
     ZAP = "actions/zap.svg"
     
     # Navigation
+    KEY = "navigation/key.svg"
+    CLOCK = "navigation/clock.svg"
     VAULT = "navigation/vault.svg"
     FOLDER = "navigation/folder.svg"
     SETTINGS = "navigation/settings.svg"
