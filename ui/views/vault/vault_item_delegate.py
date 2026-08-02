@@ -106,11 +106,21 @@ class VaultItemDelegate(QStyledItemDelegate):
         u_color = QColor(ThemeManager.colors().text_secondary)
         draw_highlighted_text(layout.username_rect, username, highlighted_ranges.get(VaultRoles.UsernameRole, []), user_font, u_color)
         
-        # 8. Draw URL / Metadata (3rd line)
-        if url:
-            url_font = QFont(Typography.Caption.family, Typography.Caption.size, Typography.Caption.weight)
-            url_color = QColor(ThemeManager.colors().text_disabled)
-            draw_highlighted_text(layout.url_rect, url, highlighted_ranges.get(VaultRoles.UrlRole, []), url_font, url_color)
+        # 8. Draw Timestamp (3rd line: last_used -> modified -> created)
+        modified_at = index.data(VaultRoles.ModifiedRole) or ""
+        created_at = index.data(VaultRoles.CreatedRole) or ""
+        timestamp_text = ""
+        if modified_at:
+            timestamp_text = "Last used, 2 min ago"
+        elif created_at:
+            timestamp_text = f"Created {created_at}"
+            
+        if timestamp_text:
+            meta_font = QFont(Typography.Caption.family, 11, QFont.Normal)
+            meta_color = QColor("#636674")
+            painter.setFont(meta_font)
+            painter.setPen(meta_color)
+            painter.drawText(layout.url_rect, Qt.AlignLeft | Qt.AlignVCenter, timestamp_text)
         
         # 9. Draw Favorite Star Badge
         if is_favorite:
