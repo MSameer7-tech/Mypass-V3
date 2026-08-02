@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import QStyledItemDelegate, QStyle
 from PySide6.QtCore import Qt, QRect, QPoint, QSize
-from PySide6.QtGui import QPainter, QColor, QFont, QPen, QIcon, QPixmap
+from PySide6.QtGui import QPainter, QColor, QFont, QPen, QIcon, QPixmap, QPainterPath
 
 from ui.models.roles import VaultRoles
 from ui.views.vault.vault_delegate_metrics import VaultDelegateMetrics
@@ -27,7 +27,7 @@ class VaultItemDelegate(QStyledItemDelegate):
         title = index.data(VaultRoles.TitleRole) or ""
         username = index.data(VaultRoles.UsernameRole) or ""
         url = index.data(VaultRoles.UrlRole) or ""
-        icon_path = index.data(VaultRoles.IconRole) or ""
+        icon_val = index.data(VaultRoles.IconRole)
         is_favorite = index.data(VaultRoles.FavoriteRole) or False
         highlighted_ranges = index.data(VaultRoles.HighlightedRangesRole) or {}
         
@@ -58,17 +58,35 @@ class VaultItemDelegate(QStyledItemDelegate):
             painter.setBrush(Qt.NoBrush)
             painter.drawRoundedRect(layout.card_rect.adjusted(1, 1, -1, -1), VaultDelegateMetrics.CARD_RADIUS, VaultDelegateMetrics.CARD_RADIUS)
             
-        # 4. Draw Icon Container (40x40, radius 10)
-        painter.setPen(Qt.NoPen)
-        painter.setBrush(QColor(ThemeManager.colors().background))
-        painter.drawRoundedRect(layout.icon_rect, VaultDelegateMetrics.ICON_RADIUS, VaultDelegateMetrics.ICON_RADIUS)
-        
-        # Monogram / Icon Fallback
-        first_char = title[0].upper() if title else "?"
-        icon_font = QFont(Typography.Headline.family, 15, QFont.Bold)
-        painter.setFont(icon_font)
-        painter.setPen(QColor(ThemeManager.colors().text_secondary))
-        painter.drawText(layout.icon_rect, Qt.AlignCenter, first_char)
+        # 4. Draw Icon / Favicon Container (44x44, radius 10)
+        painted_icon = False
+        if icon_val:
+            if isinstance(icon_val, QIcon):
+                pixmap = icon_val.pixmap(layout.icon_rect.size())
+            elif isinstance(icon_val, QPixmap):
+                pixmap = icon_val
+            else:
+                pixmap = None
+                
+            if pixmap and not pixmap.isNull():
+                painter.save()
+                clip_path = QPainterPath()
+                clip_path.addRoundedRect(layout.icon_rect, VaultDelegateMetrics.ICON_RADIUS, VaultDelegateMetrics.ICON_RADIUS)
+                painter.setClipPath(clip_path)
+                painter.drawPixmap(layout.icon_rect, pixmap)
+                painter.restore()
+                painted_icon = True
+                
+        if not painted_icon:
+            # Fallback Monogram
+            painter.setPen(Qt.NoPen)
+            painter.setBrush(QColor(ThemeManager.colors().background))
+            painter.drawRoundedRect(layout.icon_rect, VaultDelegateMetrics.ICON_RADIUS, VaultDelegateMetrics.ICON_RADIUS)
+            first_char = title[0].upper() if title else "?"
+            icon_font = QFont(Typography.Headline.family, 15, QFont.Bold)
+            painter.setFont(icon_font)
+            painter.setPen(QColor(ThemeManager.colors().text_secondary))
+            painter.drawText(layout.icon_rect, Qt.AlignCenter, first_char)
         
         # 5. Helper to draw highlighted text
         def draw_highlighted_text(rect, text, ranges, font, default_color):

@@ -71,7 +71,6 @@ class IconPipeline(QObject):
             # 2. Check Disk Cache
             pixmap = self.cache.get_disk(domain)
             if pixmap and not pixmap.isNull():
-                # If disk cache is expired, trigger background refresh asynchronously
                 if self.cache.is_disk_expired(domain) and not self.cache.is_negative_cached(domain):
                     self._trigger_async_fetch(domain, url, entry_id)
                 return pixmap
@@ -80,7 +79,7 @@ class IconPipeline(QObject):
             if not self.cache.is_negative_cached(domain):
                 self._trigger_async_fetch(domain, url, entry_id)
                 
-        # 4. Immediate Fallback Monogram while network loads (Zero UI Blocking!)
+        # 4. Immediate Fallback Monogram while network loads
         monogram_pixmap = self.monogram_provider.fetch(domain, url, size=size, letter_override=fallback_title)
         return monogram_pixmap or QPixmap()
 
