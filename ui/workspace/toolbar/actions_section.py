@@ -14,17 +14,17 @@ class ActionsSection(QWidget):
         
         layout = QHBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(Layout.INLINE_GAP)
+        layout.setSpacing(12)
         
-        self.add_btn = PrimaryButton("+ New")
-        self.add_btn.setIcon(Resources.icon(Icons.NEW))
+        self.add_btn = PrimaryButton("+ New Item")
+        self.add_btn.setIcon(Resources.icon(Icons.NEW, color_hex="#FFFFFF"))
         self.add_btn.setIconSize(QSize(Metrics.ICON_16, Metrics.ICON_16))
-        self.add_btn.setToolTip("New Item (Cmd+N)")
+        self.add_btn.setToolTip("New Item (⌘N)")
         
         self.lock_btn = ToolbarIconButton(Icons.LOCK)
-        self.lock_btn.setToolTip("Lock Vault (Cmd+L)")
+        self.lock_btn.setToolTip("Lock Vault (⌘L)")
         self.settings_btn = ToolbarIconButton(Icons.SETTINGS)
-        self.settings_btn.setToolTip("Settings (Cmd+,)")
+        self.settings_btn.setToolTip("Settings (⌘,)")
         self.profile_btn = ToolbarIconButton(Icons.USER)
         self.profile_btn.setToolTip("Vault Information")
         
@@ -43,6 +43,10 @@ class ActionsSection(QWidget):
         layout.addWidget(self.settings_btn)
         layout.addWidget(self.profile_btn)
         
-        # Shortcut for New Item
+        # Shortcuts for New Item, Lock, Settings
         self.new_shortcut = QShortcut(QKeySequence("Ctrl+N"), self)
         self.new_shortcut.activated.connect(self.add_btn.click)
+        self.lock_shortcut = QShortcut(QKeySequence("Ctrl+L"), self)
+        self.lock_shortcut.activated.connect(self.lock_btn.click)
+        self.settings_shortcut = QShortcut(QKeySequence("Ctrl+,"), self)
+        self.settings_shortcut.activated.connect(self.settings_btn.click)

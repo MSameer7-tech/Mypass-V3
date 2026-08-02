@@ -40,14 +40,15 @@ class VaultItemDelegate(QStyledItemDelegate):
         is_focused = option.state & QStyle.State_HasFocus
         
         card_bg_color = QColor(ThemeManager.colors().surface)
-        border_color = QColor(ThemeManager.colors().border)
+        border_color = QColor(255, 255, 255, 12)
         
         if is_selected:
-            card_bg_color = QColor(ThemeManager.colors().surface_elevated)
+            card_bg_color = QColor("#282A32")
             border_color = QColor(ThemeManager.colors().accent)
-            border_color.setAlpha(120) # Subtle glow/border
+            border_color.setAlpha(60)
         elif is_hovered:
             card_bg_color = QColor(ThemeManager.colors().surface_elevated)
+            border_color = QColor(255, 255, 255, 20)
             
         # Draw Card Background and Border
         painter.setPen(QPen(border_color, 1))

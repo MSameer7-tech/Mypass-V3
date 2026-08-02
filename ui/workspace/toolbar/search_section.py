@@ -14,10 +14,9 @@ class SearchSection(QWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setAlignment(Qt.AlignCenter)
         
-        self.search_field = SearchField("Search your vault...")
+        self.search_field = SearchField("Search your vault...  ⌘K")
         self.search_field.setMinimumWidth(Metrics.SEARCH_FIELD_MIN_WIDTH)
         self.search_field.setMaximumWidth(Metrics.SEARCH_FIELD_MAX_WIDTH)
-        # We don't set a hard preferred width but we can set a size policy to prefer expanding.
         self.search_field.setClearButtonEnabled(True)
         
         # Connect to SearchController
