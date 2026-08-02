@@ -1,5 +1,6 @@
 import dataclasses
 from PySide6.QtCore import QSortFilterProxyModel, QModelIndex, Qt
+from PySide6.QtGui import QIcon, QPixmap
 
 from ui.models.roles import VaultRoles
 

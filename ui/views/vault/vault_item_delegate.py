@@ -60,6 +60,7 @@ class VaultItemDelegate(QStyledItemDelegate):
             
         # 4. Draw Icon / Favicon Container (44x44, radius 10)
         painted_icon = False
+
         if icon_val:
             if isinstance(icon_val, QIcon):
                 pixmap = icon_val.pixmap(layout.icon_rect.size())
