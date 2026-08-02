@@ -158,6 +158,14 @@ class DetailsPane(BaseFrame):
         # TOTP
         self.details_coordinator.totp_service.tick.connect(self.details_view.totp.update_tick)
         
+        # Icon Pipeline Signal
+        from ui.services.asset_manager import AssetManager
+        AssetManager.instance().icon_loaded.connect(self._on_icon_loaded)
+
+    def _on_icon_loaded(self, entry_id: int, disk_path: str):
+        if hasattr(self.details_view, "current_vm") and self.details_view.current_vm and getattr(self.details_view.current_vm, "id", None) == entry_id:
+            self.details_view.header.update_view(self.details_view.current_vm)
+        
     def _on_details_fetched(self, vm: EntryDetailsViewModel):
         self.details_view.update_view(vm)
         self.stack.setCurrentIndex(1)
