@@ -32,10 +32,10 @@ class SidebarItem(BaseFrame):
         self.is_selected = False
         self.setObjectName("SidebarItem")
         self.setCursor(Qt.PointingHandCursor)
-        self.setFixedHeight(38)
+        self.setFixedHeight(36)
         
         layout = QHBoxLayout(self)
-        layout.setContentsMargins(12, 0, 12, 0)
+        layout.setContentsMargins(16, 0, 16, 0)
         layout.setSpacing(12)
         
         self.icon_label = QLabel()
@@ -62,40 +62,62 @@ class SidebarItem(BaseFrame):
         else:
             self.chevron_label = None
             
+        from PySide6.QtCore import QVariantAnimation, QAbstractAnimation
+        from PySide6.QtGui import QColor
+        self.anim = QVariantAnimation(self)
+        self.anim.setDuration(120)
+        self.anim.valueChanged.connect(self._on_anim_value_changed)
+        self._target_bg = QColor(0, 0, 0, 0)
+
+    def _on_anim_value_changed(self, value):
+        col = value
+        self.setStyleSheet(f"""
+            SidebarItem {{
+                background-color: rgba({col.red()}, {col.green()}, {col.blue()}, {col.alphaF()});
+                border-radius: 8px;
+                border: none;
+            }}
+        """)
+
     def set_selected(self, selected: bool):
+        from PySide6.QtGui import QColor
         self.is_selected = selected
+        
         if selected:
             if self.item.is_category:
-                bg_color = "#1F69FF" # Bright blue fill for categories matching reference
+                bg_color = QColor("#2563EB") # Vibrant reference blue pill
                 icon_hex = "#FFFFFF"
+                chevron_hex = "#FFFFFF"
             else:
-                bg_color = "#2E313A" # Dark subtle fill for primary nav matching reference
+                bg_color = QColor("#2D3039") # Dark reference primary nav pill
                 icon_hex = "#38BDF8"
+                chevron_hex = "#FFFFFF"
                 
-            self.setStyleSheet(f"""
-                SidebarItem {{
-                    background-color: {bg_color};
-                    border-radius: 8px;
-                }}
-            """)
             self.text_label.setStyleSheet("color: #FFFFFF; font-size: 14px; font-weight: 500; border: none; background: transparent;")
             self.icon_label.setPixmap(Resources.icon(self.item.icon, color_hex=icon_hex).pixmap(18, 18))
             if self.chevron_label:
-                self.chevron_label.setPixmap(Resources.icon(Icons.CHEVRON_DOWN, color_hex="#FFFFFF").pixmap(14, 14))
+                self.chevron_label.setPixmap(Resources.icon(Icons.CHEVRON_DOWN, color_hex=chevron_hex).pixmap(14, 14))
+                
+            self.anim.stop()
+            self.anim.setStartValue(QColor(0, 0, 0, 0))
+            self.anim.setEndValue(bg_color)
+            self.anim.start()
         else:
+            self.text_label.setStyleSheet("color: #E2E8F0; font-size: 14px; font-weight: 500; border: none; background: transparent;")
+            self.icon_label.setPixmap(Resources.icon(self.item.icon, color_hex="#38BDF8").pixmap(18, 18))
+            if self.chevron_label:
+                self.chevron_label.setPixmap(Resources.icon(Icons.CHEVRON_DOWN, color_hex="#71717A").pixmap(14, 14))
+                
             self.setStyleSheet("""
                 SidebarItem {
                     background-color: transparent;
                     border-radius: 8px;
+                    border: none;
                 }
                 SidebarItem:hover {
                     background-color: rgba(255, 255, 255, 0.05);
                 }
             """)
-            self.text_label.setStyleSheet("color: #E2E8F0; font-size: 14px; font-weight: 500; border: none; background: transparent;")
-            self.icon_label.setPixmap(Resources.icon(self.item.icon, color_hex="#38BDF8").pixmap(18, 18))
-            if self.chevron_label:
-                self.chevron_label.setPixmap(Resources.icon(Icons.CHEVRON_DOWN, color_hex="#71717A").pixmap(14, 14))
 
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
