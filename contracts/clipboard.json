@@ -1,0 +1,24 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ClipboardContracts",
+  "description": "Frozen contract specifications for MyPass Clipboard operations.",
+  "definitions": {
+    "ClipboardCopyRequest": {
+      "type": "object",
+      "properties": {
+        "text": { "type": "string" },
+        "isSensitive": { "type": "boolean" },
+        "autoClearSeconds": { "type": "integer" }
+      },
+      "required": ["text", "isSensitive", "autoClearSeconds"]
+    },
+    "ClipboardCopyResult": {
+      "type": "object",
+      "properties": {
+        "success": { "type": "boolean" },
+        "clearsAt": { "type": "string" }
+      },
+      "required": ["success", "clearsAt"]
+    }
+  }
+}

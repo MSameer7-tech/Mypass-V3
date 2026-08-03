@@ -1,0 +1,27 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SearchContracts",
+  "description": "Frozen contract specifications for MyPass Global Search operations.",
+  "definitions": {
+    "SearchQuery": {
+      "type": "object",
+      "properties": {
+        "term": { "type": "string" },
+        "category": { "type": ["string", "null"] },
+        "favoritesOnly": { "type": "boolean" }
+      },
+      "required": ["term", "favoritesOnly"]
+    },
+    "SearchResult": {
+      "type": "object",
+      "properties": {
+        "matchIds": {
+          "type": "array",
+          "items": { "type": "integer" }
+        },
+        "totalMatches": { "type": "integer" }
+      },
+      "required": ["matchIds", "totalMatches"]
+    }
+  }
+}
