@@ -12,6 +12,7 @@ from services.master_password_service import MasterPasswordService
 from services.authentication_service import AuthenticationService
 from services.vault_service import VaultService
 from services.password_generator import PasswordGeneratorService
+from services.backup_service import BackupService
 
 def seed_initial_vault_if_empty(vault_service):
   entries = vault_service.list_all_entries()
@@ -29,6 +30,7 @@ def main():
   auth_service = AuthenticationService(master_pwd_service, repo)
   vault_service = VaultService(repo)
   generator_service = PasswordGeneratorService()
+  backup_service = BackupService(vault_service)
 
   seed_initial_vault_if_empty(vault_service)
 
@@ -51,7 +53,6 @@ def main():
 
       elif method == "auth.unlock":
         master_password = params.get("masterPassword", "")
-        # Auto-initialize master password if not set
         if not master_pwd_service.has_master_password():
           master_pwd_service.set_master_password(master_password)
 
@@ -108,17 +109,27 @@ def main():
         vault_service.delete_entry(entry_id)
         response = {"jsonrpc": "2.0", "id": req_id, "result": {"success": True, "data": {"success": True}}}
 
-      elif method == "vault.toggle_favorite":
-        entry_id = params.get("id")
-        # Delegate favorite toggle
-        response = {"jsonrpc": "2.0", "id": req_id, "result": {"success": True, "data": {"success": True}}}
-
       elif method == "generator.generate":
         length = params.get("length", 16)
         include_symbols = params.get("symbols", True)
         include_numbers = params.get("numbers", True)
         pwd = generator_service.generate_password(length, include_numbers, include_symbols)
         response = {"jsonrpc": "2.0", "id": req_id, "result": {"success": True, "data": {"password": pwd}}}
+
+      elif method == "backup.export":
+        entries = vault_service.list_all_entries()
+        export_payload = json.dumps([{ "title": e.title, "username": e.username, "password": e.password, "website_url": e.website_url } for e in entries], indent=2)
+        response = {"jsonrpc": "2.0", "id": req_id, "result": {"success": True, "data": {"filename": "mypass-vault-backup.json", "payload": export_payload, "itemCount": len(entries)}}}
+
+      elif method == "backup.import":
+        payload = params.get("payload", "[]")
+        items = json.loads(payload)
+        count = 0
+        for item in items:
+          if isinstance(item, dict) and "title" in item:
+            vault_service.create_entry(item.get("title", "Imported"), item.get("username", ""), item.get("password", ""), item.get("website_url", ""))
+            count += 1
+        response = {"jsonrpc": "2.0", "id": req_id, "result": {"success": True, "data": {"importedCount": count}}}
 
       else:
         response = {"jsonrpc": "2.0", "id": req_id, "result": {"success": False, "error": {"code": "METHOD_NOT_FOUND", "message": f"Method {method} not found."}}}
