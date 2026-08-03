@@ -6,7 +6,6 @@ import { VaultList } from "./VaultList";
 import { Inspector } from "./Inspector";
 import { SecurityCenter } from "../../features/security/pages/SecurityCenter";
 import { SettingsPage } from "../../features/settings/pages/SettingsPage";
-import { SectionHeader } from "../layout/SectionHeader";
 import { Button } from "../core/Button";
 import { Dialog } from "../overlay/Dialog";
 import { ConfirmDialog } from "../overlay/ConfirmDialog";
@@ -23,7 +22,8 @@ import {
   useDeleteEntryMutation,
 } from "../../queries/useVaultQueries";
 import { GeneratorRepository } from "../../repositories/GeneratorRepository";
-import { Plus, RefreshCw } from "lucide-react";
+import { Plus, RefreshCw, ChevronDown, ListFilter } from "lucide-react";
+import { Icon } from "../core/Icon";
 
 export const WorkspaceLayout: React.FC = () => {
   // Live Server State via React Query
@@ -136,8 +136,8 @@ export const WorkspaceLayout: React.FC = () => {
   return (
     <div className="h-screen w-screen bg-[var(--background)] text-[var(--text-primary)] flex flex-col overflow-hidden select-none">
       <PanelGroup direction="horizontal" className="h-full w-full">
-        {/* Column 1: Resizable Sidebar */}
-        <Panel defaultSize={18} minSize={14} maxSize={25} className="bg-[var(--surface-sidebar)]">
+        {/* Column 1: Resizable Sidebar (240px baseline) */}
+        <Panel defaultSize={14} minSize={12} maxSize={18} className="bg-[var(--surface-sidebar)]">
           <Sidebar
             activeCategory={activeCategory}
             onSelectCategory={setSelectedCategory}
@@ -151,7 +151,7 @@ export const WorkspaceLayout: React.FC = () => {
 
         {/* View Router: Security Center vs Vault Explorer */}
         {activeCategory === "Security Center" ? (
-          <Panel defaultSize={82} minSize={75} className="bg-[var(--background)]">
+          <Panel defaultSize={86} minSize={75} className="bg-[var(--background)]">
             <SecurityCenter
               entries={liveEntries}
               onFixEntry={(id) => {
@@ -162,8 +162,8 @@ export const WorkspaceLayout: React.FC = () => {
           </Panel>
         ) : (
           <>
-            {/* Column 2: Resizable Vault List */}
-            <Panel defaultSize={30} minSize={22} maxSize={45} className="bg-[var(--surface-panel)] border-r border-[var(--border-subtle)] flex flex-col">
+            {/* Column 2: Resizable Vault List (380px baseline) */}
+            <Panel defaultSize={23} minSize={20} maxSize={32} className="bg-[var(--surface-panel)] border-r border-[var(--border-subtle)] flex flex-col">
               <Toolbar
                 searchQuery={searchQuery}
                 onSearchChange={setSearchQuery}
@@ -172,16 +172,28 @@ export const WorkspaceLayout: React.FC = () => {
                 onOpenSettings={() => openDialog("settings")}
               />
 
-              <div className="p-3 border-b border-[var(--border-subtle)] flex items-center justify-between">
-                <SectionHeader
-                  title={activeCategory}
-                  subtitle={`${filteredEntries.length} items`}
-                  action={
-                    <Button size="sm" leadingIcon={Plus} onClick={() => openDialog("newEntry")}>
+              {/* Vault Header Bar */}
+              <div className="p-4 border-b border-[var(--border-subtle)] flex flex-col gap-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <h2 className="text-xl font-bold text-[var(--text-primary)] tracking-tight">{activeCategory === "All" ? "Favorites" : activeCategory}</h2>
+                    <Button size="sm" variant="primary" leadingIcon={Plus} onClick={() => openDialog("newEntry")} className="rounded-lg text-xs font-bold px-2 py-0.5">
                       New
                     </Button>
-                  }
-                />
+                  </div>
+
+                  <div className="flex items-center gap-3 text-xs text-[var(--text-muted)] font-medium">
+                    <button className="flex items-center gap-1 hover:text-[var(--text-primary)] transition-colors">
+                      <span>Sort: Recently Used</span>
+                      <Icon icon={ChevronDown} size="xs" />
+                    </button>
+                    <button className="p-1 hover:text-[var(--text-primary)] rounded">
+                      <Icon icon={ListFilter} size="xs" />
+                    </button>
+                  </div>
+                </div>
+
+                <span className="text-xs text-[var(--text-muted)] font-medium">{filteredEntries.length} items</span>
               </div>
 
               {isError ? (
@@ -189,23 +201,28 @@ export const WorkspaceLayout: React.FC = () => {
                   Database Error: {(error as Error)?.message}
                 </div>
               ) : (
-                <VaultList
-                  entries={filteredEntries}
-                  selectedId={selectedEntry?.id}
-                  isLoading={isLoading}
-                  onSelectEntry={selectEntry}
-                  onToggleFavorite={(id, e) => {
-                    e.stopPropagation();
-                    toggleFavorite(id);
-                  }}
-                />
+                <div className="flex-1 flex flex-col justify-between overflow-hidden">
+                  <VaultList
+                    entries={filteredEntries}
+                    selectedId={selectedEntry?.id}
+                    isLoading={isLoading}
+                    onSelectEntry={selectEntry}
+                    onToggleFavorite={(id, e) => {
+                      e.stopPropagation();
+                      toggleFavorite(id);
+                    }}
+                  />
+                  <div className="p-3 px-4 border-t border-[var(--border-subtle)] text-xs text-[var(--text-muted)] font-medium shrink-0">
+                    {filteredEntries.length} items
+                  </div>
+                </div>
               )}
             </Panel>
 
             <PanelResizeHandle className="w-[1px] bg-[var(--border-subtle)] hover:bg-[var(--accent)] transition-colors cursor-col-resize" />
 
-            {/* Column 3: Resizable Inspector Pane */}
-            <Panel defaultSize={52} minSize={35} className="bg-[var(--background)]">
+            {/* Column 3: Resizable Details Inspector (Elastic) */}
+            <Panel defaultSize={63} minSize={45} className="bg-[var(--background)]">
               <Inspector
                 entry={selectedEntry}
                 onEdit={() => addToast("info", "Edit Mode", "Editor drawer active.")}
