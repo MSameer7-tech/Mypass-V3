@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "MyPass v3 — Local-First Password Manager",
+        "title": "",
         "width": 1180,
         "height": 720,
         "minWidth": 880,

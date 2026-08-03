@@ -22,8 +22,7 @@ import {
   useDeleteEntryMutation,
 } from "../../queries/useVaultQueries";
 import { GeneratorRepository } from "../../repositories/GeneratorRepository";
-import { RefreshCw, ChevronDown, ListFilter } from "lucide-react";
-import { Icon } from "../core/Icon";
+import { RefreshCw } from "lucide-react";
 
 export const WorkspaceLayout: React.FC = () => {
   // Live Server State via React Query
@@ -39,7 +38,6 @@ export const WorkspaceLayout: React.FC = () => {
   const setSelectedCategory = useVaultStore((s) => s.setSelectedCategory);
 
   const searchQuery = useSearchStore((s) => s.query);
-  const setSearchQuery = useSearchStore((s) => s.setSearchQuery);
   const commandPaletteOpen = useSearchStore((s) => s.commandPaletteOpen);
   const setCommandPaletteOpen = useSearchStore((s) => s.setCommandPaletteOpen);
 
@@ -165,34 +163,10 @@ export const WorkspaceLayout: React.FC = () => {
             {/* Column 2: Vault List (30% ≈ 354px baseline on 1180px window) */}
             <Panel defaultSize={30} minSize={25} maxSize={38} className="bg-[var(--surface-panel)] border-r border-[var(--border-subtle)] flex flex-col">
               <Toolbar
-                searchQuery={searchQuery}
-                onSearchChange={setSearchQuery}
+                activeCategory={activeCategory}
+                itemCount={filteredEntries.length}
                 onNewEntry={() => openDialog("newEntry")}
-                onLockVault={() => addToast("warning", "Vault Locked", "Session cleared.")}
-                onOpenSettings={() => openDialog("settings")}
               />
-
-              {/* Vault Header Bar (Compact px-4 py-2.5) */}
-              <div className="px-4 py-2.5 border-b border-[var(--border-subtle)] flex items-center justify-between">
-                <div className="flex items-center gap-2.5">
-                  <h2 className="text-base font-bold text-[var(--text-primary)] tracking-tight">
-                    {activeCategory === "All" ? "All Items" : activeCategory}
-                  </h2>
-                  <span className="px-2 py-0.5 rounded-full bg-white/5 text-[10px] font-mono font-medium text-[var(--text-muted)]">
-                    {filteredEntries.length}
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-1.5 text-xs text-[var(--text-muted)] font-medium">
-                  <button className="flex items-center gap-1 hover:text-[var(--text-primary)] transition-colors px-2 py-1 rounded-md hover:bg-white/5 text-[11px]">
-                    <span>Recently Used</span>
-                    <Icon icon={ChevronDown} size="xs" />
-                  </button>
-                  <button className="p-1 hover:text-[var(--text-primary)] rounded-md hover:bg-white/5" title="Filter list">
-                    <Icon icon={ListFilter} size="xs" />
-                  </button>
-                </div>
-              </div>
 
               {isError ? (
                 <div className="p-4 text-xs text-[var(--danger)] text-center font-mono">
@@ -216,12 +190,14 @@ export const WorkspaceLayout: React.FC = () => {
 
             <PanelResizeHandle className="w-[1px] bg-[var(--border-subtle)] hover:bg-[var(--accent)] transition-colors cursor-col-resize" />
 
-            {/* Column 3: Details Inspector (Elastic ~52% remaining) */}
+            {/* Column 3: Details Inspector with Top Search Header (Elastic ~52% remaining) */}
             <Panel defaultSize={52} minSize={42} className="bg-[var(--background)]">
               <Inspector
                 entry={selectedEntry}
                 onEdit={() => addToast("info", "Edit Mode", "Editor drawer active.")}
                 onDelete={() => openDialog("deleteConfirm")}
+                onOpenSettings={() => openDialog("settings")}
+                onLockVault={() => addToast("warning", "Vault Locked", "Session cleared.")}
               />
             </Panel>
           </>

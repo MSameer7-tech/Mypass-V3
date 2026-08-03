@@ -24,12 +24,12 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
 }) => {
   const activeStyle = isSelected
     ? "bg-[var(--surface-card-selected)] text-[var(--text-primary)] font-semibold shadow-xs"
-    : "text-[var(--text-secondary)] hover:bg-white/5 hover:text-[var(--text-primary)]";
+    : "text-[var(--text-secondary)] hover:bg-white/5 hover:text-[var(--text-primary)] font-medium";
 
   return (
     <button
       disabled={isDisabled}
-      className={`flex items-center justify-between w-full h-8 px-2.5 text-xs rounded-lg transition-all duration-150 select-none focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--border-focus)] disabled:opacity-40 disabled:pointer-events-none ${activeStyle} ${className}`}
+      className={`flex items-center justify-between w-full h-[34px] px-3 text-[13px] rounded-lg transition-all duration-150 select-none focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--border-focus)] disabled:opacity-40 disabled:pointer-events-none ${activeStyle} ${className}`}
       {...props}
     >
       <div className="flex items-center gap-2.5 min-w-0">
@@ -39,12 +39,12 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
       <div className="flex items-center gap-1.5 shrink-0 ml-2">
         {badge}
         {count !== undefined && (
-          <span className="px-1.5 py-0.5 text-[10px] font-mono font-medium rounded-full bg-white/5 text-[var(--text-muted)]">
+          <span className="px-2 py-0.5 text-[11px] font-mono font-medium rounded-full bg-white/5 text-[var(--text-muted)]">
             {count}
           </span>
         )}
         {shortcut && (
-          <kbd className="px-1 text-[10px] font-mono text-[var(--text-muted)] opacity-60">
+          <kbd className="px-1 text-[11px] font-mono text-[var(--text-muted)] opacity-60">
             {shortcut}
           </kbd>
         )}
