@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useMemo } from "react";
 import { PanelGroup, Panel, PanelResizeHandle } from "react-resizable-panels";
 import { Sidebar } from "./Sidebar";
 import { Toolbar } from "./Toolbar";
@@ -10,23 +10,33 @@ import { Dialog } from "../overlay/Dialog";
 import { ConfirmDialog } from "../overlay/ConfirmDialog";
 import { CommandPalette } from "../power/CommandPalette";
 import { NotificationCenter } from "../overlay/NotificationCenter";
-import { Input } from "../core/Input";
-import { PasswordInput } from "../core/Input";
+import { Input, PasswordInput } from "../core/Input";
 import { FieldGroup } from "../layout/FieldGroup";
-import { mockVaultEntries, MockVaultEntry } from "../../mocks/vault";
+import { useVaultStore } from "../../stores/vault/useVaultStore";
+import { useSearchStore } from "../../stores/search/useSearchStore";
+import { useUIStore } from "../../stores/ui/useUIStore";
 import { Plus } from "lucide-react";
 
 export const WorkspaceLayout: React.FC = () => {
-  const [entries, setEntries] = useState<MockVaultEntry[]>(mockVaultEntries);
-  const [activeCategory, setActiveCategory] = useState<string>("All");
-  const [selectedId, setSelectedId] = useState<number>(1);
-  const [searchQuery, setSearchQuery] = useState<string>("");
+  // Store Selectors (Prevents re-renders)
+  const entries = useVaultStore((s) => s.entries);
+  const selectedId = useVaultStore((s) => s.selectedEntryId);
+  const activeCategory = useVaultStore((s) => s.selectedCategory);
+  const selectEntry = useVaultStore((s) => s.selectEntry);
+  const toggleFavorite = useVaultStore((s) => s.toggleFavorite);
+  const deleteEntry = useVaultStore((s) => s.deleteEntry);
+  const setSelectedCategory = useVaultStore((s) => s.setSelectedCategory);
 
-  // Dialog & Overlay States
-  const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
-  const [newEntryDialogOpen, setNewEntryDialogOpen] = useState(false);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [toasts, setToasts] = useState<any[]>([]);
+  const searchQuery = useSearchStore((s) => s.query);
+  const setSearchQuery = useSearchStore((s) => s.setSearchQuery);
+  const commandPaletteOpen = useSearchStore((s) => s.commandPaletteOpen);
+  const setCommandPaletteOpen = useSearchStore((s) => s.setCommandPaletteOpen);
+
+  const activeDialog = useUIStore((s) => s.activeDialog);
+  const openDialog = useUIStore((s) => s.openDialog);
+  const closeDialog = useUIStore((s) => s.closeDialog);
+
+  const [toasts, setToasts] = React.useState<any[]>([]);
 
   // Category & Search Filtering
   const filteredEntries = useMemo(() => {
@@ -54,46 +64,39 @@ export const WorkspaceLayout: React.FC = () => {
     };
   }, [entries]);
 
-  const handleToggleFavorite = (id: number, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setEntries((prev) =>
-      prev.map((entry) => (entry.id === id ? { ...entry, favorite: !entry.favorite } : entry))
-    );
-  };
-
   const addToast = (variant: "success" | "error" | "warning" | "info", title: string, description?: string) => {
     setToasts((prev) => [...prev, { id: Date.now().toString(), variant, title, description }]);
   };
 
-  const handleDeleteEntry = () => {
+  const handleConfirmDelete = () => {
     if (!selectedEntry) return;
-    setEntries((prev) => prev.filter((e) => e.id !== selectedEntry.id));
-    setDeleteDialogOpen(false);
-    addToast("success", "Entry Deleted", `'${selectedEntry.title}' was removed from your vault.`);
+    deleteEntry(selectedEntry.id);
+    closeDialog();
+    addToast("success", "Entry Deleted", `'${selectedEntry.title}' was removed.`);
   };
 
   return (
     <div className="h-screen w-screen bg-[var(--background)] text-[var(--text-primary)] flex flex-col overflow-hidden select-none">
       <PanelGroup direction="horizontal" className="h-full w-full">
-        {/* Column 1: Resizable Sidebar (240px min) */}
+        {/* Column 1: Resizable Sidebar */}
         <Panel defaultSize={18} minSize={14} maxSize={25} className="bg-[var(--surface-sidebar)]">
           <Sidebar
             activeCategory={activeCategory}
-            onSelectCategory={setActiveCategory}
-            onOpenSettings={() => addToast("info", "Settings", "Settings sheet active.")}
-            onLockVault={() => addToast("warning", "Vault Locked", "Vault session cleared.")}
+            onSelectCategory={setSelectedCategory}
+            onOpenSettings={() => addToast("info", "Settings", "Settings active.")}
+            onLockVault={() => addToast("warning", "Vault Locked", "Session cleared.")}
             itemCounts={itemCounts}
           />
         </Panel>
 
         <PanelResizeHandle className="w-[1px] bg-[var(--border-subtle)] hover:bg-[var(--accent)] transition-colors cursor-col-resize" />
 
-        {/* Column 2: Resizable Vault List (340px min) */}
+        {/* Column 2: Resizable Vault List */}
         <Panel defaultSize={30} minSize={22} maxSize={45} className="bg-[var(--surface-panel)] border-r border-[var(--border-subtle)] flex flex-col">
           <Toolbar
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
-            onNewEntry={() => setNewEntryDialogOpen(true)}
+            onNewEntry={() => openDialog("newEntry")}
             onLockVault={() => addToast("warning", "Vault Locked", "Session cleared.")}
             onOpenSettings={() => setCommandPaletteOpen(true)}
           />
@@ -103,7 +106,7 @@ export const WorkspaceLayout: React.FC = () => {
               title={activeCategory}
               subtitle={`${filteredEntries.length} items`}
               action={
-                <Button size="sm" leadingIcon={Plus} onClick={() => setNewEntryDialogOpen(true)}>
+                <Button size="sm" leadingIcon={Plus} onClick={() => openDialog("newEntry")}>
                   New
                 </Button>
               }
@@ -113,19 +116,22 @@ export const WorkspaceLayout: React.FC = () => {
           <VaultList
             entries={filteredEntries}
             selectedId={selectedEntry?.id}
-            onSelectEntry={setSelectedId}
-            onToggleFavorite={handleToggleFavorite}
+            onSelectEntry={selectEntry}
+            onToggleFavorite={(id, e) => {
+              e.stopPropagation();
+              toggleFavorite(id);
+            }}
           />
         </Panel>
 
         <PanelResizeHandle className="w-[1px] bg-[var(--border-subtle)] hover:bg-[var(--accent)] transition-colors cursor-col-resize" />
 
-        {/* Column 3: Resizable Inspector Pane (~620px min) */}
+        {/* Column 3: Resizable Inspector Pane */}
         <Panel defaultSize={52} minSize={35} className="bg-[var(--background)]">
           <Inspector
             entry={selectedEntry}
             onEdit={() => addToast("info", "Edit Mode", "Editor drawer active.")}
-            onDelete={() => setDeleteDialogOpen(true)}
+            onDelete={() => openDialog("deleteConfirm")}
           />
         </Panel>
       </PanelGroup>
@@ -135,21 +141,21 @@ export const WorkspaceLayout: React.FC = () => {
 
       {/* New Entry Modal */}
       <Dialog
-        open={newEntryDialogOpen}
-        onClose={() => setNewEntryDialogOpen(false)}
+        open={activeDialog === "newEntry"}
+        onClose={closeDialog}
         title="New Vault Entry"
-        description="Add credentials to store locally in your AES-256 encrypted vault."
+        description="Add credentials to store locally in your vault."
         footer={
           <>
-            <Button variant="ghost" size="sm" onClick={() => setNewEntryDialogOpen(false)}>
+            <Button variant="ghost" size="sm" onClick={closeDialog}>
               Cancel
             </Button>
             <Button
               variant="primary"
               size="sm"
               onClick={() => {
-                setNewEntryDialogOpen(false);
-                addToast("success", "Entry Created", "Stored securely in vault.");
+                closeDialog();
+                addToast("success", "Entry Created", "Stored in vault.");
               }}
             >
               Save Entry
@@ -167,23 +173,19 @@ export const WorkspaceLayout: React.FC = () => {
           <FieldGroup label="Password">
             <PasswordInput placeholder="Enter or generate password..." />
           </FieldGroup>
-          <FieldGroup label="Website URL">
-            <Input placeholder="https://..." />
-          </FieldGroup>
         </div>
       </Dialog>
 
       {/* Confirm Delete Dialog */}
       <ConfirmDialog
-        open={deleteDialogOpen}
-        onClose={() => setDeleteDialogOpen(false)}
+        open={activeDialog === "deleteConfirm"}
+        onClose={closeDialog}
         title="Delete Vault Entry"
         description={`Are you sure you want to permanently delete '${selectedEntry?.title}'? This action cannot be undone.`}
         confirmLabel="Delete Permanently"
-        onConfirm={handleDeleteEntry}
+        onConfirm={handleConfirmDelete}
       />
 
-      {/* Toast Notification Manager */}
       <NotificationCenter toasts={toasts} onDismiss={(id) => setToasts((prev) => prev.filter((t) => t.id !== id))} />
     </div>
   );
