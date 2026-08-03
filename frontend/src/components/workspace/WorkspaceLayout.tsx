@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { PanelGroup, Panel, PanelResizeHandle } from "react-resizable-panels";
 import { Sidebar } from "./Sidebar";
 import { Toolbar } from "./Toolbar";
@@ -15,16 +15,25 @@ import { FieldGroup } from "../layout/FieldGroup";
 import { useVaultStore } from "../../stores/vault/useVaultStore";
 import { useSearchStore } from "../../stores/search/useSearchStore";
 import { useUIStore } from "../../stores/ui/useUIStore";
-import { Plus } from "lucide-react";
+import {
+  useVaultEntriesQuery,
+  useCreateEntryMutation,
+  useDeleteEntryMutation,
+} from "../../queries/useVaultQueries";
+import { GeneratorRepository } from "../../repositories/GeneratorRepository";
+import { Plus, RefreshCw } from "lucide-react";
 
 export const WorkspaceLayout: React.FC = () => {
-  // Store Selectors (Prevents re-renders)
-  const entries = useVaultStore((s) => s.entries);
+  // Live Server State via React Query
+  const { data: liveEntries = [], isLoading, isError, error } = useVaultEntriesQuery();
+  const createMutation = useCreateEntryMutation();
+  const deleteMutation = useDeleteEntryMutation();
+
+  // Store Selectors (Presentation State)
   const selectedId = useVaultStore((s) => s.selectedEntryId);
   const activeCategory = useVaultStore((s) => s.selectedCategory);
   const selectEntry = useVaultStore((s) => s.selectEntry);
   const toggleFavorite = useVaultStore((s) => s.toggleFavorite);
-  const deleteEntry = useVaultStore((s) => s.deleteEntry);
   const setSelectedCategory = useVaultStore((s) => s.setSelectedCategory);
 
   const searchQuery = useSearchStore((s) => s.query);
@@ -36,11 +45,23 @@ export const WorkspaceLayout: React.FC = () => {
   const openDialog = useUIStore((s) => s.openDialog);
   const closeDialog = useUIStore((s) => s.closeDialog);
 
-  const [toasts, setToasts] = React.useState<any[]>([]);
+  // Form State
+  const [newTitle, setNewTitle] = useState("");
+  const [newUsername, setNewUsername] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [newWebsite, setNewWebsite] = useState("");
+  const [toasts, setToasts] = useState<any[]>([]);
+
+  // Default selection on load
+  useEffect(() => {
+    if (liveEntries.length > 0 && selectedId === null) {
+      selectEntry(liveEntries[0].id);
+    }
+  }, [liveEntries, selectedId, selectEntry]);
 
   // Category & Search Filtering
   const filteredEntries = useMemo(() => {
-    return entries.filter((entry) => {
+    return liveEntries.filter((entry) => {
       const matchesSearch =
         entry.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         entry.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -50,29 +71,64 @@ export const WorkspaceLayout: React.FC = () => {
       if (activeCategory === "Favorites") return matchesSearch && entry.favorite;
       return matchesSearch && entry.category === activeCategory;
     });
-  }, [entries, activeCategory, searchQuery]);
+  }, [liveEntries, activeCategory, searchQuery]);
 
-  const selectedEntry = entries.find((e) => e.id === selectedId) || filteredEntries[0];
+  const selectedEntry = liveEntries.find((e) => e.id === selectedId) || filteredEntries[0];
 
   const itemCounts = useMemo(() => {
     return {
-      all: entries.length,
-      favorites: entries.filter((e) => e.favorite).length,
-      passwords: entries.filter((e) => e.category === "Passwords").length,
-      notes: entries.filter((e) => e.category === "Secure Notes").length,
-      keys: entries.filter((e) => e.category === "Developer Keys").length,
+      all: liveEntries.length,
+      favorites: liveEntries.filter((e) => e.favorite).length,
+      passwords: liveEntries.filter((e) => e.category === "Passwords").length,
+      notes: liveEntries.filter((e) => e.category === "Secure Notes").length,
+      keys: liveEntries.filter((e) => e.category === "Developer Keys").length,
     };
-  }, [entries]);
+  }, [liveEntries]);
 
   const addToast = (variant: "success" | "error" | "warning" | "info", title: string, description?: string) => {
     setToasts((prev) => [...prev, { id: Date.now().toString(), variant, title, description }]);
   };
 
-  const handleConfirmDelete = () => {
+  const handleGeneratePassword = async () => {
+    const res = await GeneratorRepository.generate(16, true, true);
+    if (res.success) {
+      setNewPassword(res.data.password);
+      addToast("info", "Password Generated", "Cryptographically secure password generated.");
+    }
+  };
+
+  const handleCreateSubmit = async () => {
+    if (!newTitle.trim()) return;
+
+    try {
+      await createMutation.mutateAsync({
+        title: newTitle,
+        username: newUsername,
+        password: newPassword,
+        websiteUrl: newWebsite,
+      });
+
+      setNewTitle("");
+      setNewUsername("");
+      setNewPassword("");
+      setNewWebsite("");
+      closeDialog();
+      addToast("success", "Entry Created", `'${newTitle}' stored in SQLite database.`);
+    } catch (err: any) {
+      addToast("error", "Creation Failed", err.message);
+    }
+  };
+
+  const handleConfirmDelete = async () => {
     if (!selectedEntry) return;
-    deleteEntry(selectedEntry.id);
-    closeDialog();
-    addToast("success", "Entry Deleted", `'${selectedEntry.title}' was removed.`);
+
+    try {
+      await deleteMutation.mutateAsync(selectedEntry.id);
+      closeDialog();
+      addToast("success", "Entry Deleted", `'${selectedEntry.title}' was deleted.`);
+    } catch (err: any) {
+      addToast("error", "Deletion Failed", err.message);
+    }
   };
 
   return (
@@ -113,15 +169,22 @@ export const WorkspaceLayout: React.FC = () => {
             />
           </div>
 
-          <VaultList
-            entries={filteredEntries}
-            selectedId={selectedEntry?.id}
-            onSelectEntry={selectEntry}
-            onToggleFavorite={(id, e) => {
-              e.stopPropagation();
-              toggleFavorite(id);
-            }}
-          />
+          {isError ? (
+            <div className="p-4 text-xs text-[var(--danger)] text-center font-mono">
+              Database Error: {(error as Error)?.message}
+            </div>
+          ) : (
+            <VaultList
+              entries={filteredEntries}
+              selectedId={selectedEntry?.id}
+              isLoading={isLoading}
+              onSelectEntry={selectEntry}
+              onToggleFavorite={(id, e) => {
+                e.stopPropagation();
+                toggleFavorite(id);
+              }}
+            />
+          )}
         </Panel>
 
         <PanelResizeHandle className="w-[1px] bg-[var(--border-subtle)] hover:bg-[var(--accent)] transition-colors cursor-col-resize" />
@@ -144,7 +207,7 @@ export const WorkspaceLayout: React.FC = () => {
         open={activeDialog === "newEntry"}
         onClose={closeDialog}
         title="New Vault Entry"
-        description="Add credentials to store locally in your vault."
+        description="Add credentials to store locally in your AES-256 encrypted SQLite vault."
         footer={
           <>
             <Button variant="ghost" size="sm" onClick={closeDialog}>
@@ -153,10 +216,8 @@ export const WorkspaceLayout: React.FC = () => {
             <Button
               variant="primary"
               size="sm"
-              onClick={() => {
-                closeDialog();
-                addToast("success", "Entry Created", "Stored in vault.");
-              }}
+              isLoading={createMutation.isPending}
+              onClick={handleCreateSubmit}
             >
               Save Entry
             </Button>
@@ -165,13 +226,48 @@ export const WorkspaceLayout: React.FC = () => {
       >
         <div className="flex flex-col gap-4">
           <FieldGroup label="Title" required>
-            <Input placeholder="e.g. GitHub" />
+            <Input
+              value={newTitle}
+              onChange={(e) => setNewTitle(e.target.value)}
+              placeholder="e.g. GitHub"
+              autoFocus
+            />
           </FieldGroup>
           <FieldGroup label="Username / Email">
-            <Input placeholder="user@mypass.app" />
+            <Input
+              value={newUsername}
+              onChange={(e) => setNewUsername(e.target.value)}
+              placeholder="user@mypass.app"
+            />
           </FieldGroup>
+
           <FieldGroup label="Password">
-            <PasswordInput placeholder="Enter or generate password..." />
+            <div className="flex gap-2">
+              <div className="flex-1">
+                <PasswordInput
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="Enter password..."
+                />
+              </div>
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                leadingIcon={RefreshCw}
+                onClick={handleGeneratePassword}
+              >
+                Generate
+              </Button>
+            </div>
+          </FieldGroup>
+
+          <FieldGroup label="Website URL">
+            <Input
+              value={newWebsite}
+              onChange={(e) => setNewWebsite(e.target.value)}
+              placeholder="https://..."
+            />
           </FieldGroup>
         </div>
       </Dialog>
@@ -183,6 +279,7 @@ export const WorkspaceLayout: React.FC = () => {
         title="Delete Vault Entry"
         description={`Are you sure you want to permanently delete '${selectedEntry?.title}'? This action cannot be undone.`}
         confirmLabel="Delete Permanently"
+        isLoading={deleteMutation.isPending}
         onConfirm={handleConfirmDelete}
       />
 
