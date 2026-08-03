@@ -22,7 +22,24 @@ export async function sendIPCRequest<T>(
     const rawResponse = await invoke<string>("python_ipc", { payload });
     const duration = Math.round(performance.now() - startTime);
 
-    const parsed = JSON.parse(rawResponse);
+    if (!rawResponse || !rawResponse.trim()) {
+      console.warn(`[IPC Empty Output] ${method} (${duration}ms): Empty stdout returned from bridge.`);
+      return {
+        success: false,
+        error: { code: "EMPTY_RESPONSE", message: "Empty IPC response received from backend." },
+      };
+    }
+
+    let parsed: any;
+    try {
+      parsed = JSON.parse(rawResponse);
+    } catch (parseErr: any) {
+      console.error(`[IPC JSON Parse Error] ${method} (${duration}ms): Raw payload was: "${rawResponse}"`, parseErr);
+      return {
+        success: false,
+        error: { code: "JSON_PARSE_ERROR", message: `Invalid JSON from backend: ${parseErr.message}` },
+      };
+    }
 
     if (process.env.NODE_ENV !== "production") {
       console.log(`[IPC] ${method} (${duration}ms):`, parsed.result?.success ? "OK" : "ERROR");
@@ -34,11 +51,11 @@ export async function sendIPCRequest<T>(
 
     return {
       success: false,
-      error: { code: "INVALID_RESPONSE", message: "Malformed JSON-RPC response." },
+      error: { code: "INVALID_RESPONSE", message: "Malformed JSON-RPC response format." },
     };
   } catch (err: unknown) {
     const duration = Math.round(performance.now() - startTime);
-    console.error(`[IPC Error] ${method} (${duration}ms):`, err);
+    console.error(`[IPC Transport Error] ${method} (${duration}ms):`, err);
 
     return {
       success: false,
