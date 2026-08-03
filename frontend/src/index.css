@@ -1,14 +1,14 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0F1015;
-  --surface-sidebar: #14151B;
-  --surface-panel: #181920;
-  --surface-card: #1E202A;
-  --surface-card-hover: #262834;
-  --surface-card-selected: #2D303E;
+  --background: #0B0C10;
+  --surface-sidebar: #0F1015;
+  --surface-panel: #13141B;
+  --surface-card: #181922;
+  --surface-card-hover: #1F212D;
+  --surface-card-selected: #1A243B;
   
-  --border-subtle: #232532;
+  --border-subtle: #222533;
   --border-focus: #3B82F6;
   
   --text-primary: #F8FAFC;

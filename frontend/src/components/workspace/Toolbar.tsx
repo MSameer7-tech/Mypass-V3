@@ -22,7 +22,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
   return (
     <header className="h-14 w-full bg-[var(--surface-panel)] border-b border-[var(--border-subtle)] px-4 flex items-center justify-between gap-3 shrink-0 select-none">
       {/* Search Input Dominates Width */}
-      <div className="flex-1 max-w-lg">
+      <div className="flex-1 max-w-xl">
         <SearchInput
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
@@ -40,9 +40,9 @@ export const Toolbar: React.FC<ToolbarProps> = ({
             size="sm"
             leadingIcon={Plus}
             onClick={onNewEntry}
-            className="font-bold shadow-xs"
+            className="font-bold shadow-xs px-3 py-1.5"
           >
-            New
+            New Entry
           </Button>
         )}
 
