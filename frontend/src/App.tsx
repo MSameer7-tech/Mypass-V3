@@ -1,10 +1,10 @@
 import { AppProviders } from "./providers/AppProviders";
-import { WorkspaceLayout } from "./components/workspace/WorkspaceLayout";
+import { AuthenticationRouter } from "./features/auth/providers/AuthenticationRouter";
 
 function App() {
   return (
     <AppProviders>
-      <WorkspaceLayout />
+      <AuthenticationRouter />
     </AppProviders>
   );
 }

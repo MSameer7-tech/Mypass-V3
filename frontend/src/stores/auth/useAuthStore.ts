@@ -1,37 +1,86 @@
 import { create } from "zustand";
+import { AuthRepository } from "../../repositories/AuthRepository";
 
-export type SessionState = "UNLOCKED" | "LOCKED" | "UNINITIALIZED";
+export type SessionState =
+  | "BOOTING"
+  | "NO_VAULT"
+  | "LOCKED"
+  | "UNLOCKING"
+  | "UNLOCKED"
+  | "LOCKING"
+  | "ERROR";
 
 export interface AuthState {
   sessionState: SessionState;
-  isLocked: boolean;
-  isUnlocking: boolean;
   user: { name: string; email: string } | null;
   autoLockMinutes: number;
+  lastActivityTimestamp: number;
+  authError: string | null;
 
-  // Semantic Actions
+  // Actions
+  checkVaultStatus: () => Promise<void>;
+  unlockVault: (masterPassword: string) => Promise<boolean>;
   lockVault: () => void;
-  unlockVault: (masterPassword?: string) => Promise<boolean>;
-  setSessionState: (state: SessionState) => void;
+  createVault: (masterPassword: string) => Promise<boolean>;
+  resetActivityTimer: () => void;
+  setAutoLockMinutes: (minutes: number) => void;
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
-  sessionState: "UNLOCKED",
-  isLocked: false,
-  isUnlocking: false,
+export const useAuthStore = create<AuthState>((set, get) => ({
+  sessionState: "BOOTING",
   user: { name: "Sameer", email: "sameer@mypass.app" },
   autoLockMinutes: 15,
+  lastActivityTimestamp: Date.now(),
+  authError: null,
 
-  lockVault: () => set({ sessionState: "LOCKED", isLocked: true }),
-
-  unlockVault: async (_masterPassword) => {
-    set({ isUnlocking: true });
-    // Mock unlock delay
-    await new Promise((resolve) => setTimeout(resolve, 300));
-    set({ sessionState: "UNLOCKED", isLocked: false, isUnlocking: false });
-    return true;
+  checkVaultStatus: async () => {
+    set({ sessionState: "BOOTING", authError: null });
+    const res = await AuthRepository.status();
+    if (res.success) {
+      set({ sessionState: res.data.sessionState });
+    } else {
+      set({ sessionState: "LOCKED" });
+    }
   },
 
-  setSessionState: (sessionState) =>
-    set({ sessionState, isLocked: sessionState === "LOCKED" }),
+  unlockVault: async (masterPassword) => {
+    set({ sessionState: "UNLOCKING", authError: null });
+    const res = await AuthRepository.unlock(masterPassword);
+
+    if (res.success && res.data.success) {
+      set({ sessionState: "UNLOCKED", lastActivityTimestamp: Date.now() });
+      return true;
+    }
+
+    set({
+      sessionState: "LOCKED",
+      authError: res.success ? "Invalid password" : res.error.message,
+    });
+    return false;
+  },
+
+  lockVault: () => {
+    set({ sessionState: "LOCKING" });
+    AuthRepository.lock();
+    set({ sessionState: "LOCKED", lastActivityTimestamp: Date.now() });
+  },
+
+  createVault: async (masterPassword) => {
+    set({ sessionState: "UNLOCKING", authError: null });
+    const res = await AuthRepository.unlock(masterPassword);
+    if (res.success) {
+      set({ sessionState: "UNLOCKED", lastActivityTimestamp: Date.now() });
+      return true;
+    }
+    set({ sessionState: "NO_VAULT", authError: "Failed to create vault." });
+    return false;
+  },
+
+  resetActivityTimer: () => {
+    if (get().sessionState === "UNLOCKED") {
+      set({ lastActivityTimestamp: Date.now() });
+    }
+  },
+
+  setAutoLockMinutes: (minutes) => set({ autoLockMinutes: minutes }),
 }));
