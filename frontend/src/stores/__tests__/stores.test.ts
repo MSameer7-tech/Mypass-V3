@@ -16,7 +16,7 @@ describe("VaultStore & AuthStore Unit Tests", () => {
 
     useAuthStore.setState({
       sessionState: "UNLOCKED",
-      isLocked: false,
+      authError: null,
     });
   });
 
@@ -54,7 +54,6 @@ describe("VaultStore & AuthStore Unit Tests", () => {
   it("lockVault sets sessionState to LOCKED", () => {
     useAuthStore.getState().lockVault();
     expect(useAuthStore.getState().sessionState).toBe("LOCKED");
-    expect(useAuthStore.getState().isLocked).toBe(true);
   });
 
   it("vaultMapper maps DTOs correctly", () => {
