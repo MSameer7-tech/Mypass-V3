@@ -17,7 +17,6 @@ from services.backup_service import BackupService
 def seed_initial_vault_if_empty(vault_service):
   entries = vault_service.list_all_entries()
   if len(entries) == 0:
-    print("[IPC Bridge] Seeding initial local SQLite vault entries...", file=sys.stderr)
     vault_service.create_entry("GitHub", "developer@mypass.app", "ghp_98472938472938479238472398", "https://github.com", "Main developer GitHub account.")
     vault_service.create_entry("Google", "sameer@google.com", "G00gl3-S3cur3-P@ss2026!", "https://google.com", "Primary email account.")
     vault_service.create_entry("Apple ID", "sameer@icloud.com", "Ap1e-S3cur3-Vault-Key!", "https://apple.com", "iCloud and App Store developer account.")

@@ -1,10 +1,8 @@
 use std::process::{Command, Stdio};
 use std::io::{BufRead, BufReader, Write};
-use serde_json::Value;
 
 #[tauri::command]
 fn python_ipc(payload: String) -> Result<String, String> {
-    // Locate Python executable and script
     let python_bin = "/Users/sameer/Documents/Password-Manager-App/.venv/bin/python";
     let script_path = "/Users/sameer/Documents/Password-Manager-App/backend/ipc_bridge.py";
 
@@ -21,11 +19,17 @@ fn python_ipc(payload: String) -> Result<String, String> {
     }
 
     let stdout = child.stdout.take().ok_or("Failed to open stdout")?;
-    let mut reader = BufReader::new(stdout);
-    let mut response_line = String::new();
-    reader.read_line(&mut response_line).map_err(|e| format!("Failed to read stdout: {}", e))?;
+    let reader = BufReader::new(stdout);
 
-    Ok(response_line.trim().to_string())
+    for line_result in reader.lines() {
+        let line = line_result.map_err(|e| format!("Failed to read line: {}", e))?;
+        let trimmed = line.trim();
+        if trimmed.starts_with('{') || trimmed.starts_with('[') {
+            return Ok(trimmed.to_string());
+        }
+    }
+
+    Err("No valid JSON output received from Python backend process.".to_string())
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
