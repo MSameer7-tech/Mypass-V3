@@ -46,11 +46,12 @@ export const VaultList: React.FC<VaultListProps> = ({
           title={entry.title}
           username={entry.username}
           websiteUrl={entry.websiteUrl}
-          isFavorite={entry.favorite}
-          timestamp={entry.updatedAt}
+          favorite={entry.favorite}
+          securityStatus={entry.securityStatus}
+          updatedAt={entry.updatedAt}
           isSelected={selectedId === entry.id}
-          onItemSelect={onSelectEntry}
-          onToggleFavorite={onToggleFavorite}
+          onClick={() => onSelectEntry(entry.id)}
+          onToggleFavorite={onToggleFavorite ? (e) => onToggleFavorite(entry.id, e) : undefined}
         />
       ))}
     </div>
