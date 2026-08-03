@@ -5,6 +5,7 @@ import { Toolbar } from "./Toolbar";
 import { VaultList } from "./VaultList";
 import { Inspector } from "./Inspector";
 import { SecurityCenter } from "../../features/security/pages/SecurityCenter";
+import { SettingsPage } from "../../features/settings/pages/SettingsPage";
 import { SectionHeader } from "../layout/SectionHeader";
 import { Button } from "../core/Button";
 import { Dialog } from "../overlay/Dialog";
@@ -140,7 +141,7 @@ export const WorkspaceLayout: React.FC = () => {
           <Sidebar
             activeCategory={activeCategory}
             onSelectCategory={setSelectedCategory}
-            onOpenSettings={() => addToast("info", "Settings", "Settings active.")}
+            onOpenSettings={() => openDialog("settings")}
             onLockVault={() => addToast("warning", "Vault Locked", "Session cleared.")}
             itemCounts={itemCounts}
           />
@@ -168,7 +169,7 @@ export const WorkspaceLayout: React.FC = () => {
                 onSearchChange={setSearchQuery}
                 onNewEntry={() => openDialog("newEntry")}
                 onLockVault={() => addToast("warning", "Vault Locked", "Session cleared.")}
-                onOpenSettings={() => setCommandPaletteOpen(true)}
+                onOpenSettings={() => openDialog("settings")}
               />
 
               <div className="p-3 border-b border-[var(--border-subtle)] flex items-center justify-between">
@@ -217,6 +218,13 @@ export const WorkspaceLayout: React.FC = () => {
 
       {/* Global Overlays */}
       <CommandPalette open={commandPaletteOpen} onClose={() => setCommandPaletteOpen(false)} />
+
+      {/* Settings Page Modal */}
+      {activeDialog === "settings" && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+          <SettingsPage onClose={closeDialog} onShowToast={addToast} />
+        </div>
+      )}
 
       {/* New Entry Modal */}
       <Dialog
