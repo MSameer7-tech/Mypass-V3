@@ -39,14 +39,15 @@ export const Inspector: React.FC<InspectorProps> = ({ entry, onEdit, onDelete })
 
   return (
     <div className="h-full w-full bg-[var(--background)] p-8 overflow-y-auto flex flex-col justify-between select-text border-l border-[var(--border-subtle)]">
-      <div className="flex flex-col gap-7">
+      {/* Readable Max Content Container (760px max width) */}
+      <div className="flex flex-col gap-6 max-w-[760px] w-full mx-auto">
         {/* 1. Header Section */}
-        <div className="flex items-start justify-between border-b border-[var(--border-subtle)] pb-6">
+        <div className="flex items-start justify-between border-b border-[var(--border-subtle)] pb-5">
           <div className="flex items-center gap-4">
-            <FaviconAvatar title={entry.title} websiteUrl={entry.websiteUrl} size="lg" className="h-16 w-16 rounded-2xl text-2xl font-bold shrink-0 shadow-md bg-[var(--surface-card)] border border-[var(--border-subtle)]" />
+            <FaviconAvatar title={entry.title} websiteUrl={entry.websiteUrl} size="lg" className="h-14 w-14 rounded-2xl text-xl font-bold shrink-0 shadow-md bg-[var(--surface-card)] border border-[var(--border-subtle)]" />
             <div className="flex flex-col gap-1">
               <div className="flex items-center gap-2.5">
-                <h2 className="text-2xl font-bold text-[var(--text-primary)] tracking-tight">{entry.title}</h2>
+                <h2 className="text-xl font-bold text-[var(--text-primary)] tracking-tight">{entry.title}</h2>
                 <Badge variant="outline" className="text-xs bg-[var(--surface-card)] border-[var(--border-subtle)] text-[var(--text-muted)] px-2.5 py-0.5">{entry.category || "Passwords"}</Badge>
               </div>
               {entry.websiteUrl ? (
@@ -76,14 +77,14 @@ export const Inspector: React.FC<InspectorProps> = ({ entry, onEdit, onDelete })
         </div>
 
         {/* 2. CREDENTIALS Section */}
-        <div className="flex flex-col gap-3">
-          <h4 className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider">CREDENTIALS</h4>
+        <div className="flex flex-col gap-2.5">
+          <h4 className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-wider">CREDENTIALS</h4>
 
-          <Card variant="default" className="flex flex-col gap-3 p-4 bg-[var(--surface-card)] border border-[var(--border-subtle)] rounded-xl">
+          <Card variant="default" className="flex flex-col gap-2.5 p-3.5 bg-[var(--surface-card)] border-transparent hover:border-[var(--border-subtle)] rounded-[14px]">
             {/* Username Field */}
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between h-9">
               <div className="flex flex-col gap-0.5 min-w-0">
-                <span className="text-[11px] font-medium text-[var(--text-muted)]">Username / Email</span>
+                <span className="text-[10px] font-medium text-[var(--text-muted)]">Username / Email</span>
                 <span className="text-sm font-semibold text-[var(--text-primary)] truncate">{entry.username || "—"}</span>
               </div>
               <CopyButton valueToCopy={entry.username || ""} label="" className="h-8 w-8 p-0 min-w-0" />
@@ -92,15 +93,15 @@ export const Inspector: React.FC<InspectorProps> = ({ entry, onEdit, onDelete })
             <div className="border-t border-[var(--border-subtle)]" />
 
             {/* Password Field */}
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between h-9">
               <div className="flex flex-col gap-0.5 min-w-0">
-                <span className="text-[11px] font-medium text-[var(--text-muted)]">Password</span>
+                <span className="text-[10px] font-medium text-[var(--text-muted)]">Password</span>
                 <span className="text-sm font-mono font-semibold text-[var(--text-primary)] tracking-wider">
                   {showPassword ? entry.password || "••••••••••••" : "••••••••••••••••"}
                 </span>
               </div>
 
-              <div className="flex items-center gap-1.5 shrink-0">
+              <div className="flex items-center gap-1 shrink-0">
                 <IconButton
                   icon={showPassword ? EyeOff : Eye}
                   label={showPassword ? "Hide password" : "Reveal password"}
@@ -126,19 +127,18 @@ export const Inspector: React.FC<InspectorProps> = ({ entry, onEdit, onDelete })
         </div>
 
         {/* 3. SECURITY ANALYSIS Section */}
-        <div className="flex flex-col gap-3">
-          <h4 className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider">SECURITY ANALYSIS</h4>
-          <Card variant="default" className="flex flex-col gap-3 p-4 bg-[var(--surface-card)] border border-[var(--border-subtle)] rounded-xl">
+        <div className="flex flex-col gap-2.5">
+          <h4 className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-wider">SECURITY ANALYSIS</h4>
+          <Card variant="default" className="flex flex-col gap-2.5 p-3.5 bg-[var(--surface-card)] border-transparent hover:border-[var(--border-subtle)] rounded-[14px]">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold text-[var(--text-secondary)]">Password Strength</span>
-              <div className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-950/60 border border-emerald-800/60 text-[11px] font-bold text-emerald-400">
+              <div className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-950/60 border border-emerald-800/60 text-[10px] font-bold text-emerald-400">
                 <Icon icon={Check} size="xs" className="text-emerald-400" />
                 <span>Very Strong</span>
               </div>
             </div>
 
-            {/* Segmented Strength Bar */}
-            <div className="flex items-center gap-1.5 h-2 w-full mt-1">
+            <div className="flex items-center gap-1.5 h-1.5 w-full mt-0.5">
               <div className="flex-1 h-full rounded-full bg-emerald-500" />
               <div className="flex-1 h-full rounded-full bg-emerald-500" />
               <div className="flex-1 h-full rounded-full bg-emerald-500" />
@@ -149,36 +149,38 @@ export const Inspector: React.FC<InspectorProps> = ({ entry, onEdit, onDelete })
         </div>
 
         {/* 4. SECURE NOTES Section */}
-        <div className="flex flex-col gap-3">
-          <h4 className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider">SECURE NOTES</h4>
-          <Card variant="default" className="flex items-center justify-between p-4 bg-[var(--surface-card)] border border-[var(--border-subtle)] rounded-xl text-xs font-medium text-[var(--text-secondary)]">
-            <span>{entry.notes || "Main developer GitHub account."}</span>
-            {onEdit && (
-              <IconButton icon={Edit3} label="Edit Notes" size="sm" variant="ghost" onClick={onEdit} className="h-7 w-7 text-[var(--text-muted)] hover:text-[var(--text-primary)] shrink-0" />
-            )}
-          </Card>
-        </div>
+        {entry.notes && (
+          <div className="flex flex-col gap-2.5">
+            <h4 className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-wider">SECURE NOTES</h4>
+            <Card variant="default" className="flex items-center justify-between p-3.5 bg-[var(--surface-card)] border-transparent hover:border-[var(--border-subtle)] rounded-[14px] text-xs font-medium text-[var(--text-secondary)]">
+              <span>{entry.notes}</span>
+              {onEdit && (
+                <IconButton icon={Edit3} label="Edit Notes" size="sm" variant="ghost" onClick={onEdit} className="h-7 w-7 text-[var(--text-muted)] hover:text-[var(--text-primary)] shrink-0" />
+              )}
+            </Card>
+          </div>
+        )}
 
         {/* 5. METADATA Section */}
-        <div className="flex flex-col gap-3">
-          <h4 className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider">METADATA</h4>
-          <div className="grid grid-cols-3 gap-3 text-xs">
-            <div className="p-3.5 bg-[var(--surface-card)] border border-[var(--border-subtle)] rounded-xl flex items-center gap-3">
-              <Icon icon={Calendar} size="sm" tone="muted" />
+        <div className="flex flex-col gap-2.5">
+          <h4 className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-wider">METADATA</h4>
+          <div className="grid grid-cols-3 gap-2.5 text-xs">
+            <div className="p-3 bg-[var(--surface-card)] border-transparent hover:border-[var(--border-subtle)] rounded-[14px] flex items-center gap-2.5">
+              <Icon icon={Calendar} size="xs" tone="muted" />
               <div className="flex flex-col">
                 <span className="text-[10px] text-[var(--text-muted)] font-medium">Last Updated</span>
                 <span className="font-semibold text-[var(--text-primary)] mt-0.5">{entry.updatedAt || "Just now"}</span>
               </div>
             </div>
-            <div className="p-3.5 bg-[var(--surface-card)] border border-[var(--border-subtle)] rounded-xl flex items-center gap-3">
-              <Icon icon={Calendar} size="sm" tone="muted" />
+            <div className="p-3 bg-[var(--surface-card)] border-transparent hover:border-[var(--border-subtle)] rounded-[14px] flex items-center gap-2.5">
+              <Icon icon={Calendar} size="xs" tone="muted" />
               <div className="flex flex-col">
                 <span className="text-[10px] text-[var(--text-muted)] font-medium">Created</span>
                 <span className="font-semibold text-[var(--text-primary)] mt-0.5">Jan 12, 2024</span>
               </div>
             </div>
-            <div className="p-3.5 bg-[var(--surface-card)] border border-[var(--border-subtle)] rounded-xl flex items-center gap-3">
-              <Icon icon={Key} size="sm" tone="muted" />
+            <div className="p-3 bg-[var(--surface-card)] border-transparent hover:border-[var(--border-subtle)] rounded-[14px] flex items-center gap-2.5">
+              <Icon icon={Key} size="xs" tone="muted" />
               <div className="flex flex-col">
                 <span className="text-[10px] text-[var(--text-muted)] font-medium">Record ID</span>
                 <span className="font-semibold text-[var(--text-primary)] font-mono mt-0.5">#00{entry.id}</span>
@@ -189,9 +191,9 @@ export const Inspector: React.FC<InspectorProps> = ({ entry, onEdit, onDelete })
       </div>
 
       {/* Footer Encryption Badge */}
-      <div className="flex items-center justify-center gap-2 pt-6 text-[11px] font-medium text-[var(--text-muted)] border-t border-[var(--border-subtle)]">
+      <div className="flex items-center justify-center gap-2 pt-5 text-[11px] font-medium text-[var(--text-muted)] border-t border-[var(--border-subtle)] mt-6">
         <Icon icon={Shield} size="xs" tone="muted" />
-        <span>Encrypted with AES-256-GCM & Argon2id</span>
+        <span>AES-256-GCM • Argon2id • Vault Updated 2 min ago</span>
       </div>
     </div>
   );
