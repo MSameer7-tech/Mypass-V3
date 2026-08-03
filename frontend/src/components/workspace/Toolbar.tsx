@@ -20,27 +20,27 @@ export const Toolbar: React.FC<ToolbarProps> = ({
   onOpenSettings,
 }) => {
   return (
-    <header className="h-[56px] w-full bg-[var(--surface-panel)] border-b border-[var(--border-subtle)] px-6 flex items-center justify-between gap-4 shrink-0 select-none">
-      {/* Dominant Search Input (620px max width) */}
-      <div className="flex-1 max-w-[620px]">
+    <header className="h-[48px] w-full bg-[var(--surface-panel)] border-b border-[var(--border-subtle)] px-4 flex items-center justify-between gap-3 shrink-0 select-none">
+      {/* Compact Search Input */}
+      <div className="flex-1 max-w-[480px]">
         <SearchInput
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
           onClear={() => onSearchChange("")}
           placeholder="Search vault..."
-          className="w-full h-10"
+          className="w-full h-8 text-xs"
         />
       </div>
 
       {/* Baseline Aligned Toolbar Controls */}
-      <div className="flex items-center gap-2 shrink-0">
+      <div className="flex items-center gap-1.5 shrink-0">
         {onNewEntry && (
           <Button
             variant="primary"
             size="sm"
             leadingIcon={Plus}
             onClick={onNewEntry}
-            className="h-10 rounded-xl font-semibold px-4 shadow-xs hover:shadow-button-glow transition-all"
+            className="h-8 rounded-lg text-xs font-semibold px-3 shadow-xs hover:shadow-button-glow transition-all"
           >
             New Entry
           </Button>
@@ -53,7 +53,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
             size="sm"
             variant="secondary"
             onClick={onOpenSettings}
-            className="h-10 w-10 rounded-xl bg-[var(--surface-card)] border-transparent hover:bg-[var(--surface-card-hover)]"
+            className="h-8 w-8 rounded-lg bg-[var(--surface-card)] border-transparent hover:bg-[var(--surface-card-hover)]"
           />
         )}
 
@@ -64,7 +64,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
             size="sm"
             variant="secondary"
             onClick={onLockVault}
-            className="h-10 w-10 rounded-xl bg-[var(--surface-card)] border-transparent hover:bg-[var(--surface-card-hover)]"
+            className="h-8 w-8 rounded-lg bg-[var(--surface-card)] border-transparent hover:bg-[var(--surface-card-hover)]"
           />
         )}
       </div>
