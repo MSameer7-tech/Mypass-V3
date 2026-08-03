@@ -4,6 +4,7 @@ import { Sidebar } from "./Sidebar";
 import { Toolbar } from "./Toolbar";
 import { VaultList } from "./VaultList";
 import { Inspector } from "./Inspector";
+import { SecurityCenter } from "../../features/security/pages/SecurityCenter";
 import { SectionHeader } from "../layout/SectionHeader";
 import { Button } from "../core/Button";
 import { Dialog } from "../overlay/Dialog";
@@ -147,56 +148,71 @@ export const WorkspaceLayout: React.FC = () => {
 
         <PanelResizeHandle className="w-[1px] bg-[var(--border-subtle)] hover:bg-[var(--accent)] transition-colors cursor-col-resize" />
 
-        {/* Column 2: Resizable Vault List */}
-        <Panel defaultSize={30} minSize={22} maxSize={45} className="bg-[var(--surface-panel)] border-r border-[var(--border-subtle)] flex flex-col">
-          <Toolbar
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            onNewEntry={() => openDialog("newEntry")}
-            onLockVault={() => addToast("warning", "Vault Locked", "Session cleared.")}
-            onOpenSettings={() => setCommandPaletteOpen(true)}
-          />
-
-          <div className="p-3 border-b border-[var(--border-subtle)] flex items-center justify-between">
-            <SectionHeader
-              title={activeCategory}
-              subtitle={`${filteredEntries.length} items`}
-              action={
-                <Button size="sm" leadingIcon={Plus} onClick={() => openDialog("newEntry")}>
-                  New
-                </Button>
-              }
-            />
-          </div>
-
-          {isError ? (
-            <div className="p-4 text-xs text-[var(--danger)] text-center font-mono">
-              Database Error: {(error as Error)?.message}
-            </div>
-          ) : (
-            <VaultList
-              entries={filteredEntries}
-              selectedId={selectedEntry?.id}
-              isLoading={isLoading}
-              onSelectEntry={selectEntry}
-              onToggleFavorite={(id, e) => {
-                e.stopPropagation();
-                toggleFavorite(id);
+        {/* View Router: Security Center vs Vault Explorer */}
+        {activeCategory === "Security Center" ? (
+          <Panel defaultSize={82} minSize={75} className="bg-[var(--background)]">
+            <SecurityCenter
+              entries={liveEntries}
+              onFixEntry={(id) => {
+                selectEntry(id);
+                setSelectedCategory("All");
               }}
             />
-          )}
-        </Panel>
+          </Panel>
+        ) : (
+          <>
+            {/* Column 2: Resizable Vault List */}
+            <Panel defaultSize={30} minSize={22} maxSize={45} className="bg-[var(--surface-panel)] border-r border-[var(--border-subtle)] flex flex-col">
+              <Toolbar
+                searchQuery={searchQuery}
+                onSearchChange={setSearchQuery}
+                onNewEntry={() => openDialog("newEntry")}
+                onLockVault={() => addToast("warning", "Vault Locked", "Session cleared.")}
+                onOpenSettings={() => setCommandPaletteOpen(true)}
+              />
 
-        <PanelResizeHandle className="w-[1px] bg-[var(--border-subtle)] hover:bg-[var(--accent)] transition-colors cursor-col-resize" />
+              <div className="p-3 border-b border-[var(--border-subtle)] flex items-center justify-between">
+                <SectionHeader
+                  title={activeCategory}
+                  subtitle={`${filteredEntries.length} items`}
+                  action={
+                    <Button size="sm" leadingIcon={Plus} onClick={() => openDialog("newEntry")}>
+                      New
+                    </Button>
+                  }
+                />
+              </div>
 
-        {/* Column 3: Resizable Inspector Pane */}
-        <Panel defaultSize={52} minSize={35} className="bg-[var(--background)]">
-          <Inspector
-            entry={selectedEntry}
-            onEdit={() => addToast("info", "Edit Mode", "Editor drawer active.")}
-            onDelete={() => openDialog("deleteConfirm")}
-          />
-        </Panel>
+              {isError ? (
+                <div className="p-4 text-xs text-[var(--danger)] text-center font-mono">
+                  Database Error: {(error as Error)?.message}
+                </div>
+              ) : (
+                <VaultList
+                  entries={filteredEntries}
+                  selectedId={selectedEntry?.id}
+                  isLoading={isLoading}
+                  onSelectEntry={selectEntry}
+                  onToggleFavorite={(id, e) => {
+                    e.stopPropagation();
+                    toggleFavorite(id);
+                  }}
+                />
+              )}
+            </Panel>
+
+            <PanelResizeHandle className="w-[1px] bg-[var(--border-subtle)] hover:bg-[var(--accent)] transition-colors cursor-col-resize" />
+
+            {/* Column 3: Resizable Inspector Pane */}
+            <Panel defaultSize={52} minSize={35} className="bg-[var(--background)]">
+              <Inspector
+                entry={selectedEntry}
+                onEdit={() => addToast("info", "Edit Mode", "Editor drawer active.")}
+                onDelete={() => openDialog("deleteConfirm")}
+              />
+            </Panel>
+          </>
+        )}
       </PanelGroup>
 
       {/* Global Overlays */}
