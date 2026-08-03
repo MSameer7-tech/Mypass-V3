@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "VaultContracts",
+  "description": "Frozen contract specifications for MyPass VaultService operations.",
+  "definitions": {
+    "VaultEntryDTO": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "title": { "type": "string" },
+        "username": { "type": "string" },
+        "website": { "type": "string" },
+        "category": { "type": "string" },
+        "favorite": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "title", "username", "website", "category", "favorite"]
+    },
+    "VaultEntryDetailsDTO": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "title": { "type": "string" },
+        "username": { "type": "string" },
+        "password": { "type": "string" },
+        "website": { "type": "string" },
+        "notes": { "type": "string" },
+        "category": { "type": "string" },
+        "favorite": { "type": "boolean" },
+        "totpSecret": { "type": ["string", "null"] },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "title", "username", "password", "website", "notes", "category", "favorite"]
+    }
+  }
+}
