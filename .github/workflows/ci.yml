@@ -1,0 +1,47 @@
+name: MyPass Continuous Integration
+
+on:
+  push:
+    branches: [ tauri-react, main, "feature/**" ]
+  pull_request:
+    branches: [ tauri-react, main ]
+
+jobs:
+  backend-test:
+    name: Python Backend Test Suite
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt pytest
+      - name: Run Pytest
+        run: |
+          PYTHONPATH=backend pytest backend/tests -k "not qtbot"
+
+  frontend-check:
+    name: Frontend Quality & Typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.18.0
+      - name: Set up Node.js
+        uses: actions/setup-python@v5
+        with:
+          node-version: 20
+      - name: Install dependencies
+        run: |
+          cd frontend
+          pnpm install --no-frozen-lockfile
+      - name: TypeScript Check
+        run: |
+          cd frontend
+          pnpm typecheck
