@@ -1,14 +1,14 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0B0D13;
-  --surface-sidebar: #10131C;
-  --surface-panel: #161924;
-  --surface-card: #1F2330;
-  --surface-card-hover: #272C3C;
-  --surface-card-selected: #212C45;
+  --background: #090A0F;
+  --surface-sidebar: #0D0F17;
+  --surface-panel: #131620;
+  --surface-card: #1C202E;
+  --surface-card-hover: #252B3E;
+  --surface-card-selected: #1E2B4B;
   
-  --border-subtle: #2A2F40;
+  --border-subtle: rgba(255, 255, 255, 0.07);
   --border-focus: #3B82F6;
   
   --text-primary: #F8FAFC;
@@ -34,4 +34,13 @@ body {
   font-family: Inter, -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
   overflow: hidden;
   user-select: none;
+}
+
+/* Custom glow & shadow classes for premium desktop feel */
+.shadow-card-selected {
+  box-shadow: 0 0 30px rgba(59, 130, 246, 0.08), 0 4px 20px rgba(0, 0, 0, 0.25);
+}
+
+.shadow-button-glow {
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.12);
 }

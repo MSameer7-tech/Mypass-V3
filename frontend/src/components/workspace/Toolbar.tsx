@@ -20,15 +20,15 @@ export const Toolbar: React.FC<ToolbarProps> = ({
   onOpenSettings,
 }) => {
   return (
-    <header className="h-[56px] w-full bg-[var(--surface-panel)] border-b border-[var(--border-subtle)] px-4 flex items-center justify-between gap-3 shrink-0 select-none">
+    <header className="h-[56px] w-full bg-[var(--surface-panel)] border-b border-[var(--border-subtle)] px-6 flex items-center justify-between gap-4 shrink-0 select-none">
       {/* Dominant Search Input (620px max width) */}
       <div className="flex-1 max-w-[620px]">
         <SearchInput
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
           onClear={() => onSearchChange("")}
-          placeholder="Search vault (⌘F)..."
-          className="w-full h-10 rounded-[14px]"
+          placeholder="Search vault..."
+          className="w-full h-10"
         />
       </div>
 
@@ -40,7 +40,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
             size="sm"
             leadingIcon={Plus}
             onClick={onNewEntry}
-            className="h-10 rounded-xl font-bold px-4 shadow-xs"
+            className="h-10 rounded-xl font-semibold px-4 shadow-xs hover:shadow-button-glow transition-all"
           >
             New Entry
           </Button>
@@ -53,7 +53,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
             size="sm"
             variant="secondary"
             onClick={onOpenSettings}
-            className="h-10 w-10 rounded-xl"
+            className="h-10 w-10 rounded-xl bg-[var(--surface-card)] border-transparent hover:bg-[var(--surface-card-hover)]"
           />
         )}
 
@@ -64,7 +64,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
             size="sm"
             variant="secondary"
             onClick={onLockVault}
-            className="h-10 w-10 rounded-xl"
+            className="h-10 w-10 rounded-xl bg-[var(--surface-card)] border-transparent hover:bg-[var(--surface-card-hover)]"
           />
         )}
       </div>
