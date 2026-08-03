@@ -34,21 +34,21 @@ export const VaultCard: React.FC<VaultCardProps> = ({
       whileTap={{ scale: 0.99 }}
       transition={{ duration: 0.12 }}
       onClick={onClick}
-      className={`group relative flex items-center justify-between h-[84px] p-3.5 rounded-xl cursor-pointer transition-all border ${
+      className={`group relative flex items-center justify-between h-[74px] px-3.5 py-3 rounded-[14px] cursor-pointer transition-all border ${
         isSelected
-          ? "bg-[var(--surface-card-selected)] border-[var(--border-focus)] shadow-md shadow-blue-500/10"
-          : "bg-[var(--surface-card)] border-[var(--border-subtle)] hover:bg-[var(--surface-card-hover)] hover:border-slate-700"
+          ? "bg-[var(--surface-card-selected)] border-[var(--border-focus)] shadow-md shadow-blue-500/10 -translate-y-[1px]"
+          : "bg-[var(--surface-card)] border-transparent hover:border-[var(--border-subtle)] hover:bg-[var(--surface-card-hover)]"
       }`}
     >
-      <div className="flex items-center gap-3.5 min-w-0">
+      <div className="flex items-center gap-3 min-w-0">
         <FaviconAvatar title={title} websiteUrl={websiteUrl} size="md" className="h-11 w-11 rounded-xl text-base font-bold shrink-0 shadow-xs" />
         <div className="flex flex-col min-w-0">
           <div className="flex items-center gap-1.5">
-            <span className="text-base font-semibold text-[var(--text-primary)] truncate tracking-tight">{title}</span>
+            <span className="text-[15px] font-semibold text-[var(--text-primary)] truncate tracking-tight">{title}</span>
             {favorite && <Icon icon={Star} size="xs" className="fill-amber-400 text-amber-400 shrink-0" />}
           </div>
-          <span className="text-sm font-normal text-[var(--text-secondary)] truncate">{username || "No username"}</span>
-          <span className="text-xs text-[var(--text-muted)] mt-0.5">{updatedAt}</span>
+          <span className="text-[13px] font-normal text-[var(--text-secondary)] truncate">{username || "No username"}</span>
+          <span className="text-[11px] text-[var(--text-muted)] mt-0.5">{updatedAt}</span>
         </div>
       </div>
 

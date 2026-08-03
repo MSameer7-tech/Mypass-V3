@@ -20,19 +20,19 @@ export const Toolbar: React.FC<ToolbarProps> = ({
   onOpenSettings,
 }) => {
   return (
-    <header className="h-14 w-full bg-[var(--surface-panel)] border-b border-[var(--border-subtle)] px-4 flex items-center justify-between gap-3 shrink-0 select-none">
-      {/* Search Input Dominates Width */}
-      <div className="flex-1 max-w-xl">
+    <header className="h-[56px] w-full bg-[var(--surface-panel)] border-b border-[var(--border-subtle)] px-4 flex items-center justify-between gap-3 shrink-0 select-none">
+      {/* Dominant Search Input (620px max width) */}
+      <div className="flex-1 max-w-[620px]">
         <SearchInput
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
           onClear={() => onSearchChange("")}
           placeholder="Search vault (⌘F)..."
-          className="w-full"
+          className="w-full h-10 rounded-[14px]"
         />
       </div>
 
-      {/* Primary Actions & Controls Aligned */}
+      {/* Baseline Aligned Toolbar Controls */}
       <div className="flex items-center gap-2 shrink-0">
         {onNewEntry && (
           <Button
@@ -40,7 +40,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
             size="sm"
             leadingIcon={Plus}
             onClick={onNewEntry}
-            className="font-bold shadow-xs px-3 py-1.5"
+            className="h-10 rounded-xl font-bold px-4 shadow-xs"
           >
             New Entry
           </Button>
@@ -53,6 +53,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
             size="sm"
             variant="secondary"
             onClick={onOpenSettings}
+            className="h-10 w-10 rounded-xl"
           />
         )}
 
@@ -63,6 +64,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
             size="sm"
             variant="secondary"
             onClick={onLockVault}
+            className="h-10 w-10 rounded-xl"
           />
         )}
       </div>

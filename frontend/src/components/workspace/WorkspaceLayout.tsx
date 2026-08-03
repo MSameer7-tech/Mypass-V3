@@ -136,7 +136,7 @@ export const WorkspaceLayout: React.FC = () => {
   return (
     <div className="h-screen w-screen bg-[var(--background)] text-[var(--text-primary)] flex flex-col overflow-hidden select-none">
       <PanelGroup direction="horizontal" className="h-full w-full">
-        {/* Column 1: Resizable Sidebar (240px baseline) */}
+        {/* Column 1: Sidebar (240px baseline) */}
         <Panel defaultSize={14} minSize={12} maxSize={18} className="bg-[var(--surface-sidebar)]">
           <Sidebar
             activeCategory={activeCategory}
@@ -162,8 +162,8 @@ export const WorkspaceLayout: React.FC = () => {
           </Panel>
         ) : (
           <>
-            {/* Column 2: Resizable Vault List (380px baseline) */}
-            <Panel defaultSize={23} minSize={20} maxSize={32} className="bg-[var(--surface-panel)] border-r border-[var(--border-subtle)] flex flex-col">
+            {/* Column 2: Vault List (430px baseline) */}
+            <Panel defaultSize={26} minSize={22} maxSize={35} className="bg-[var(--surface-panel)] border-r border-[var(--border-subtle)] flex flex-col">
               <Toolbar
                 searchQuery={searchQuery}
                 onSearchChange={setSearchQuery}
@@ -173,9 +173,9 @@ export const WorkspaceLayout: React.FC = () => {
               />
 
               {/* Vault Header Bar */}
-              <div className="p-4 border-b border-[var(--border-subtle)] flex flex-col gap-2">
+              <div className="p-3.5 px-4 border-b border-[var(--border-subtle)] flex flex-col gap-1.5">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2.5">
                     <h2 className="text-xl font-bold text-[var(--text-primary)] tracking-tight">{activeCategory === "All" ? "Favorites" : activeCategory}</h2>
                     <Button size="sm" variant="primary" leadingIcon={Plus} onClick={() => openDialog("newEntry")} className="rounded-lg text-xs font-bold px-2 py-0.5">
                       New
@@ -221,8 +221,8 @@ export const WorkspaceLayout: React.FC = () => {
 
             <PanelResizeHandle className="w-[1px] bg-[var(--border-subtle)] hover:bg-[var(--accent)] transition-colors cursor-col-resize" />
 
-            {/* Column 3: Resizable Details Inspector (Elastic) */}
-            <Panel defaultSize={63} minSize={45} className="bg-[var(--background)]">
+            {/* Column 3: Details Inspector (Elastic) */}
+            <Panel defaultSize={60} minSize={45} className="bg-[var(--background)]">
               <Inspector
                 entry={selectedEntry}
                 onEdit={() => addToast("info", "Edit Mode", "Editor drawer active.")}
