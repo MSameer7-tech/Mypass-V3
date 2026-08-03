@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SettingsContracts",
+  "description": "Frozen contract specifications for MyPass Settings operations.",
+  "definitions": {
+    "AppSettings": {
+      "type": "object",
+      "properties": {
+        "idleTimeoutMinutes": { "type": "integer", "minimum": 1, "maximum": 60 },
+        "clearClipboardSeconds": { "type": "integer", "minimum": 10, "maximum": 120 },
+        "theme": { "type": "string", "enum": ["dark", "light", "system"] },
+        "biometricsEnabled": { "type": "boolean" }
+      },
+      "required": ["idleTimeoutMinutes", "clearClipboardSeconds", "theme", "biometricsEnabled"]
+    }
+  }
+}
