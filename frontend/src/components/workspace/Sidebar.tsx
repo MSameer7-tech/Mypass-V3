@@ -3,6 +3,7 @@ import { SidebarItem } from "../layout/SidebarItem";
 import { Badge } from "../core/Badge";
 import { Avatar } from "../core/Avatar";
 import { Shield, Star, KeyRound, FileText, Code, Lock, Settings, ShieldCheck } from "lucide-react";
+import { Icon } from "../core/Icon";
 
 export interface SidebarProps {
   activeCategory: string;
@@ -26,18 +27,23 @@ export const Sidebar: React.FC<SidebarProps> = ({
   itemCounts,
 }) => {
   return (
-    <aside className="h-full w-full bg-[var(--surface-sidebar)] p-3 flex flex-col justify-between select-none overflow-y-auto">
-      <div className="flex flex-col gap-4">
+    <aside className="h-full w-full bg-[var(--surface-sidebar)] p-3 flex flex-col justify-between select-none overflow-y-auto border-r border-[var(--border-subtle)]">
+      <div className="flex flex-col gap-5">
         {/* Header Branding */}
-        <div className="flex items-center gap-2.5 px-2 py-1">
-          <div className="h-7 w-7 rounded-lg bg-[var(--accent)] flex items-center justify-center font-bold text-white text-xs shadow-sm">
-            M
+        <div className="flex items-center gap-3 px-2 py-1.5">
+          <div className="h-9 w-9 rounded-xl bg-[var(--accent)] flex items-center justify-center shadow-md shadow-blue-500/20 shrink-0">
+            <Icon icon={Shield} size="md" tone="primary" />
           </div>
-          <span className="font-bold text-sm tracking-tight text-[var(--text-primary)]">MyPass v3</span>
-          <Badge variant="outline" className="ml-auto text-[10px]">Local</Badge>
+          <div className="flex flex-col">
+            <div className="flex items-center gap-2">
+              <span className="font-bold text-sm tracking-tight text-[var(--text-primary)]">MyPass</span>
+              <Badge variant="outline" className="text-[10px] px-1 py-0 font-mono">v3.0</Badge>
+            </div>
+            <span className="text-[11px] text-[var(--text-muted)] tracking-tight">Local-First Password Manager</span>
+          </div>
         </div>
 
-        {/* Categories Section */}
+        {/* Categories Navigation */}
         <div className="flex flex-col gap-1">
           <SidebarItem
             icon={Shield}
@@ -87,7 +93,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
       </div>
 
-      {/* Footer User & Actions */}
+      {/* Footer User & Session Status */}
       <div className="flex flex-col gap-1 pt-3 border-t border-[var(--border-subtle)]">
         {onOpenSettings && (
           <SidebarItem
@@ -105,11 +111,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
             onClick={onLockVault}
           />
         )}
-        <div className="flex items-center gap-2.5 px-2 pt-2 mt-1 border-t border-[var(--border-subtle)]">
+        <div className="flex items-center gap-3 px-2 pt-2 mt-1 border-t border-[var(--border-subtle)]">
           <Avatar initials="Sameer" size="sm" />
           <div className="flex flex-col truncate">
             <span className="text-xs font-semibold text-[var(--text-primary)] truncate">Sameer</span>
-            <span className="text-[10px] text-[var(--text-muted)] truncate">Vault Encrypted</span>
+            <div className="flex items-center gap-1.5 mt-0.5">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-xs shadow-emerald-400" />
+              <span className="text-[10px] font-medium text-[var(--success)] truncate">Vault Unlocked</span>
+            </div>
           </div>
         </div>
       </div>
