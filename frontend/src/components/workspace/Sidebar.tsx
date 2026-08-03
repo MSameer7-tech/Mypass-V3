@@ -2,7 +2,7 @@ import React from "react";
 import { SidebarItem } from "../layout/SidebarItem";
 import { Badge } from "../core/Badge";
 import { Avatar } from "../core/Avatar";
-import { Shield, Star, KeyRound, FileText, Code, Lock, Settings } from "lucide-react";
+import { Shield, Star, KeyRound, FileText, Code, Lock, Settings, ShieldCheck } from "lucide-react";
 
 export interface SidebarProps {
   activeCategory: string;
@@ -73,6 +73,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
             count={itemCounts.keys}
             isSelected={activeCategory === "Developer Keys"}
             onClick={() => onSelectCategory("Developer Keys")}
+          />
+
+          <div className="my-2 border-t border-[var(--border-subtle)]" />
+
+          {/* Security Center Destination */}
+          <SidebarItem
+            icon={ShieldCheck}
+            title="Security Center"
+            isSelected={activeCategory === "Security Center"}
+            onClick={() => onSelectCategory("Security Center")}
           />
         </div>
       </div>
