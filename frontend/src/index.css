@@ -1,70 +1,74 @@
 @import "tailwindcss";
 
 :root {
-  --background: #090A0F;
-  --surface-sidebar: #0D0F17;
-  --surface-panel: #131620;
-  --surface-card: #1C202E;
-  --surface-card-hover: #252B3E;
-  --surface-card-selected: #1E2B4B;
+  --background: #090B10;
+  --surface-sidebar: #0D1016;
+  --surface-panel: #11151D;
+  --surface-card: #171C26;
+  --surface-card-hover: #1C2330;
+  --surface-card-selected: #182A46;
+  --surface-input: #141923;
+  --surface-elevated: #1B212D;
   
-  --border-subtle: rgba(255, 255, 255, 0.07);
+  --border-subtle: rgba(255, 255, 255, 0.06);
   --border-focus: #3B82F6;
   
-  --text-primary: #F8FAFC;
-  --text-secondary: #94A3B8;
-  --text-muted: #64748B;
+  --text-primary: #F5F7FA;
+  --text-secondary: #A7B0C0;
+  --text-muted: #6F7B8F;
   
   --accent: #3B82F6;
   --accent-hover: #2563EB;
-  --accent-glowing: rgba(59, 130, 246, 0.25);
+  --accent-glowing: rgba(59, 130, 246, 0.15);
   
   --danger: #EF4444;
-  --danger-surface: rgba(239, 68, 68, 0.15);
+  --danger-surface: rgba(239, 68, 68, 0.1);
   --success: #10B981;
-  --success-surface: rgba(16, 185, 129, 0.15);
+  --success-surface: rgba(16, 185, 129, 0.1);
   --warning: #F59E0B;
-  --warning-surface: rgba(245, 158, 11, 0.15);
+  --warning-surface: rgba(245, 158, 11, 0.1);
 
   --shadow-card-selected: 0 0 30px rgba(59, 130, 246, 0.08), 0 4px 20px rgba(0, 0, 0, 0.25);
   --shadow-button-glow: 0 6px 20px rgba(59, 130, 246, 0.12);
 }
 
 .light {
-  --background: #F3F4F6; /* subtle gray background behind the main window */
-  --surface-sidebar: #F9FAFB;
-  --surface-panel: #FFFFFF;
-  --surface-card: #F4F4F5; /* subtle contrast for inputs and inner cards */
-  --surface-card-hover: #E4E4E7;
-  --surface-card-selected: #EBF5FF;
+  --background: #F5F5F7;
+  --surface-sidebar: #F2F2F4;
+  --surface-panel: #F5F5F7;
+  --surface-card: #FFFFFF;
+  --surface-card-hover: #F8F8FA;
+  --surface-card-selected: #E8F1FF;
+  --surface-input: #FFFFFF;
+  --surface-elevated: #FFFFFF;
   
-  --border-subtle: #E4E4E7;
-  --border-focus: #2563EB;
+  --border-subtle: #E5E5EA;
+  --border-focus: #0071E3;
   
-  --text-primary: #111827;
-  --text-secondary: #4B5563;
-  --text-muted: #9CA3AF;
+  --text-primary: #1D1D1F;
+  --text-secondary: #6E6E73;
+  --text-muted: #86868B;
   
-  --accent: #2563EB;
-  --accent-hover: #1D4ED8;
-  --accent-glowing: rgba(37, 99, 235, 0.08);
+  --accent: #0071E3;
+  --accent-hover: #0077ED;
+  --accent-glowing: rgba(0, 113, 227, 0.08);
   
-  --danger: #DC2626;
-  --danger-surface: rgba(220, 38, 38, 0.08);
-  --success: #16A34A;
-  --success-surface: rgba(22, 163, 74, 0.08);
-  --warning: #D97706;
-  --warning-surface: rgba(217, 119, 6, 0.08);
+  --danger: #FF3B30;
+  --danger-surface: rgba(255, 59, 48, 0.08);
+  --success: #1A9B55;
+  --success-surface: rgba(26, 155, 85, 0.08);
+  --warning: #FF9F0A;
+  --warning-surface: rgba(255, 159, 10, 0.08);
 
-  --shadow-card-selected: 0 2px 10px rgba(0, 0, 0, 0.04), 0 4px 20px rgba(0, 0, 0, 0.02);
-  --shadow-button-glow: 0 4px 14px rgba(37, 99, 235, 0.15);
+  --shadow-card-selected: 0 2px 8px rgba(0, 113, 227, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04);
+  --shadow-button-glow: 0 4px 12px rgba(0, 113, 227, 0.15);
 }
 
 body {
   margin: 0;
   background-color: var(--background);
   color: var(--text-primary);
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", Inter, sans-serif;
   overflow: hidden;
   user-select: none;
 }

@@ -32,7 +32,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           <input
             id={inputId}
             ref={ref}
-            className={`w-full h-10 px-3.5 bg-[var(--surface-card)] text-[var(--text-primary)] text-sm rounded-[14px] border border-transparent hover:border-[var(--border-subtle)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--border-focus)] focus:bg-[var(--surface-card-hover)] transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed ${
+            className={`w-full h-10 px-3.5 bg-[var(--surface-input,var(--surface-card))] text-[var(--text-primary)] text-sm rounded-lg border border-[var(--border-subtle)] shadow-[0_1px_2px_rgba(0,0,0,0.05)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--border-focus)] focus:bg-[var(--surface-card-hover)] transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed ${
               leadingIcon ? "pl-10" : ""
             } ${trailingIcon || onClear || shortcutBadge ? "pr-12" : ""} ${
               error ? "border-[var(--danger)] focus:border-[var(--danger)] focus:ring-[var(--danger)]" : ""
@@ -49,7 +49,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             </button>
           ) : shortcutBadge ? (
             <div className="absolute right-3.5 pointer-events-none flex items-center">
-              <kbd className="px-1.5 py-0.5 text-[10px] font-mono font-medium rounded-md bg-white/5 text-[var(--text-muted)] border border-[var(--border-subtle)]">
+              <kbd className="px-1.5 py-0.5 text-[10px] font-mono font-medium rounded-md text-[var(--text-muted)] bg-[var(--surface-card)] border border-[var(--border-subtle)]">
                 {shortcutBadge}
               </kbd>
             </div>

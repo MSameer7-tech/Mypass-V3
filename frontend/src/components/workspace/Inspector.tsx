@@ -54,9 +54,9 @@ export const Inspector: React.FC<InspectorProps> = ({
               icon={Settings}
               label="Open Settings"
               size="sm"
-              variant="secondary"
+              variant="ghost"
               onClick={onOpenSettings}
-              className="h-8 w-8 rounded-lg bg-[var(--surface-card)] border-transparent hover:bg-[var(--surface-card-hover)]"
+              className="h-8 w-8 rounded-lg"
             />
           )}
           {onLockVault && (
@@ -64,9 +64,9 @@ export const Inspector: React.FC<InspectorProps> = ({
               icon={Lock}
               label="Lock Vault"
               size="sm"
-              variant="secondary"
+              variant="ghost"
               onClick={onLockVault}
-              className="h-8 w-8 rounded-lg bg-[var(--surface-card)] border-transparent hover:bg-[var(--surface-card-hover)]"
+              className="h-8 w-8 rounded-lg"
             />
           )}
         </div>
@@ -90,11 +90,11 @@ export const Inspector: React.FC<InspectorProps> = ({
             {/* Header Section (Compact 12x12 avatar, 20px title, 32px action buttons) */}
             <div className="flex items-start justify-between pb-5 border-b border-[var(--border-subtle)]">
               <div className="flex items-center gap-3.5">
-                <FaviconAvatar title={entry.title} websiteUrl={entry.websiteUrl} size="md" className="h-12 w-12 rounded-xl text-lg font-bold shrink-0 shadow-sm bg-[var(--surface-card)] border-transparent" />
+                <FaviconAvatar title={entry.title} websiteUrl={entry.websiteUrl} size="md" className="h-12 w-12 rounded-xl text-lg font-bold shrink-0 shadow-sm" />
                 <div className="flex flex-col gap-1">
                   <div className="flex items-center gap-2.5">
                     <h2 className="text-xl font-bold text-[var(--text-primary)] tracking-tight">{entry.title}</h2>
-                    <Badge variant="outline" className="text-[11px] bg-[var(--surface-card)] border-transparent text-[var(--text-muted)] px-2 py-0.5 rounded-md font-medium">{entry.category || "Passwords"}</Badge>
+                    <Badge variant="outline" className="text-[11px] px-2 py-0.5 rounded-md font-medium">{entry.category || "Passwords"}</Badge>
                   </div>
                   {entry.websiteUrl ? (
                     <a
@@ -114,10 +114,10 @@ export const Inspector: React.FC<InspectorProps> = ({
 
               <div className="flex items-center gap-1.5">
                 {onEdit && (
-                  <IconButton icon={Edit3} label="Edit Entry" size="sm" variant="secondary" onClick={onEdit} className="h-8 w-8 rounded-lg bg-[var(--surface-card)] border-transparent hover:bg-[var(--surface-card-hover)]" />
+                  <IconButton icon={Edit3} label="Edit Entry" size="sm" variant="ghost" onClick={onEdit} className="h-8 w-8 rounded-lg" />
                 )}
                 {onDelete && (
-                  <IconButton icon={Trash2} label="Delete Entry" size="sm" variant="destructive" onClick={onDelete} className="h-8 w-8 rounded-lg bg-[var(--danger-surface)] border-transparent hover:bg-[var(--danger)]/20 text-[var(--danger)]" />
+                  <IconButton icon={Trash2} label="Delete Entry" size="sm" variant="ghost" onClick={onDelete} className="h-8 w-8 rounded-lg hover:bg-[var(--danger-surface)] hover:text-[var(--danger)]" />
                 )}
               </div>
             </div>
@@ -129,7 +129,7 @@ export const Inspector: React.FC<InspectorProps> = ({
                 <h4 className="text-[11px] font-bold uppercase tracking-wider">Credentials</h4>
               </div>
 
-              <Card variant="default" className="flex flex-col gap-2 p-3.5 bg-[var(--surface-card)] border-transparent hover:bg-[var(--surface-card-hover)] transition-colors rounded-xl shadow-xs">
+              <Card variant="default" className="flex flex-col gap-2 p-3.5 transition-colors shadow-sm">
                 {/* Username Row */}
                 <div className="flex items-center justify-between h-8">
                   <div className="flex flex-col gap-0.5 min-w-0">
@@ -182,10 +182,10 @@ export const Inspector: React.FC<InspectorProps> = ({
                 <h4 className="text-[11px] font-bold uppercase tracking-wider">Security Analysis</h4>
               </div>
 
-              <Card variant="default" className="flex flex-col gap-2.5 p-3.5 bg-[var(--surface-card)] border-transparent hover:bg-[var(--surface-card-hover)] transition-colors rounded-xl shadow-xs">
+              <Card variant="default" className="flex flex-col gap-2.5 p-3.5 transition-colors shadow-sm">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-semibold text-[var(--text-secondary)]">Password Strength</span>
-                  <div className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-[var(--success-surface)] border border-[var(--success)]/30 text-[10px] font-bold text-[var(--success)]">
+                  <div className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-[var(--success-surface)] text-[10px] font-bold text-[var(--success)]">
                     <Icon icon={Check} size="xs" className="text-[var(--success)]" />
                     <span>Very Strong</span>
                   </div>
@@ -209,7 +209,7 @@ export const Inspector: React.FC<InspectorProps> = ({
                   <h4 className="text-[11px] font-bold uppercase tracking-wider">Secure Notes</h4>
                 </div>
 
-                <Card variant="default" className="flex items-center justify-between p-3.5 bg-[var(--surface-card)] border-transparent hover:bg-[var(--surface-card-hover)] transition-colors rounded-xl shadow-xs text-xs font-medium text-[var(--text-secondary)]">
+                <Card variant="default" className="flex items-center justify-between p-3.5 transition-colors shadow-sm text-xs font-medium text-[var(--text-secondary)]">
                   <span className="leading-relaxed">{entry.notes}</span>
                   {onEdit && (
                     <IconButton icon={Edit3} label="Edit Notes" size="sm" variant="ghost" onClick={onEdit} className="h-7 w-7 text-[var(--text-muted)] hover:text-[var(--text-primary)] shrink-0" />
@@ -225,7 +225,7 @@ export const Inspector: React.FC<InspectorProps> = ({
                 <h4 className="text-[11px] font-bold uppercase tracking-wider">Metadata</h4>
               </div>
 
-              <Card variant="default" className="grid grid-cols-3 divide-x divide-[var(--border-subtle)] bg-[var(--surface-card)] border-transparent hover:bg-[var(--surface-card-hover)] transition-colors rounded-xl shadow-xs p-3.5 text-xs">
+              <Card variant="default" className="grid grid-cols-3 divide-x divide-[var(--border-subtle)] transition-colors shadow-sm p-3.5 text-xs">
                 <div className="flex flex-col pr-3">
                   <span className="text-[10px] text-[var(--text-muted)] font-medium">Updated</span>
                   <span className="font-semibold text-[var(--text-primary)] mt-0.5 truncate">{entry.updatedAt || "Just now"}</span>

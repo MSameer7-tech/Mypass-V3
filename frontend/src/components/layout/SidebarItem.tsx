@@ -23,8 +23,8 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
   ...props
 }) => {
   const activeStyle = isSelected
-    ? "bg-[var(--surface-card-selected)] text-[var(--text-primary)] font-semibold shadow-xs"
-    : "text-[var(--text-secondary)] hover:bg-white/5 hover:text-[var(--text-primary)] font-medium";
+    ? "bg-[var(--surface-card-selected)] text-[var(--text-primary)] font-semibold"
+    : "text-[var(--text-secondary)] hover:bg-[var(--surface-card-hover)] hover:text-[var(--text-primary)] font-medium";
 
   return (
     <button
@@ -39,7 +39,7 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
       <div className="flex items-center gap-1.5 shrink-0 ml-2">
         {badge}
         {count !== undefined && (
-          <span className="px-2 py-0.5 text-[11px] font-mono font-medium rounded-full bg-white/5 text-[var(--text-muted)]">
+          <span className="px-2 py-0.5 text-[11px] font-mono font-medium rounded-full bg-[var(--surface-card-hover)] text-[var(--text-muted)]">
             {count}
           </span>
         )}
