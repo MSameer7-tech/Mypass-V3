@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useSettingsStore } from "../../../stores/settings/useSettingsStore";
 import { BackupRepository } from "../../../repositories/BackupRepository";
 import { Button } from "../../../components/core/Button";
-import { Badge } from "../../../components/core/Badge";
+
 import { FieldGroup } from "../../../components/layout/FieldGroup";
 import {
   Sliders,
@@ -265,12 +265,59 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
 
           {/* About Tab */}
           {activeTab === "about" && (
-            <div className="flex flex-col gap-3 text-xs">
-              <h3 className="text-base font-bold text-[var(--text-primary)] border-b border-[var(--border-subtle)] pb-2">About MyPass</h3>
-              <p className="text-[var(--text-muted)]">MyPass v3.0.0 Commercial Desktop Password Manager.</p>
-              <div className="flex items-center gap-2">
-                <Badge variant="success">Production Ready</Badge>
-                <Badge variant="outline">MIT License</Badge>
+            <div className="flex flex-col flex-1 gap-6">
+              {/* Header / Identity */}
+              <div className="flex items-start gap-4">
+                <img src="/favicon.png" alt="MyPass" className="w-16 h-16 rounded-2xl shadow-sm object-cover border border-[var(--border-subtle)] bg-[var(--surface-card)]" />
+                <div className="flex flex-col gap-1.5 pt-1">
+                  <h2 className="text-xl font-bold text-[var(--text-primary)] tracking-tight">MyPass</h2>
+                  <span className="text-xs font-semibold text-[var(--text-secondary)]">Local-first password manager</span>
+                  <p className="text-xs text-[var(--text-muted)] mt-1 max-w-[340px] leading-relaxed">
+                    Securely store, organize, and manage your passwords and sensitive information with a private, local-first vault.
+                  </p>
+                </div>
+              </div>
+
+              <div className="border-t border-[var(--border-subtle)]" />
+
+              {/* Details Grid */}
+              <div className="grid grid-cols-2 gap-x-8 gap-y-6">
+                {/* Column 1 */}
+                <div className="flex flex-col gap-5">
+                  <div className="flex flex-col gap-1.5">
+                    <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider">Version</span>
+                    <div className="text-xs font-medium text-[var(--text-primary)]">MyPass v3.0.0</div>
+                    <div className="text-xs text-[var(--text-secondary)]">Stable Release</div>
+                  </div>
+                  
+                  <div className="flex flex-col gap-1.5">
+                    <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider">Technology</span>
+                    <div className="text-xs text-[var(--text-secondary)]">React + TypeScript</div>
+                    <div className="text-xs text-[var(--text-secondary)]">Tauri</div>
+                    <div className="text-xs text-[var(--text-secondary)]">Tailwind CSS</div>
+                    <div className="text-xs text-[var(--text-secondary)]">Framer Motion</div>
+                  </div>
+                </div>
+
+                {/* Column 2 */}
+                <div className="flex flex-col gap-5">
+                  <div className="flex flex-col gap-1.5">
+                    <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider">Security</span>
+                    <div className="text-xs text-[var(--text-secondary)]">AES-256-GCM encryption</div>
+                    <div className="text-xs text-[var(--text-secondary)]">Argon2id key derivation</div>
+                    <div className="text-xs text-[var(--text-secondary)]">Local-first architecture</div>
+                    <div className="text-xs text-[var(--text-secondary)]">No account or cloud dependency</div>
+                  </div>
+                  
+                  <div className="flex flex-col gap-1.5">
+                    <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider">Open Source</span>
+                    <div className="text-xs text-[var(--text-secondary)]">MIT License</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-8 text-center text-[10px] text-[var(--text-muted)] font-medium">
+                © 2026 MyPass • Built with privacy in mind
               </div>
             </div>
           )}
