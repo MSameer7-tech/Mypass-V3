@@ -3,8 +3,6 @@ import { motion } from "framer-motion";
 import { useSettingsStore } from "../../../stores/settings/useSettingsStore";
 import { BackupRepository } from "../../../repositories/BackupRepository";
 import { Button } from "../../../components/core/Button";
-
-import { FieldGroup } from "../../../components/layout/FieldGroup";
 import { useQueryClient } from "@tanstack/react-query";
 import { VAULT_QUERY_KEY } from "../../../queries/useVaultQueries";
 import {
@@ -18,7 +16,6 @@ import {
   Activity,
   Keyboard,
   Info,
-  Check,
   Globe,
 } from "lucide-react";
 import { Icon, IconProps } from "../../../components/core/Icon";
@@ -66,6 +63,8 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
   const setAutoLockMinutes = useSettingsStore((s) => s.setAutoLockMinutes);
   const clipboardAutoClearSeconds = useSettingsStore((s) => s.clipboardAutoClearSeconds);
   const setClipboardAutoClearSeconds = useSettingsStore((s) => s.setClipboardAutoClearSeconds);
+  const confirmBeforeDelete = useSettingsStore((s) => s.confirmBeforeDelete);
+  const setConfirmBeforeDelete = useSettingsStore((s) => s.setConfirmBeforeDelete);
 
   const handleExport = async () => {
     setExporting(true);
@@ -136,7 +135,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
                   : "text-[var(--text-primary)] hover:bg-[#2b2d31]"
               }`}
             >
-              <Icon icon={item.icon} size="sm" tone={isSelected ? "white" : "muted"} />
+              <Icon icon={item.icon} size="sm" tone={isSelected ? "inherit" : "muted"} />
               <span>{item.label}</span>
             </button>
           );
