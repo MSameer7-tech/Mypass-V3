@@ -224,6 +224,7 @@ export const WorkspaceLayout: React.FC = () => {
                 entry={selectedEntry}
                 onEdit={() => addToast("info", "Edit Mode", "Editor drawer active.")}
                 onDelete={() => openDialog("deleteConfirm")}
+                onToggleFavorite={() => selectedEntry && toggleFavorite(selectedEntry.id)}
                 onOpenSettings={() => openDialog("settings")}
                 onLockVault={handleLockVault}
               />
