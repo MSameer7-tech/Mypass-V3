@@ -190,14 +190,14 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
                   <button
                     onClick={() => setCompactMode(!compactMode)}
                     className={`relative flex h-5 w-9 shrink-0 items-center rounded-full p-0.5 transition-colors duration-200 ease-in-out focus:outline-none ${
-                      compactMode ? "bg-blue-500" : "bg-[#333]"
+                      compactMode ? "bg-[var(--accent)]" : "bg-[var(--surface-input)] border border-[var(--border-subtle)]"
                     }`}
                   >
                     <motion.div
                       layout
                       className="h-4 w-4 rounded-full bg-white shadow-sm"
-                      animate={{ x: compactMode ? 16 : 0 }}
-                      transition={{ type: "spring", stiffness: 700, damping: 40 }}
+                      animate={{ x: compactMode ? 16 : 0, scaleX: compactMode ? 1.05 : 1 }}
+                      transition={{ type: "spring", stiffness: 500, damping: 30 }}
                     />
                   </button>
                 </div>
@@ -224,20 +224,29 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
                   </div>
                   
                   {/* Segmented Control */}
-                  <div className="flex items-center bg-[var(--surface-sidebar)] p-1 rounded-lg border border-[var(--border-subtle)] shadow-inner">
-                    {(["dark", "light", "system"] as const).map((t) => (
-                      <button
-                        key={t}
-                        onClick={() => setTheme(t)}
-                        className={`px-3 py-1 text-[11px] font-bold tracking-wider uppercase rounded-md transition-all ${
-                          theme === t
-                            ? "bg-[var(--surface-panel)] text-[var(--text-primary)] shadow-sm border border-[var(--border-subtle)]"
-                            : "text-[var(--text-muted)] hover:text-[var(--text-secondary)] border border-transparent"
-                        }`}
-                      >
-                        {t}
-                      </button>
-                    ))}
+                  <div className="relative flex items-center bg-[var(--surface-sidebar)] p-1 rounded-lg border border-[var(--border-subtle)] shadow-inner">
+                    {(["dark", "light", "system"] as const).map((t) => {
+                      const isSel = theme === t;
+                      return (
+                        <button
+                          key={t}
+                          onClick={() => setTheme(t)}
+                          className={`relative px-3 py-1 text-[11px] tracking-wider uppercase rounded-md transition-colors duration-200 z-10 ${
+                            isSel ? "text-white font-bold" : "text-[var(--text-muted)] font-medium hover:text-[var(--text-secondary)]"
+                          }`}
+                        >
+                          {isSel && (
+                            <motion.div
+                              layoutId="theme-active"
+                              className="absolute inset-0 bg-[var(--accent)] rounded-md shadow-sm"
+                              transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                              style={{ zIndex: -1 }}
+                            />
+                          )}
+                          {t}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 
@@ -257,14 +266,14 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
                   <button
                     onClick={() => setShowFavicons(!showFavicons)}
                     className={`relative flex h-5 w-9 shrink-0 items-center rounded-full p-0.5 transition-colors duration-200 ease-in-out focus:outline-none ${
-                      showFavicons ? "bg-blue-500" : "bg-[#333]"
+                      showFavicons ? "bg-[var(--accent)]" : "bg-[var(--surface-input)] border border-[var(--border-subtle)]"
                     }`}
                   >
                     <motion.div
                       layout
                       className="h-4 w-4 rounded-full bg-white shadow-sm"
-                      animate={{ x: showFavicons ? 16 : 0 }}
-                      transition={{ type: "spring", stiffness: 700, damping: 40 }}
+                      animate={{ x: showFavicons ? 16 : 0, scaleX: showFavicons ? 1.05 : 1 }}
+                      transition={{ type: "spring", stiffness: 500, damping: 30 }}
                     />
                   </button>
                 </div>
@@ -291,20 +300,29 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
                   </div>
                   
                   {/* Segmented Control */}
-                  <div className="flex items-center bg-[var(--surface-sidebar)] p-1 rounded-lg border border-[var(--border-subtle)] shadow-inner shrink-0">
-                    {[1, 5, 15, 30, 60].map((mins) => (
-                      <button
-                        key={mins}
-                        onClick={() => setAutoLockMinutes(mins)}
-                        className={`px-2 py-1 text-[11px] font-bold tracking-wider rounded-md transition-all ${
-                          autoLockMinutes === mins
-                            ? "bg-[var(--surface-panel)] text-[var(--text-primary)] shadow-sm border border-[var(--border-subtle)]"
-                            : "text-[var(--text-muted)] hover:text-[var(--text-secondary)] border border-transparent"
-                        }`}
-                      >
-                        {mins} MIN
-                      </button>
-                    ))}
+                  <div className="relative flex items-center bg-[var(--surface-sidebar)] p-1 rounded-lg border border-[var(--border-subtle)] shadow-inner shrink-0">
+                    {[1, 5, 15, 30, 60].map((mins) => {
+                      const isSel = autoLockMinutes === mins;
+                      return (
+                        <button
+                          key={mins}
+                          onClick={() => setAutoLockMinutes(mins)}
+                          className={`relative px-2 py-1 text-[11px] tracking-wider rounded-md transition-colors duration-200 z-10 ${
+                            isSel ? "text-white font-bold" : "text-[var(--text-muted)] font-medium hover:text-[var(--text-secondary)]"
+                          }`}
+                        >
+                          {isSel && (
+                            <motion.div
+                              layoutId="autolock-active"
+                              className="absolute inset-0 bg-[var(--accent)] rounded-md shadow-sm"
+                              transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                              style={{ zIndex: -1 }}
+                            />
+                          )}
+                          {mins} MIN
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 
@@ -324,14 +342,14 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
                   <button
                     onClick={() => setConfirmBeforeDelete(!confirmBeforeDelete)}
                     className={`relative flex h-5 w-9 shrink-0 items-center rounded-full p-0.5 transition-colors duration-200 ease-in-out focus:outline-none ${
-                      confirmBeforeDelete ? "bg-blue-500" : "bg-[#333]"
+                      confirmBeforeDelete ? "bg-[var(--accent)]" : "bg-[var(--surface-input)] border border-[var(--border-subtle)]"
                     }`}
                   >
                     <motion.div
                       layout
                       className="h-4 w-4 rounded-full bg-white shadow-sm"
-                      animate={{ x: confirmBeforeDelete ? 16 : 0 }}
-                      transition={{ type: "spring", stiffness: 700, damping: 40 }}
+                      animate={{ x: confirmBeforeDelete ? 16 : 0, scaleX: confirmBeforeDelete ? 1.05 : 1 }}
+                      transition={{ type: "spring", stiffness: 500, damping: 30 }}
                     />
                   </button>
                 </div>
@@ -357,20 +375,29 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
                   </div>
                   
                   {/* Segmented Control */}
-                  <div className="flex items-center bg-[var(--surface-sidebar)] p-1 rounded-lg border border-[var(--border-subtle)] shadow-inner shrink-0">
-                    {[15, 30, 45, 60].map((secs) => (
-                      <button
-                        key={secs}
-                        onClick={() => setClipboardAutoClearSeconds(secs)}
-                        className={`px-3 py-1 text-[11px] font-bold tracking-wider rounded-md transition-all ${
-                          clipboardAutoClearSeconds === secs
-                            ? "bg-[var(--surface-panel)] text-[var(--text-primary)] shadow-sm border border-[var(--border-subtle)]"
-                            : "text-[var(--text-muted)] hover:text-[var(--text-secondary)] border border-transparent"
-                        }`}
-                      >
-                        {secs} SEC
-                      </button>
-                    ))}
+                  <div className="relative flex items-center bg-[var(--surface-sidebar)] p-1 rounded-lg border border-[var(--border-subtle)] shadow-inner shrink-0">
+                    {[15, 30, 45, 60].map((secs) => {
+                      const isSel = clipboardAutoClearSeconds === secs;
+                      return (
+                        <button
+                          key={secs}
+                          onClick={() => setClipboardAutoClearSeconds(secs)}
+                          className={`relative px-3 py-1 text-[11px] tracking-wider rounded-md transition-colors duration-200 z-10 ${
+                            isSel ? "text-white font-bold" : "text-[var(--text-muted)] font-medium hover:text-[var(--text-secondary)]"
+                          }`}
+                        >
+                          {isSel && (
+                            <motion.div
+                              layoutId="clipboard-active"
+                              className="absolute inset-0 bg-[var(--accent)] rounded-md shadow-sm"
+                              transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                              style={{ zIndex: -1 }}
+                            />
+                          )}
+                          {secs} SEC
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               </div>
@@ -447,7 +474,20 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
                       </div>
                     </div>
                     <div className="flex items-center">
-                      <span className="text-[11px] font-bold tracking-wider text-green-400 bg-green-500/10 px-2 py-0.5 rounded-md border border-green-500/20">OK</span>
+                      <motion.span 
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.2 }}
+                        className="relative text-[11px] font-bold tracking-wider text-green-400 bg-green-500/10 px-2 py-0.5 rounded-md border border-green-500/20"
+                      >
+                        <motion.div
+                          className="absolute inset-0 bg-green-400 rounded-md"
+                          initial={{ opacity: 0.3, scale: 1 }}
+                          animate={{ opacity: 0, scale: 1.3 }}
+                          transition={{ duration: 0.5, ease: "easeOut", delay: 0.1 }}
+                        />
+                        <span className="relative z-10">OK</span>
+                      </motion.span>
                     </div>
                   </div>
 
@@ -516,52 +556,60 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
 
           {/* About Tab */}
           {activeTab === "about" && (
-            <div className="flex flex-col flex-1 gap-6 max-w-[540px]">
+            <motion.div 
+              variants={{
+                hidden: { opacity: 0 },
+                show: { opacity: 1, transition: { staggerChildren: 0.05 } }
+              }}
+              initial="hidden"
+              animate="show"
+              className="flex flex-col flex-1 gap-6 max-w-[540px]"
+            >
               {/* Header / Identity */}
               <div className="flex items-start gap-5">
-                <div className="w-[72px] h-[72px] rounded-[16px] bg-[#1a1b1e] border border-[var(--border-subtle)] shadow-[0_0_15px_rgba(255,255,255,0.05)] overflow-hidden flex items-center justify-center shrink-0">
+                <motion.div variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, transition: { duration: 0.3 } } }} className="w-[72px] h-[72px] rounded-[16px] bg-[#1a1b1e] border border-[var(--border-subtle)] shadow-[0_0_15px_rgba(255,255,255,0.05)] overflow-hidden flex items-center justify-center shrink-0">
                   <img src="/icon-128.png" alt="MyPass" className="w-[72px] h-[72px] object-cover" onError={(e) => (e.currentTarget.style.display = 'none')} />
-                </div>
+                </motion.div>
                 <div className="flex flex-col pt-0.5">
-                  <h2 className="text-[22px] font-bold text-[var(--text-primary)] tracking-tight leading-none mb-1.5">MyPass</h2>
-                  <span className="text-[13px] font-semibold text-[var(--text-secondary)] mb-2">Private by design. Simple by default.</span>
-                  <p className="text-[13px] text-[var(--text-muted)] max-w-[360px] leading-[1.5]">
+                  <motion.h2 variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, transition: { duration: 0.3 } } }} className="text-[22px] font-bold text-[var(--text-primary)] tracking-tight leading-none mb-1.5">MyPass</motion.h2>
+                  <motion.span variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, transition: { duration: 0.3 } } }} className="text-[13px] font-semibold text-[var(--text-secondary)] mb-2">Private by design. Simple by default.</motion.span>
+                  <motion.p variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, transition: { duration: 0.3 } } }} className="text-[13px] text-[var(--text-muted)] max-w-[360px] leading-[1.5]">
                     A local-first password manager built to keep your credentials secure, organized, and entirely under your control.
-                  </p>
+                  </motion.p>
                 </div>
               </div>
 
-              <div className="border-t border-[var(--border-subtle)]" />
+              <motion.div variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, transition: { duration: 0.3 } } }} className="border-t border-[var(--border-subtle)]" />
 
               {/* Details Grid */}
               <div className="grid grid-cols-2 gap-3 mt-1">
                 {/* Version Card */}
-                <div className="flex flex-col gap-1 p-3 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)]">
+                <motion.div variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, transition: { duration: 0.3 } } }} className="flex flex-col gap-1 p-3 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)]">
                   <span className="text-[11px] font-medium text-[var(--text-muted)] uppercase tracking-wider">Version</span>
                   <div className="text-[15px] font-semibold text-[var(--text-primary)]">MyPass v3.0.0</div>
                   <div className="text-[13px] text-[var(--text-secondary)]">Stable Release</div>
-                </div>
+                </motion.div>
 
                 {/* Security Card */}
-                <div className="flex flex-col gap-1 p-3 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)]">
+                <motion.div variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, transition: { duration: 0.3 } } }} className="flex flex-col gap-1 p-3 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)]">
                   <span className="text-[11px] font-medium text-[var(--text-muted)] uppercase tracking-wider">Security</span>
                   <div className="text-[15px] font-semibold text-[var(--text-primary)]">AES-256-GCM</div>
                   <div className="text-[13px] text-[var(--text-secondary)]">Argon2id + Local-first</div>
-                </div>
+                </motion.div>
 
                 {/* Technology Card */}
-                <div className="flex flex-col gap-1 p-3 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)]">
+                <motion.div variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, transition: { duration: 0.3 } } }} className="flex flex-col gap-1 p-3 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)]">
                   <span className="text-[11px] font-medium text-[var(--text-muted)] uppercase tracking-wider">Technology</span>
                   <div className="text-[15px] font-semibold text-[var(--text-primary)]">React + Tauri</div>
                   <div className="text-[13px] text-[var(--text-secondary)]">Tailwind + Framer Motion</div>
-                </div>
+                </motion.div>
 
                 {/* Open Source Card */}
-                <div className="flex flex-col gap-1 p-3 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)]">
+                <motion.div variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, transition: { duration: 0.3 } } }} className="flex flex-col gap-1 p-3 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)]">
                   <span className="text-[11px] font-medium text-[var(--text-muted)] uppercase tracking-wider">Open Source</span>
                   <div className="text-[15px] font-semibold text-[var(--text-primary)]">MIT License</div>
                   <div className="text-[13px] text-[var(--text-secondary)]">Free forever</div>
-                </div>
+                </motion.div>
               </div>
             </div>
           )}
