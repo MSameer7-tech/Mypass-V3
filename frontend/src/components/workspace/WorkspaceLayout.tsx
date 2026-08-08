@@ -195,6 +195,41 @@ export const WorkspaceLayout: React.FC = () => {
     }, 500);
   };
 
+  // Global Keyboard Shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // ⌘ on Mac, Ctrl on Windows
+      if (e.metaKey || e.ctrlKey) {
+        switch (e.key.toLowerCase()) {
+          case "k":
+            e.preventDefault();
+            setCommandPaletteOpen(true);
+            break;
+          case "l":
+            e.preventDefault();
+            handleLockVault();
+            break;
+          case "n":
+            e.preventDefault();
+            openDialog("newEntry");
+            break;
+          case ",":
+            e.preventDefault();
+            openDialog("settings");
+            break;
+          case "f":
+            e.preventDefault();
+            const searchInput = document.querySelector('input[placeholder="Search vault items..."]') as HTMLInputElement;
+            if (searchInput) searchInput.focus();
+            break;
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [setCommandPaletteOpen, openDialog]); // eslint-disable-line react-hooks/exhaustive-deps
+
   return (
     <div className="h-screen w-screen bg-[var(--background)] text-[var(--text-primary)] flex flex-col overflow-hidden select-none">
       <PanelGroup direction="horizontal" className="h-full w-full">
