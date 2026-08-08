@@ -42,8 +42,8 @@ export const VaultCard: React.FC<VaultCardProps> = ({
         compactMode ? "h-[50px] py-1.5" : "h-[62px] py-2.5"
       } ${
         isSelected
-          ? "bg-[var(--surface-card-selected)] border-[var(--border-focus)] shadow-card-selected -translate-y-[1px]"
-          : "bg-[var(--surface-card)] border-transparent hover:bg-[var(--surface-card-hover)] shadow-xs"
+          ? "bg-[var(--surface-card-selected)] border-[var(--border-focus)] shadow-card-selected"
+          : "bg-transparent border-transparent hover:bg-[var(--surface-card-hover)]"
       }`}
     >
       <div className="flex items-center gap-3 min-w-0">
@@ -69,7 +69,7 @@ export const VaultCard: React.FC<VaultCardProps> = ({
             e.stopPropagation();
             if (onToggleFavorite) onToggleFavorite(e);
           }}
-          className="p-1 text-[var(--text-muted)] hover:text-[var(--text-primary)] rounded-md hover:bg-white/5 transition-all"
+          className="p-1 text-[var(--text-muted)] hover:text-[var(--text-primary)] rounded-md hover:bg-[var(--surface-card-hover)] transition-all"
         >
           <Icon icon={MoreHorizontal} size="sm" />
         </button>

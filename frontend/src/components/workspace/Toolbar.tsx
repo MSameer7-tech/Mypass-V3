@@ -21,7 +21,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
         <select
           value={sortOption}
           onChange={(e) => onSortChange(e.target.value)}
-          className="appearance-none bg-transparent hover:bg-white/5 text-[var(--text-primary)] text-[13px] font-medium pl-3 pr-8 py-1.5 rounded-lg border border-transparent focus:outline-none transition-colors cursor-pointer"
+          className="appearance-none bg-transparent hover:bg-[var(--surface-card-hover)] text-[var(--text-primary)] text-[13px] font-medium pl-3 pr-8 py-1.5 rounded-lg border border-transparent focus:outline-none transition-colors cursor-pointer"
         >
           <option value="recent" className="bg-[var(--surface-panel)] text-[var(--text-primary)]">Recently Used</option>
           <option value="az" className="bg-[var(--surface-panel)] text-[var(--text-primary)]">Alphabetical (A-Z)</option>
