@@ -54,6 +54,7 @@ export const WorkspaceLayout: React.FC = () => {
   const [newUsername, setNewUsername] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [newWebsite, setNewWebsite] = useState("");
+  const [newCategory, setNewCategory] = useState("Passwords");
   const [toasts, setToasts] = useState<any[]>([]);
   const [sortOption, setSortOption] = useState("recent");
 
@@ -123,12 +124,14 @@ export const WorkspaceLayout: React.FC = () => {
         username: newUsername,
         password: newPassword,
         websiteUrl: newWebsite,
+        category: newCategory,
       });
 
       setNewTitle("");
       setNewUsername("");
       setNewPassword("");
       setNewWebsite("");
+      setNewCategory("Passwords");
       closeDialog();
       addToast("success", "Entry Created", `'${newTitle}' stored in SQLite database.`);
     } catch (err: any) {
@@ -269,6 +272,20 @@ export const WorkspaceLayout: React.FC = () => {
               placeholder="e.g. GitHub"
               autoFocus
             />
+          </FieldGroup>
+          <FieldGroup label="Category">
+            <select
+              value={newCategory}
+              onChange={(e) => setNewCategory(e.target.value)}
+              className="w-full h-10 px-3.5 bg-[var(--surface-input,var(--surface-card))] text-[var(--text-primary)] text-sm rounded-lg border border-[var(--border-subtle)] shadow-[0_1px_2px_rgba(0,0,0,0.05)] focus:outline-none focus:border-[var(--border-focus)] transition-all duration-150"
+            >
+              <option value="Passwords">Passwords</option>
+              <option value="Work">Work</option>
+              <option value="Personal">Personal</option>
+              <option value="Finance">Finance</option>
+              <option value="Social">Social</option>
+              <option value="Developer Keys">Developer Keys</option>
+            </select>
           </FieldGroup>
           <FieldGroup label="Username / Email">
             <Input
