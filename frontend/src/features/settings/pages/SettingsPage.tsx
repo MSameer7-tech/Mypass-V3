@@ -407,42 +407,93 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
 
           {/* Diagnostics Tab */}
           {activeTab === "diagnostics" && (
-            <div className="flex flex-col gap-3 font-mono text-xs">
-              <h3 className="text-base font-bold font-sans text-[var(--text-primary)] border-b border-[var(--border-subtle)] pb-2">System Diagnostics</h3>
-              <div className="p-3 bg-[var(--surface-card)] rounded-xl border border-[var(--border-subtle)] flex flex-col gap-2">
-                <div>Database Path: ~/.password_manager_data/mypass.db</div>
-                <div>Encryption: AES-256-GCM + Argon2id</div>
-                <div>Python Engine: v3.11</div>
-                <div>Tauri Desktop: v2.2</div>
-                <div>SQLite Status: Healthy ✓</div>
+            <div className="flex flex-col gap-6 max-w-[540px]">
+              <div className="flex flex-col gap-2">
+                <h3 className="text-[14px] font-semibold text-[var(--text-primary)] px-1">System Diagnostics</h3>
+                
+                <div className="flex flex-col rounded-xl overflow-hidden border border-[var(--border-subtle)] bg-[var(--surface-card)]">
+                  {/* Database Status Row */}
+                  <div className="flex items-center justify-between p-4 border-b border-[var(--border-subtle)]">
+                    <div className="flex items-center gap-4">
+                      <div className="w-8 h-8 rounded-lg bg-[var(--surface-sidebar)] flex items-center justify-center shrink-0 border border-[var(--border-subtle)]">
+                        <Database size={16} className="text-[var(--text-primary)]" />
+                      </div>
+                      <div className="flex flex-col gap-0.5">
+                        <span className="text-[13px] font-medium text-[var(--text-primary)]">Database</span>
+                        <span className="text-[12px] text-[var(--text-muted)]">SQLite • Healthy</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center">
+                      <span className="text-[11px] font-bold tracking-wider text-green-400 bg-green-500/10 px-2 py-0.5 rounded-md border border-green-500/20">OK</span>
+                    </div>
+                  </div>
+
+                  {/* Path Row */}
+                  <div className="flex items-center justify-between p-4 border-b border-[var(--border-subtle)]">
+                    <div className="flex items-center gap-4">
+                      <div className="flex flex-col gap-1 w-full">
+                        <span className="text-[12px] font-medium text-[var(--text-primary)]">Location</span>
+                        <div className="flex items-center gap-2">
+                          <code className="text-[11px] text-[var(--text-muted)] font-mono truncate max-w-[320px]">~/.mypass_data/mypass.db</code>
+                        </div>
+                      </div>
+                    </div>
+                    <button 
+                      className="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors p-1.5 rounded-md hover:bg-[var(--surface-sidebar)] border border-transparent hover:border-[var(--border-subtle)] shrink-0"
+                      onClick={() => navigator.clipboard.writeText("~/.mypass_data/mypass.db")}
+                      title="Copy Path"
+                    >
+                      <Clipboard size={14} />
+                    </button>
+                  </div>
+                  
+                  {/* Engine versions Row */}
+                  <div className="flex flex-col p-4 gap-3 bg-[var(--surface-sidebar)]">
+                     <div className="flex items-center justify-between">
+                        <span className="text-[12px] text-[var(--text-muted)]">Encryption</span>
+                        <span className="text-[12px] font-medium text-[var(--text-primary)]">AES-256-GCM + Argon2id</span>
+                     </div>
+                     <div className="flex items-center justify-between">
+                        <span className="text-[12px] text-[var(--text-muted)]">Python Engine</span>
+                        <span className="text-[12px] font-medium text-[var(--text-primary)]">v3.11</span>
+                     </div>
+                     <div className="flex items-center justify-between">
+                        <span className="text-[12px] text-[var(--text-muted)]">Tauri Desktop</span>
+                        <span className="text-[12px] font-medium text-[var(--text-primary)]">v2.2</span>
+                     </div>
+                  </div>
+                </div>
               </div>
             </div>
           )}
 
           {/* Shortcuts Tab */}
           {activeTab === "shortcuts" && (
-            <div className="flex flex-col gap-3 text-xs">
-              <h3 className="text-base font-bold text-[var(--text-primary)] border-b border-[var(--border-subtle)] pb-2">Keyboard Shortcuts</h3>
-              <div className="grid grid-cols-2 gap-2">
-                {[
-                  { shortcut: "⌘K", desc: "Open Command Palette" },
-                  { shortcut: "⌘L", desc: "Lock Vault Immediately" },
-                  { shortcut: "⌘N", desc: "Create New Entry" },
-                  { shortcut: "⌘F", desc: "Focus Search Input" },
-                  { shortcut: "⌘,", desc: "Open Preferences" },
-                ].map((s) => (
-                  <div key={s.shortcut} className="flex items-center justify-between p-2.5 bg-[var(--surface-card)] rounded-lg border border-[var(--border-subtle)]">
-                    <span className="text-[var(--text-secondary)]">{s.desc}</span>
-                    <kbd className="px-1.5 py-0.5 font-mono text-[10px] bg-[var(--surface-sidebar)] border border-[var(--border-subtle)] rounded">{s.shortcut}</kbd>
-                  </div>
-                ))}
+            <div className="flex flex-col gap-6 max-w-[540px]">
+              <div className="flex flex-col gap-2">
+                <h3 className="text-[14px] font-semibold text-[var(--text-primary)] px-1">Keyboard Shortcuts</h3>
+                
+                <div className="flex flex-col rounded-xl overflow-hidden border border-[var(--border-subtle)] bg-[var(--surface-card)]">
+                  {[
+                    { shortcut: "⌘K", desc: "Open Command Palette" },
+                    { shortcut: "⌘L", desc: "Lock Vault Immediately" },
+                    { shortcut: "⌘N", desc: "Create New Entry" },
+                    { shortcut: "⌘F", desc: "Focus Search Input" },
+                    { shortcut: "⌘,", desc: "Open Preferences" },
+                  ].map((s, index, arr) => (
+                    <div key={s.shortcut} className={`flex items-center justify-between p-4 ${index !== arr.length - 1 ? 'border-b border-[var(--border-subtle)]' : ''}`}>
+                      <span className="text-[13px] text-[var(--text-primary)] font-medium">{s.desc}</span>
+                      <kbd className="px-2 py-1 font-mono text-[11px] font-semibold tracking-widest text-[var(--text-secondary)] bg-[var(--surface-sidebar)] border border-[var(--border-subtle)] rounded shadow-sm">{s.shortcut}</kbd>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           )}
 
           {/* About Tab */}
           {activeTab === "about" && (
-            <div className="flex flex-col flex-1 gap-8">
+            <div className="flex flex-col flex-1 gap-8 max-w-[540px]">
               {/* Header / Identity */}
               <div className="flex items-start gap-5">
                 <div className="w-[72px] h-[72px] rounded-[18px] bg-[#1a1b1e] border border-[var(--border-subtle)] shadow-sm flex items-center justify-center shrink-0">
