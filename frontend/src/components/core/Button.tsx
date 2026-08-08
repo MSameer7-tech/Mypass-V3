@@ -47,15 +47,17 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ) => {
     const isButtonDisabled = disabled || isLoading;
     
-    const tapScale = variant === "primary" || variant === "destructive" ? 0.96 : 0.98;
+    const tapScale = variant === "primary" || variant === "destructive" ? 0.98 : 0.99;
+    const hoverScale = variant === "primary" || variant === "destructive" ? 1.01 : 1.0;
 
     return (
       <motion.button
         ref={ref as any}
         disabled={isButtonDisabled}
+        whileHover={isButtonDisabled ? undefined : { scale: hoverScale }}
         whileTap={isButtonDisabled ? undefined : { scale: tapScale }}
-        transition={{ type: "spring", stiffness: 400, damping: 25 }}
-        className={`inline-flex items-center justify-center font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--border-focus)] disabled:opacity-50 disabled:pointer-events-none ${variantStyles[variant]} ${sizeStyles[size]} ${className}`}
+        transition={{ type: "spring", stiffness: 450, damping: 25 }}
+        className={`inline-flex items-center justify-center font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--border-focus)] disabled:opacity-50 disabled:pointer-events-none ${variantStyles[variant]} ${sizeStyles[size]} ${className}`}
         {...props}
       >
         {isLoading ? (
