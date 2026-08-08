@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { useAuthStore } from "../../../stores/auth/useAuthStore";
+import { motion, AnimatePresence } from "framer-motion";
 import { UnlockScreen } from "../screens/UnlockScreen";
 import { CreateVaultScreen } from "../screens/CreateVaultScreen";
 import { WorkspaceLayout } from "../../../components/workspace/WorkspaceLayout";
@@ -21,33 +22,47 @@ export const AuthenticationRouter: React.FC = () => {
 
   const unlockVaultWithBiometrics = useAuthStore((s) => s.unlockVaultWithBiometrics);
 
-  if (sessionState === "BOOTING") {
-    return (
-      <div className="h-screen w-screen bg-[var(--background)] flex flex-col items-center justify-center gap-3">
-        <Spinner size="lg" />
-        <span className="text-xs font-semibold text-[var(--text-muted)] tracking-wide">Initializing Security Engine...</span>
-      </div>
-    );
-  }
+  const renderContent = () => {
+    if (sessionState === "BOOTING") {
+      return (
+        <motion.div key="booting" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }} className="h-screen w-screen bg-[var(--background)] flex flex-col items-center justify-center gap-3">
+          <Spinner size="lg" />
+          <span className="text-xs font-semibold text-[var(--text-muted)] tracking-wide">Initializing Security Engine...</span>
+        </motion.div>
+      );
+    }
 
-  if (sessionState === "NO_VAULT") {
-    return (
-      <CreateVaultScreen
-        onCreateVault={createVault}
-      />
-    );
-  }
+    if (sessionState === "NO_VAULT") {
+      return (
+        <motion.div key="no_vault" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }} className="h-full w-full">
+          <CreateVaultScreen onCreateVault={createVault} />
+        </motion.div>
+      );
+    }
 
-  if (sessionState === "UNLOCKED") {
-    return <WorkspaceLayout />;
-  }
+    if (sessionState === "UNLOCKED") {
+      return (
+        <motion.div key="unlocked" initial={{ opacity: 0, filter: 'blur(2px)' }} animate={{ opacity: 1, filter: 'blur(0px)' }} exit={{ opacity: 0, filter: 'blur(2px)' }} transition={{ duration: 0.35, ease: "easeOut" }} className="h-full w-full">
+          <WorkspaceLayout />
+        </motion.div>
+      );
+    }
+
+    return (
+      <motion.div key="locked" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }} className="h-full w-full">
+        <UnlockScreen
+          onUnlock={unlockVault}
+          onBiometricUnlock={unlockVaultWithBiometrics}
+          isUnlocking={sessionState === "UNLOCKING"}
+          errorMessage={authError}
+        />
+      </motion.div>
+    );
+  };
 
   return (
-    <UnlockScreen
-      onUnlock={unlockVault}
-      onBiometricUnlock={unlockVaultWithBiometrics}
-      isUnlocking={sessionState === "UNLOCKING"}
-      errorMessage={authError}
-    />
+    <AnimatePresence mode="wait">
+      {renderContent()}
+    </AnimatePresence>
   );
 };
