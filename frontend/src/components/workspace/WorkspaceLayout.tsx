@@ -105,6 +105,10 @@ export const WorkspaceLayout: React.FC = () => {
       passwords: liveEntries.filter((e) => e.category === "Passwords").length,
       notes: liveEntries.filter((e) => e.category === "Secure Notes").length,
       keys: liveEntries.filter((e) => e.category === "Developer Keys").length,
+      work: liveEntries.filter((e) => e.category === "Work").length,
+      personal: liveEntries.filter((e) => e.category === "Personal").length,
+      finance: liveEntries.filter((e) => e.category === "Finance").length,
+      social: liveEntries.filter((e) => e.category === "Social").length,
     };
   }, [liveEntries]);
 
