@@ -19,6 +19,7 @@ import {
   Keyboard,
   Info,
   Check,
+  Globe,
 } from "lucide-react";
 import { Icon, IconProps } from "../../../components/core/Icon";
 
@@ -183,27 +184,68 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
 
           {/* Appearance Tab */}
           {activeTab === "appearance" && (
-            <div className="flex flex-col gap-4">
-              <h3 className="text-base font-bold text-[var(--text-primary)] border-b border-[var(--border-subtle)] pb-2">Appearance</h3>
-              <FieldGroup label="Color Theme">
-                <div className="flex items-center gap-2">
-                  {(["dark", "light", "system"] as const).map((t) => (
-                    <Button
-                      key={t}
-                      variant={theme === t ? "primary" : "secondary"}
-                      size="sm"
-                      onClick={() => setTheme(t)}
-                    >
-                      {t.toUpperCase()}
-                    </Button>
-                  ))}
+            <div className="flex flex-col gap-5">
+              <h3 className="text-[14px] font-semibold text-[var(--text-primary)] px-1">Interface Appearance</h3>
+              
+              <div className="flex flex-col rounded-xl overflow-hidden border border-[var(--border-subtle)] bg-[var(--surface-card)]">
+                {/* Color Theme Row */}
+                <div className="flex items-center justify-between p-4 border-b border-[var(--border-subtle)]">
+                  <div className="flex items-center gap-4">
+                    <div className="w-8 h-8 rounded-lg bg-[var(--surface-sidebar)] flex items-center justify-center shrink-0 border border-[var(--border-subtle)]">
+                      <Palette size={16} className="text-[var(--text-primary)]" />
+                    </div>
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-[13px] font-medium text-[var(--text-primary)]">Color Theme</span>
+                      <span className="text-[12px] text-[var(--text-muted)]">Select your preferred application theme.</span>
+                    </div>
+                  </div>
+                  
+                  {/* Segmented Control */}
+                  <div className="flex items-center bg-[var(--surface-sidebar)] p-1 rounded-lg border border-[var(--border-subtle)] shadow-inner">
+                    {(["dark", "light", "system"] as const).map((t) => (
+                      <button
+                        key={t}
+                        onClick={() => setTheme(t)}
+                        className={`px-3 py-1 text-[11px] font-bold tracking-wider uppercase rounded-md transition-all ${
+                          theme === t
+                            ? "bg-[var(--surface-panel)] text-[var(--text-primary)] shadow-sm border border-[var(--border-subtle)]"
+                            : "text-[var(--text-muted)] hover:text-[var(--text-secondary)] border border-transparent"
+                        }`}
+                      >
+                        {t}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </FieldGroup>
-              <FieldGroup label="Favicons" description="Fetch website favicons for vault cards.">
-                <Button variant={showFavicons ? "primary" : "secondary"} size="sm" onClick={() => setShowFavicons(!showFavicons)}>
-                  {showFavicons ? "Favicons Visible ✓" : "Hidden"}
-                </Button>
-              </FieldGroup>
+
+                {/* Favicons Row */}
+                <div className="flex items-center justify-between p-4">
+                  <div className="flex items-center gap-4">
+                    <div className="w-8 h-8 rounded-lg bg-[var(--surface-sidebar)] flex items-center justify-center shrink-0 border border-[var(--border-subtle)]">
+                      <Globe size={16} className="text-[var(--text-primary)]" />
+                    </div>
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-[13px] font-medium text-[var(--text-primary)]">Website Favicons</span>
+                      <span className="text-[12px] text-[var(--text-muted)]">Fetch and display website icons on vault cards.</span>
+                    </div>
+                  </div>
+                  
+                  {/* Toggle Switch */}
+                  <button
+                    onClick={() => setShowFavicons(!showFavicons)}
+                    className={`relative flex h-5 w-9 shrink-0 items-center rounded-full p-0.5 transition-colors duration-200 ease-in-out focus:outline-none ${
+                      showFavicons ? "bg-blue-500" : "bg-[#333]"
+                    }`}
+                  >
+                    <motion.div
+                      layout
+                      className="h-4 w-4 rounded-full bg-white shadow-sm"
+                      animate={{ x: showFavicons ? 16 : 0 }}
+                      transition={{ type: "spring", stiffness: 700, damping: 40 }}
+                    />
+                  </button>
+                </div>
+              </div>
             </div>
           )}
 
