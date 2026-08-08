@@ -265,14 +265,16 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
 
           {/* About Tab */}
           {activeTab === "about" && (
-            <div className="flex flex-col flex-1 gap-6">
+            <div className="flex flex-col flex-1 gap-8">
               {/* Header / Identity */}
-              <div className="flex items-start gap-4">
-                <img src="/favicon.png" alt="MyPass" className="w-16 h-16 rounded-2xl shadow-sm object-cover border border-[var(--border-subtle)] bg-[var(--surface-card)]" />
-                <div className="flex flex-col gap-1.5 pt-1">
-                  <h2 className="text-xl font-bold text-[var(--text-primary)] tracking-tight">MyPass</h2>
-                  <span className="text-xs font-semibold text-[var(--text-secondary)]">Local-first password manager</span>
-                  <p className="text-xs text-[var(--text-muted)] mt-1 max-w-[340px] leading-relaxed">
+              <div className="flex items-start gap-5">
+                <div className="w-[72px] h-[72px] rounded-[18px] bg-[#1a1b1e] border border-[var(--border-subtle)] shadow-sm flex items-center justify-center shrink-0">
+                  <img src="/mypass-icon.png" alt="MyPass" className="w-[48px] h-[48px] object-contain" onError={(e) => (e.currentTarget.style.display = 'none')} />
+                </div>
+                <div className="flex flex-col pt-1">
+                  <h2 className="text-[22px] font-bold text-[var(--text-primary)] tracking-tight leading-none mb-1">MyPass</h2>
+                  <span className="text-[13px] font-semibold text-[var(--text-secondary)] mb-2">Local-first password manager</span>
+                  <p className="text-[13px] text-[var(--text-muted)] max-w-[360px] leading-[1.6]">
                     Securely store, organize, and manage your passwords and sensitive information with a private, local-first vault.
                   </p>
                 </div>
@@ -281,42 +283,50 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
               <div className="border-t border-[var(--border-subtle)]" />
 
               {/* Details Grid */}
-              <div className="grid grid-cols-2 gap-x-8 gap-y-6">
+              <div className="grid grid-cols-2 gap-x-8 gap-y-8">
                 {/* Column 1 */}
-                <div className="flex flex-col gap-5">
-                  <div className="flex flex-col gap-1.5">
+                <div className="flex flex-col gap-6">
+                  <div className="flex flex-col gap-2">
                     <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider">Version</span>
-                    <div className="text-xs font-medium text-[var(--text-primary)]">MyPass v3.0.0</div>
-                    <div className="text-xs text-[var(--text-secondary)]">Stable Release</div>
+                    <div className="flex flex-col gap-1">
+                      <div className="text-[13px] font-bold text-[var(--text-primary)]">MyPass v3.0.0</div>
+                      <div className="text-[13px] text-[var(--text-secondary)]">Stable Release</div>
+                    </div>
                   </div>
                   
-                  <div className="flex flex-col gap-1.5">
+                  <div className="flex flex-col gap-2">
                     <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider">Technology</span>
-                    <div className="text-xs text-[var(--text-secondary)]">React + TypeScript</div>
-                    <div className="text-xs text-[var(--text-secondary)]">Tauri</div>
-                    <div className="text-xs text-[var(--text-secondary)]">Tailwind CSS</div>
-                    <div className="text-xs text-[var(--text-secondary)]">Framer Motion</div>
+                    <div className="flex flex-col gap-1">
+                      <div className="text-[13px] text-[var(--text-secondary)]">React + TypeScript</div>
+                      <div className="text-[13px] text-[var(--text-secondary)]">Tauri</div>
+                      <div className="text-[13px] text-[var(--text-secondary)]">Tailwind CSS</div>
+                      <div className="text-[13px] text-[var(--text-secondary)]">Framer Motion</div>
+                    </div>
                   </div>
                 </div>
 
                 {/* Column 2 */}
-                <div className="flex flex-col gap-5">
-                  <div className="flex flex-col gap-1.5">
+                <div className="flex flex-col gap-6">
+                  <div className="flex flex-col gap-2">
                     <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider">Security</span>
-                    <div className="text-xs text-[var(--text-secondary)]">AES-256-GCM encryption</div>
-                    <div className="text-xs text-[var(--text-secondary)]">Argon2id key derivation</div>
-                    <div className="text-xs text-[var(--text-secondary)]">Local-first architecture</div>
-                    <div className="text-xs text-[var(--text-secondary)]">No account or cloud dependency</div>
+                    <div className="flex flex-col gap-1">
+                      <div className="text-[13px] text-[var(--text-secondary)]">AES-256-GCM encryption</div>
+                      <div className="text-[13px] text-[var(--text-secondary)]">Argon2id key derivation</div>
+                      <div className="text-[13px] text-[var(--text-secondary)]">Local-first architecture</div>
+                      <div className="text-[13px] text-[var(--text-secondary)]">No account or cloud dependency</div>
+                    </div>
                   </div>
                   
-                  <div className="flex flex-col gap-1.5">
+                  <div className="flex flex-col gap-2">
                     <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider">Open Source</span>
-                    <div className="text-xs text-[var(--text-secondary)]">MIT License</div>
+                    <div className="flex flex-col gap-1">
+                      <div className="text-[13px] text-[var(--text-secondary)]">MIT License</div>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <div className="mt-8 text-center text-[10px] text-[var(--text-muted)] font-medium">
+              <div className="mt-auto pt-8 text-center text-[11px] text-[var(--text-muted)] font-medium">
                 © 2026 MyPass • Built with privacy in mind
               </div>
             </div>
