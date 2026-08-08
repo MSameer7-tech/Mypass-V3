@@ -63,7 +63,7 @@ export const CopyButton: React.FC<CopyButtonProps> = ({
       className={`transition-all duration-100 ${className}`}
       {...props}
     >
-      {copied ? "Copied!" : label}
+      {copied && label ? "Copied!" : label}
     </Button>
   );
 };

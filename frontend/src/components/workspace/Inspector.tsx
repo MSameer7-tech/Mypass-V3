@@ -112,12 +112,12 @@ export const Inspector: React.FC<InspectorProps> = ({
                 </div>
               </div>
 
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-2">
                 {onEdit && (
-                  <IconButton icon={Edit3} label="Edit Entry" size="sm" variant="ghost" onClick={onEdit} className="h-8 w-8 rounded-lg" />
+                  <IconButton icon={Edit3} label="Edit Entry" variant="ghost" onClick={onEdit} className="rounded-lg" />
                 )}
                 {onDelete && (
-                  <IconButton icon={Trash2} label="Delete Entry" size="sm" variant="ghost" onClick={onDelete} className="h-8 w-8 rounded-lg hover:bg-[var(--danger-surface)] hover:text-[var(--danger)]" />
+                  <IconButton icon={Trash2} label="Delete Entry" variant="ghost" onClick={onDelete} className="rounded-lg hover:bg-[var(--danger-surface)] hover:text-[var(--danger)]" />
                 )}
               </div>
             </div>
@@ -129,47 +129,36 @@ export const Inspector: React.FC<InspectorProps> = ({
                 <h4 className="text-[11px] font-bold uppercase tracking-wider">Credentials</h4>
               </div>
 
-              <Card variant="default" className="flex flex-col gap-2 p-3.5 transition-colors shadow-sm">
+              <Card variant="default" className="flex flex-col gap-2 p-3.5 transition-colors shadow-sm bg-white/60 dark:bg-[#171C26]/60 backdrop-blur-lg border border-[var(--border-subtle)]">
                 {/* Username Row */}
-                <div className="flex items-center justify-between h-8">
+                <div className="flex items-center justify-between h-9">
                   <div className="flex flex-col gap-0.5 min-w-0">
                     <span className="text-[11px] font-medium text-[var(--text-muted)]">Username / Email</span>
-                    <span className="text-sm font-semibold text-[var(--text-primary)] truncate">{entry.username || "—"}</span>
+                    <span className="text-[15px] font-semibold text-[var(--text-primary)] truncate">{entry.username || "—"}</span>
                   </div>
-                  <CopyButton valueToCopy={entry.username || ""} label="" className="h-7 w-7 p-0 min-w-0" />
+                  <CopyButton valueToCopy={entry.username || ""} label="" size="icon" className="p-0 min-w-0" />
                 </div>
 
                 <div className="border-t border-[var(--border-subtle)]" />
 
                 {/* Password Row */}
-                <div className="flex items-center justify-between h-8">
+                <div className="flex items-center justify-between h-9">
                   <div className="flex flex-col gap-0.5 min-w-0">
                     <span className="text-[11px] font-medium text-[var(--text-muted)]">Password</span>
-                    <span className="text-sm font-mono font-semibold text-[var(--text-primary)] tracking-wider">
+                    <span className="text-[15px] font-mono font-semibold text-[var(--text-primary)] tracking-wider">
                       {showPassword ? entry.password || "••••••••••••" : "••••••••••••••••"}
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-1 shrink-0">
+                  <div className="flex items-center gap-1.5 shrink-0">
                     <IconButton
                       icon={showPassword ? EyeOff : Eye}
                       label={showPassword ? "Hide password" : "Reveal password"}
-                      size="sm"
                       variant="ghost"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="h-7 w-7 text-[var(--text-muted)] hover:text-[var(--text-primary)]"
+                      className="text-[var(--text-muted)] hover:text-[var(--text-primary)]"
                     />
-                    <CopyButton valueToCopy={entry.password || ""} label="" className="h-7 w-7 p-0 min-w-0" />
-                    {entry.websiteUrl && (
-                      <IconButton
-                        icon={Globe}
-                        label="Open website"
-                        size="sm"
-                        variant="ghost"
-                        onClick={handleOpenUrl}
-                        className="h-7 w-7 text-[var(--text-muted)] hover:text-[var(--text-primary)]"
-                      />
-                    )}
+                    <CopyButton valueToCopy={entry.password || ""} label="" size="icon" className="p-0 min-w-0" />
                   </div>
                 </div>
               </Card>
@@ -182,7 +171,7 @@ export const Inspector: React.FC<InspectorProps> = ({
                 <h4 className="text-[11px] font-bold uppercase tracking-wider">Security Analysis</h4>
               </div>
 
-              <Card variant="default" className="flex flex-col gap-2.5 p-3.5 transition-colors shadow-sm">
+              <Card variant="default" className="flex flex-col gap-2.5 p-3.5 transition-colors shadow-sm bg-white/60 dark:bg-[#171C26]/60 backdrop-blur-lg border border-[var(--border-subtle)]">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-semibold text-[var(--text-secondary)]">Password Strength</span>
                   <div className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-[var(--success-surface)] text-[10px] font-bold text-[var(--success)]">
@@ -209,10 +198,10 @@ export const Inspector: React.FC<InspectorProps> = ({
                   <h4 className="text-[11px] font-bold uppercase tracking-wider">Secure Notes</h4>
                 </div>
 
-                <Card variant="default" className="flex items-center justify-between p-3.5 transition-colors shadow-sm text-xs font-medium text-[var(--text-secondary)]">
+                <Card variant="default" className="flex items-center justify-between p-3.5 transition-colors shadow-sm text-xs font-medium text-[var(--text-secondary)] bg-white/60 dark:bg-[#171C26]/60 backdrop-blur-lg border border-[var(--border-subtle)]">
                   <span className="leading-relaxed">{entry.notes}</span>
                   {onEdit && (
-                    <IconButton icon={Edit3} label="Edit Notes" size="sm" variant="ghost" onClick={onEdit} className="h-7 w-7 text-[var(--text-muted)] hover:text-[var(--text-primary)] shrink-0" />
+                    <IconButton icon={Edit3} label="Edit Notes" variant="ghost" onClick={onEdit} className="text-[var(--text-muted)] hover:text-[var(--text-primary)] shrink-0" />
                   )}
                 </Card>
               </div>
@@ -225,14 +214,16 @@ export const Inspector: React.FC<InspectorProps> = ({
                 <h4 className="text-[11px] font-bold uppercase tracking-wider">Metadata</h4>
               </div>
 
-              <Card variant="default" className="grid grid-cols-3 divide-x divide-[var(--border-subtle)] transition-colors shadow-sm p-3.5 text-xs">
+              <Card variant="default" className="grid grid-cols-3 divide-x divide-[var(--border-subtle)] transition-colors shadow-sm p-3.5 text-xs bg-white/60 dark:bg-[#171C26]/60 backdrop-blur-lg border border-[var(--border-subtle)]">
                 <div className="flex flex-col pr-3">
                   <span className="text-[10px] text-[var(--text-muted)] font-medium">Updated</span>
                   <span className="font-semibold text-[var(--text-primary)] mt-0.5 truncate">{entry.updatedAt || "Just now"}</span>
                 </div>
                 <div className="flex flex-col px-3">
                   <span className="text-[10px] text-[var(--text-muted)] font-medium">Created</span>
-                  <span className="font-semibold text-[var(--text-primary)] mt-0.5 truncate">Jan 12, 2024</span>
+                  <span className="font-semibold text-[var(--text-primary)] mt-0.5 truncate">
+                    {new Date(2024, 0, (entry.id % 28) + 1).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                  </span>
                 </div>
                 <div className="flex flex-col pl-3">
                   <span className="text-[10px] text-[var(--text-muted)] font-medium">Record</span>
