@@ -17,6 +17,7 @@ import {
   Keyboard,
   Info,
   Globe,
+  AlertTriangle,
 } from "lucide-react";
 import { Icon, IconProps } from "../../../components/core/Icon";
 
@@ -355,15 +356,51 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
 
           {/* Backup Tab */}
           {activeTab === "backup" && (
-            <div className="flex flex-col gap-4">
-              <h3 className="text-base font-bold text-[var(--text-primary)] border-b border-[var(--border-subtle)] pb-2">Backup & Export</h3>
-              <div className="flex items-center gap-3">
-                <Button variant="primary" size="sm" leadingIcon={Download} isLoading={exporting} onClick={handleExport}>
-                  Export Vault (JSON)
-                </Button>
-                <Button variant="secondary" size="sm" leadingIcon={Upload} isLoading={importing} onClick={handleImport}>
-                  Import Vault
-                </Button>
+            <div className="flex flex-col gap-6 max-w-[540px]">
+              <div className="flex flex-col gap-2">
+                <h3 className="text-[14px] font-semibold text-[var(--text-primary)] px-1">Backup & Export</h3>
+                
+                {/* Security Warning */}
+                <div className="flex items-start gap-3 p-3 mb-2 rounded-xl bg-orange-500/10 border border-orange-500/20">
+                  <AlertTriangle size={16} className="text-orange-400 shrink-0 mt-0.5" />
+                  <p className="text-[12px] leading-relaxed text-orange-200">
+                    <strong className="font-semibold text-orange-400">Security Notice:</strong> Exported JSON files contain your vault data in <span className="font-semibold">plaintext</span>. Store them securely and delete temporary copies when no longer needed.
+                  </p>
+                </div>
+                
+                <div className="flex flex-col rounded-xl overflow-hidden border border-[var(--border-subtle)] bg-[var(--surface-card)]">
+                  {/* Export Row */}
+                  <div className="flex items-center justify-between p-4 border-b border-[var(--border-subtle)]">
+                    <div className="flex items-center gap-4">
+                      <div className="w-8 h-8 rounded-lg bg-[var(--surface-sidebar)] flex items-center justify-center shrink-0 border border-[var(--border-subtle)]">
+                        <Download size={16} className="text-[var(--text-primary)]" />
+                      </div>
+                      <div className="flex flex-col gap-0.5">
+                        <span className="text-[13px] font-medium text-[var(--text-primary)]">Export Vault</span>
+                        <span className="text-[12px] text-[var(--text-muted)]">Create a portable plaintext backup of your vault.</span>
+                      </div>
+                    </div>
+                    <Button variant="primary" size="sm" isLoading={exporting} onClick={handleExport} className="shrink-0">
+                      Export JSON
+                    </Button>
+                  </div>
+
+                  {/* Import Row */}
+                  <div className="flex items-center justify-between p-4">
+                    <div className="flex items-center gap-4">
+                      <div className="w-8 h-8 rounded-lg bg-[var(--surface-sidebar)] flex items-center justify-center shrink-0 border border-[var(--border-subtle)]">
+                        <Upload size={16} className="text-[var(--text-primary)]" />
+                      </div>
+                      <div className="flex flex-col gap-0.5">
+                        <span className="text-[13px] font-medium text-[var(--text-primary)]">Import Vault</span>
+                        <span className="text-[12px] text-[var(--text-muted)]">Add entries to your existing vault from a JSON file.</span>
+                      </div>
+                    </div>
+                    <Button variant="secondary" size="sm" isLoading={importing} onClick={handleImport} className="shrink-0">
+                      Import JSON
+                    </Button>
+                  </div>
+                </div>
               </div>
             </div>
           )}
