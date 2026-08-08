@@ -1,7 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { FaviconAvatar } from "./FaviconAvatar";
-import { Star, MoreHorizontal, Check } from "lucide-react";
+import { Star } from "lucide-react";
 import { Icon } from "../core/Icon";
 import { useSettingsStore } from "../../stores/settings/useSettingsStore";
 
@@ -27,7 +27,6 @@ export const VaultCard: React.FC<VaultCardProps> = ({
   updatedAt = "Recently",
   isSelected = false,
   onClick,
-  onToggleFavorite,
 }) => {
   const compactMode = useSettingsStore((s) => s.compactMode);
   const showFavicons = useSettingsStore((s) => s.showFavicons);
