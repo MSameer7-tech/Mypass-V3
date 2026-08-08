@@ -251,43 +251,106 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
 
           {/* Security Tab */}
           {activeTab === "security" && (
-            <div className="flex flex-col gap-4">
-              <h3 className="text-base font-bold text-[var(--text-primary)] border-b border-[var(--border-subtle)] pb-2">Security & Auto-Lock</h3>
-              <FieldGroup label="Auto-Lock Inactivity Timeout" description="Vault locks automatically when inactive.">
-                <div className="flex items-center gap-2">
-                  {[1, 5, 15, 30, 60].map((mins) => (
-                    <Button
-                      key={mins}
-                      variant={autoLockMinutes === mins ? "primary" : "secondary"}
-                      size="sm"
-                      onClick={() => setAutoLockMinutes(mins)}
-                    >
-                      {mins}m
-                    </Button>
-                  ))}
+            <div className="flex flex-col gap-5">
+              <h3 className="text-[14px] font-semibold text-[var(--text-primary)] px-1">Security & Access</h3>
+              
+              <div className="flex flex-col rounded-xl overflow-hidden border border-[var(--border-subtle)] bg-[var(--surface-card)]">
+                {/* Auto-Lock Row */}
+                <div className="flex items-center justify-between p-4 border-b border-[var(--border-subtle)]">
+                  <div className="flex items-center gap-4">
+                    <div className="w-8 h-8 rounded-lg bg-[var(--surface-sidebar)] flex items-center justify-center shrink-0 border border-[var(--border-subtle)]">
+                      <Shield size={16} className="text-[var(--text-primary)]" />
+                    </div>
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-[13px] font-medium text-[var(--text-primary)]">Auto-Lock Timeout</span>
+                      <span className="text-[12px] text-[var(--text-muted)]">Vault locks automatically when inactive.</span>
+                    </div>
+                  </div>
+                  
+                  {/* Segmented Control */}
+                  <div className="flex items-center bg-[var(--surface-sidebar)] p-1 rounded-lg border border-[var(--border-subtle)] shadow-inner shrink-0">
+                    {[1, 5, 15, 30, 60].map((mins) => (
+                      <button
+                        key={mins}
+                        onClick={() => setAutoLockMinutes(mins)}
+                        className={`px-2 py-1 text-[11px] font-bold tracking-wider rounded-md transition-all ${
+                          autoLockMinutes === mins
+                            ? "bg-[var(--surface-panel)] text-[var(--text-primary)] shadow-sm border border-[var(--border-subtle)]"
+                            : "text-[var(--text-muted)] hover:text-[var(--text-secondary)] border border-transparent"
+                        }`}
+                      >
+                        {mins} MIN
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </FieldGroup>
+
+                {/* Confirm Deletions Row */}
+                <div className="flex items-center justify-between p-4">
+                  <div className="flex items-center gap-4">
+                    <div className="w-8 h-8 rounded-lg bg-[var(--surface-sidebar)] flex items-center justify-center shrink-0 border border-[var(--border-subtle)]">
+                      <Activity size={16} className="text-[var(--text-primary)]" />
+                    </div>
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-[13px] font-medium text-[var(--text-primary)]">Confirm Deletions</span>
+                      <span className="text-[12px] text-[var(--text-muted)]">Require confirmation before deleting entries.</span>
+                    </div>
+                  </div>
+                  
+                  {/* Toggle Switch */}
+                  <button
+                    onClick={() => setConfirmBeforeDelete(!confirmBeforeDelete)}
+                    className={`relative flex h-5 w-9 shrink-0 items-center rounded-full p-0.5 transition-colors duration-200 ease-in-out focus:outline-none ${
+                      confirmBeforeDelete ? "bg-blue-500" : "bg-[#333]"
+                    }`}
+                  >
+                    <motion.div
+                      layout
+                      className="h-4 w-4 rounded-full bg-white shadow-sm"
+                      animate={{ x: confirmBeforeDelete ? 16 : 0 }}
+                      transition={{ type: "spring", stiffness: 700, damping: 40 }}
+                    />
+                  </button>
+                </div>
+              </div>
             </div>
           )}
 
           {/* Clipboard Tab */}
           {activeTab === "clipboard" && (
-            <div className="flex flex-col gap-4">
-              <h3 className="text-base font-bold text-[var(--text-primary)] border-b border-[var(--border-subtle)] pb-2">Clipboard Auto-Clear</h3>
-              <FieldGroup label="Clear Timeout" description="Automatically purge copied passwords from OS clipboard.">
-                <div className="flex items-center gap-2">
-                  {[15, 30, 45, 60].map((secs) => (
-                    <Button
-                      key={secs}
-                      variant={clipboardAutoClearSeconds === secs ? "primary" : "secondary"}
-                      size="sm"
-                      onClick={() => setClipboardAutoClearSeconds(secs)}
-                    >
-                      {secs}s
-                    </Button>
-                  ))}
+            <div className="flex flex-col gap-5">
+              <h3 className="text-[14px] font-semibold text-[var(--text-primary)] px-1">Clipboard Behavior</h3>
+              
+              <div className="flex flex-col rounded-xl overflow-hidden border border-[var(--border-subtle)] bg-[var(--surface-card)]">
+                <div className="flex items-center justify-between p-4">
+                  <div className="flex items-center gap-4">
+                    <div className="w-8 h-8 rounded-lg bg-[var(--surface-sidebar)] flex items-center justify-center shrink-0 border border-[var(--border-subtle)]">
+                      <Clipboard size={16} className="text-[var(--text-primary)]" />
+                    </div>
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-[13px] font-medium text-[var(--text-primary)]">Clear Timeout</span>
+                      <span className="text-[12px] text-[var(--text-muted)]">Automatically purge copied passwords from OS clipboard.</span>
+                    </div>
+                  </div>
+                  
+                  {/* Segmented Control */}
+                  <div className="flex items-center bg-[var(--surface-sidebar)] p-1 rounded-lg border border-[var(--border-subtle)] shadow-inner shrink-0">
+                    {[15, 30, 45, 60].map((secs) => (
+                      <button
+                        key={secs}
+                        onClick={() => setClipboardAutoClearSeconds(secs)}
+                        className={`px-3 py-1 text-[11px] font-bold tracking-wider rounded-md transition-all ${
+                          clipboardAutoClearSeconds === secs
+                            ? "bg-[var(--surface-panel)] text-[var(--text-primary)] shadow-sm border border-[var(--border-subtle)]"
+                            : "text-[var(--text-muted)] hover:text-[var(--text-secondary)] border border-transparent"
+                        }`}
+                      >
+                        {secs} SEC
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </FieldGroup>
+              </div>
             </div>
           )}
 
