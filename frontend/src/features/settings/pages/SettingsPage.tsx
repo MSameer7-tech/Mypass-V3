@@ -567,7 +567,6 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
           )}
           </motion.div>
         </AnimatePresence>
-        </div>
 
         {/* Footer Area with Copyright and Done Button */}
         <div className="flex items-center justify-between pt-4 mt-auto">
