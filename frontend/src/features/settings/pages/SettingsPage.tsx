@@ -67,18 +67,43 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
     const res = await BackupRepository.exportVault("json");
     setExporting(false);
     if (res.success && onShowToast) {
+      const blob = new Blob([res.data.payload], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = res.data.filename || "mypass-vault-backup.json";
+      a.click();
+      URL.revokeObjectURL(url);
+      
       onShowToast("success", "Vault Exported", `Exported ${res.data.itemCount} items to JSON.`);
     }
   };
 
   const handleImport = async () => {
-    setImporting(true);
-    const mockJson = JSON.stringify([{ title: "Imported Service", username: "import@mypass.app", password: "importedPass123!" }]);
-    const res = await BackupRepository.importVault(mockJson);
-    setImporting(false);
-    if (res.success && onShowToast) {
-      onShowToast("success", "Vault Imported", `Imported ${res.data.importedCount} entries into vault.`);
-    }
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "application/json,.json";
+    input.onchange = async (e: Event) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        const content = event.target?.result as string;
+        if (content) {
+          setImporting(true);
+          const res = await BackupRepository.importVault(content);
+          setImporting(false);
+          if (res.success && onShowToast) {
+            onShowToast("success", "Vault Imported", `Imported ${res.data.importedCount} entries into vault.`);
+          } else {
+            onShowToast?.("error", "Import Failed", "Could not parse JSON or save entries.");
+          }
+        }
+      };
+      reader.readAsText(file);
+    };
+    input.click();
   };
 
   return (
