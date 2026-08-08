@@ -179,9 +179,29 @@ export const WorkspaceLayout: React.FC = () => {
     if (!selectedEntry) return;
 
     try {
+      const currentIndex = filteredEntries.findIndex(e => e.id === selectedEntry.id);
+      let nextId: number | null = null;
+      if (filteredEntries.length > 1) {
+        if (currentIndex < filteredEntries.length - 1) {
+          nextId = filteredEntries[currentIndex + 1].id;
+        } else {
+          nextId = filteredEntries[currentIndex - 1].id;
+        }
+      }
+
       await deleteMutation.mutateAsync(selectedEntry.id);
       closeDialog();
       addToast("success", "Entry Deleted", `'${selectedEntry.title}' was deleted.`);
+
+      if (nextId !== null) {
+        selectEntry(nextId);
+      } else {
+        selectEntry(null);
+        const searchInput = document.querySelector('input[type="search"]') as HTMLInputElement;
+        if (searchInput) {
+          searchInput.focus();
+        }
+      }
     } catch (err: any) {
       addToast("error", "Deletion Failed", err.message);
     }

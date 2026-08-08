@@ -20,6 +20,7 @@ import {
   AlertTriangle,
   Check,
   X,
+  Loader2,
 } from "lucide-react";
 import { Icon, IconProps } from "../../../components/core/Icon";
 
@@ -440,12 +441,17 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
                         <span className="text-[12px] text-[var(--text-muted)]">Create a portable plaintext backup of your vault.</span>
                       </div>
                     </div>
-                    <Button variant="primary" size="sm" isLoading={exportStatus === "loading"} onClick={handleExport} className="shrink-0 w-[120px] relative overflow-hidden" disabled={exportStatus !== "idle"}>
+                    <Button variant="primary" size="sm" onClick={handleExport} className="shrink-0 w-[130px] relative overflow-hidden" disabled={exportStatus !== "idle"}>
                       <AnimatePresence mode="popLayout" initial={false}>
                         {exportStatus === "idle" && (
                           <motion.span key="idle" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
                             Export JSON
                           </motion.span>
+                        )}
+                        {exportStatus === "loading" && (
+                          <motion.div key="loading" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }} transition={{ duration: 0.2 }} className="flex items-center gap-1.5 text-[var(--text-primary)]">
+                             <Loader2 size={14} className="animate-spin" /> Exporting...
+                          </motion.div>
                         )}
                         {exportStatus === "success" && (
                           <motion.div key="success" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }} transition={{ duration: 0.2 }} className="flex items-center gap-1.5 text-green-100">
@@ -453,7 +459,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
                           </motion.div>
                         )}
                         {exportStatus === "error" && (
-                          <motion.div key="error" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }} transition={{ duration: 0.2 }} className="flex items-center gap-1.5 text-red-100">
+                          <motion.div key="error" initial={{ opacity: 0, filter: 'blur(2px)' }} animate={{ opacity: 1, filter: 'blur(0px)' }} exit={{ opacity: 0, filter: 'blur(2px)' }} transition={{ duration: 0.2 }} className="flex items-center gap-1.5 text-red-100">
                             <X size={14} /> Failed
                           </motion.div>
                         )}
@@ -472,12 +478,17 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
                         <span className="text-[12px] text-[var(--text-muted)]">Add entries to your existing vault from a JSON file.</span>
                       </div>
                     </div>
-                    <Button variant="secondary" size="sm" isLoading={importStatus === "loading"} onClick={handleImport} className="shrink-0 w-[120px] relative overflow-hidden" disabled={importStatus !== "idle"}>
+                    <Button variant="secondary" size="sm" onClick={handleImport} className="shrink-0 w-[130px] relative overflow-hidden border-transparent" disabled={importStatus !== "idle"}>
                       <AnimatePresence mode="popLayout" initial={false}>
                         {importStatus === "idle" && (
                           <motion.span key="idle" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
                             Import JSON
                           </motion.span>
+                        )}
+                        {importStatus === "loading" && (
+                          <motion.div key="loading" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }} transition={{ duration: 0.2 }} className="flex items-center gap-1.5 text-[var(--text-primary)]">
+                             <Loader2 size={14} className="animate-spin" /> Importing...
+                          </motion.div>
                         )}
                         {importStatus === "success" && (
                           <motion.div key="success" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }} transition={{ duration: 0.2 }} className="flex items-center gap-1.5 text-green-600 dark:text-green-400">
@@ -485,7 +496,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
                           </motion.div>
                         )}
                         {importStatus === "error" && (
-                          <motion.div key="error" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }} transition={{ duration: 0.2 }} className="flex items-center gap-1.5 text-red-600 dark:text-red-400">
+                          <motion.div key="error" initial={{ opacity: 0, filter: 'blur(2px)' }} animate={{ opacity: 1, filter: 'blur(0px)' }} exit={{ opacity: 0, filter: 'blur(2px)' }} transition={{ duration: 0.2 }} className="flex items-center gap-1.5 text-red-600 dark:text-red-400">
                             <X size={14} /> Failed
                           </motion.div>
                         )}
