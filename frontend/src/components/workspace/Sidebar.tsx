@@ -13,6 +13,10 @@ export interface SidebarProps {
     passwords: number;
     notes: number;
     keys: number;
+    work: number;
+    personal: number;
+    finance: number;
+    social: number;
   };
 }
 
@@ -75,10 +79,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {/* Categories Section - Clear 11px uppercase label & 13px items */}
         <div className="flex flex-col gap-1">
           <h4 className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-wider px-2.5 py-1.5">Categories</h4>
-          <SidebarItem icon={Folder} title="Work" count={10} isSelected={activeCategory === "Work"} onClick={() => onSelectCategory("Work")} />
-          <SidebarItem icon={Folder} title="Personal" count={8} isSelected={activeCategory === "Personal"} onClick={() => onSelectCategory("Personal")} />
-          <SidebarItem icon={Folder} title="Finance" count={3} isSelected={activeCategory === "Finance"} onClick={() => onSelectCategory("Finance")} />
-          <SidebarItem icon={Folder} title="Social" count={3} isSelected={activeCategory === "Social"} onClick={() => onSelectCategory("Social")} />
+          <SidebarItem icon={Folder} title="Work" count={itemCounts.work} isSelected={activeCategory === "Work"} onClick={() => onSelectCategory("Work")} />
+          <SidebarItem icon={Folder} title="Personal" count={itemCounts.personal} isSelected={activeCategory === "Personal"} onClick={() => onSelectCategory("Personal")} />
+          <SidebarItem icon={Folder} title="Finance" count={itemCounts.finance} isSelected={activeCategory === "Finance"} onClick={() => onSelectCategory("Finance")} />
+          <SidebarItem icon={Folder} title="Social" count={itemCounts.social} isSelected={activeCategory === "Social"} onClick={() => onSelectCategory("Social")} />
         </div>
 
 

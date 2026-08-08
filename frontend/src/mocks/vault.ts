@@ -6,7 +6,7 @@ export interface MockVaultEntry {
   websiteUrl: string;
   notes?: string;
   favorite: boolean;
-  category: "Passwords" | "Secure Notes" | "Credit Cards" | "Developer Keys";
+  category: string;
   securityStatus: "secure" | "weak" | "breached";
   strengthScore: number;
   updatedAt: string;
