@@ -27,6 +27,7 @@ export function useCreateEntryMutation() {
       password?: string;
       websiteUrl?: string;
       notes?: string;
+      category?: string;
     }) => {
       const res = await VaultRepository.createEntry(entryData);
       if (!res.success) throw new Error(res.error.message);

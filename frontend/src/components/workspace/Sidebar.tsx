@@ -1,8 +1,6 @@
 import React from "react";
 import { SidebarItem } from "../layout/SidebarItem";
-import { Avatar } from "../core/Avatar";
-import { Shield, Star, KeyRound, FileText, Code, Lock, Settings, ShieldCheck, Folder, MoreHorizontal } from "lucide-react";
-import { Icon } from "../core/Icon";
+import { Shield, KeyRound, Code, ShieldCheck, Folder, Star } from "lucide-react";
 
 export interface SidebarProps {
   activeCategory: string;
@@ -21,8 +19,6 @@ export interface SidebarProps {
 export const Sidebar: React.FC<SidebarProps> = ({
   activeCategory,
   onSelectCategory,
-  onOpenSettings,
-  onLockVault,
   itemCounts,
 }) => {
   return (

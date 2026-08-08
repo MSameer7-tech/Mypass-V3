@@ -5,7 +5,7 @@ import { Badge } from "../core/Badge";
 import { Card } from "../core/Card";
 import { CopyButton } from "../domain/CopyButton";
 import { SearchInput } from "../core/Input";
-import { Eye, EyeOff, ExternalLink, Edit3, Trash2, Shield, Calendar, Key, Globe, Check, FileText, Settings, Lock } from "lucide-react";
+import { Eye, EyeOff, ExternalLink, Edit3, Trash2, Shield, Calendar, Key, FileText, Settings, Lock, Star, Check } from "lucide-react";
 import { Icon } from "../core/Icon";
 import { MockVaultEntry } from "../../mocks/vault";
 import { useSearchStore } from "../../stores/search/useSearchStore";
@@ -30,12 +30,6 @@ export const Inspector: React.FC<InspectorProps> = ({
   const [showPassword, setShowPassword] = useState(false);
   const searchQuery = useSearchStore((s) => s.query);
   const setSearchQuery = useSearchStore((s) => s.setSearchQuery);
-
-  const handleOpenUrl = () => {
-    if (entry?.websiteUrl) {
-      window.open(entry.websiteUrl, "_blank", "noopener,noreferrer");
-    }
-  };
 
   return (
     <div className="h-full w-full bg-[var(--background)] flex flex-col justify-between select-text overflow-hidden">

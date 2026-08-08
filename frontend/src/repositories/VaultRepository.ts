@@ -21,6 +21,7 @@ export class VaultRepository {
     password?: string;
     websiteUrl?: string;
     notes?: string;
+    category?: string;
   }): Promise<Result<{ id: number; title: string }>> {
     return sendIPCRequest<{ id: number; title: string }>("vault.create_entry", {
       title: entry.title,
@@ -28,6 +29,7 @@ export class VaultRepository {
       password: entry.password,
       website_url: entry.websiteUrl,
       notes: entry.notes,
+      category: entry.category,
     });
   }
 
