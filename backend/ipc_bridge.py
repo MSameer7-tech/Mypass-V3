@@ -95,7 +95,8 @@ def main():
             "notes": e.notes,
             "is_favorite": getattr(e, "favorite", False),
             "category": getattr(e, "category", "Passwords") or "Passwords",
-            "updated_at": "Updated just now",
+            "updated_at": getattr(e, "updated_at", ""),
+            "created_at": getattr(e, "created_at", ""),
           })
         response = {"jsonrpc": "2.0", "id": req_id, "result": {"success": True, "data": dtos}}
 

@@ -31,6 +31,18 @@ export const Inspector: React.FC<InspectorProps> = ({
   const searchQuery = useSearchStore((s) => s.query);
   const setSearchQuery = useSearchStore((s) => s.setSearchQuery);
 
+  const getPasswordStrength = (password?: string) => {
+    if (!password) return { score: 0, label: "None", color: "var(--text-muted)", bg: "var(--surface-card-hover)" };
+    const len = password.length;
+    if (len < 6) return { score: 1, label: "Very Weak", color: "var(--danger)", bg: "var(--danger-surface)" };
+    if (len < 10) return { score: 2, label: "Weak", color: "var(--warning)", bg: "var(--warning-surface)" };
+    if (len < 14) return { score: 3, label: "Good", color: "var(--accent)", bg: "var(--surface-elevated)" };
+    if (len < 18) return { score: 4, label: "Strong", color: "var(--success)", bg: "var(--success-surface)" };
+    return { score: 5, label: "Very Strong", color: "var(--success)", bg: "var(--success-surface)" };
+  };
+
+  const strength = entry ? getPasswordStrength(entry.password) : getPasswordStrength("");
+
   return (
     <div className="h-full w-full bg-[var(--background)] flex flex-col justify-between select-text overflow-hidden">
       {/* 1. Top Search Bar Header on the Right Section for better visibility and UX */}
@@ -179,18 +191,20 @@ export const Inspector: React.FC<InspectorProps> = ({
               <Card variant="default" className="flex flex-col gap-2.5 p-3.5 transition-all shadow-[0_8px_32px_rgba(0,0,0,0.08)] bg-white/40 dark:bg-black/20 backdrop-blur-2xl border border-white/40 dark:border-white/10">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-semibold text-[var(--text-secondary)]">Password Strength</span>
-                  <div className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-[var(--success-surface)] text-[10px] font-bold text-[var(--success)]">
-                    <Icon icon={Check} size="xs" className="text-[var(--success)]" />
-                    <span>Very Strong</span>
+                  <div className="flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold" style={{ backgroundColor: strength.bg, color: strength.color }}>
+                    <Icon icon={Check} size="xs" style={{ color: strength.color }} />
+                    <span>{strength.label}</span>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-1.5 h-1.5 w-full mt-0.5">
-                  <div className="flex-1 h-full rounded-full bg-[var(--success)]" />
-                  <div className="flex-1 h-full rounded-full bg-[var(--success)]" />
-                  <div className="flex-1 h-full rounded-full bg-[var(--success)]" />
-                  <div className="flex-1 h-full rounded-full bg-[var(--success)]" />
-                  <div className="flex-1 h-full rounded-full bg-[var(--success)]" />
+                  {[1, 2, 3, 4, 5].map((level) => (
+                    <div
+                      key={level}
+                      className="flex-1 h-full rounded-full transition-colors"
+                      style={{ backgroundColor: level <= strength.score ? strength.color : "var(--border-subtle)" }}
+                    />
+                  ))}
                 </div>
               </Card>
             </div>

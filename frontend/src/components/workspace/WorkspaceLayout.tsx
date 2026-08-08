@@ -57,6 +57,7 @@ export const WorkspaceLayout: React.FC = () => {
   const [newUsername, setNewUsername] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [newWebsite, setNewWebsite] = useState("");
+  const [newNotes, setNewNotes] = useState("");
   const [newCategory, setNewCategory] = useState("Passwords");
   const [newFavorite, setNewFavorite] = useState(false);
   const [toasts, setToasts] = useState<any[]>([]);
@@ -128,6 +129,7 @@ export const WorkspaceLayout: React.FC = () => {
         username: newUsername,
         password: newPassword,
         websiteUrl: newWebsite,
+        notes: newNotes,
         category: newCategory,
         favorite: newFavorite,
       });
@@ -136,6 +138,7 @@ export const WorkspaceLayout: React.FC = () => {
       setNewUsername("");
       setNewPassword("");
       setNewWebsite("");
+      setNewNotes("");
       setNewCategory("Passwords");
       setNewFavorite(false);
       closeDialog();
@@ -156,6 +159,7 @@ export const WorkspaceLayout: React.FC = () => {
           username: newUsername,
           password: newPassword,
           websiteUrl: newWebsite,
+          notes: newNotes,
           category: newCategory as any,
           favorite: newFavorite,
         }
@@ -255,6 +259,7 @@ export const WorkspaceLayout: React.FC = () => {
                   setNewUsername(selectedEntry?.username || "");
                   setNewPassword(selectedEntry?.password || "");
                   setNewWebsite(selectedEntry?.websiteUrl || "");
+                  setNewNotes(selectedEntry?.notes || "");
                   setNewCategory(selectedEntry?.category || "Passwords");
                   setNewFavorite(selectedEntry?.favorite || false);
                   openDialog("editEntry");
@@ -369,6 +374,14 @@ export const WorkspaceLayout: React.FC = () => {
               value={newWebsite}
               onChange={(e) => setNewWebsite(e.target.value)}
               placeholder="https://..."
+            />
+          </FieldGroup>
+          <FieldGroup label="Notes">
+            <textarea
+              value={newNotes}
+              onChange={(e) => setNewNotes(e.target.value)}
+              placeholder="Add secure notes..."
+              className="w-full h-20 px-3.5 py-2.5 bg-[var(--surface-input,var(--surface-card))] text-[var(--text-primary)] text-sm rounded-lg border border-[var(--border-subtle)] shadow-[0_1px_2px_rgba(0,0,0,0.05)] focus:outline-none focus:border-[var(--border-focus)] transition-all duration-150 resize-none"
             />
           </FieldGroup>
         </div>
