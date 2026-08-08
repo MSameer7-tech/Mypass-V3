@@ -86,9 +86,15 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
     const input = document.createElement("input");
     input.type = "file";
     input.accept = "application/json,.json";
+    input.style.display = "none";
+    document.body.appendChild(input);
+    
     input.onchange = async (e: Event) => {
       const file = (e.target as HTMLInputElement).files?.[0];
-      if (!file) return;
+      if (!file) {
+        document.body.removeChild(input);
+        return;
+      }
       
       const reader = new FileReader();
       reader.onload = async (event) => {
@@ -104,6 +110,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
             onShowToast?.("error", "Import Failed", "Could not parse JSON or save entries.");
           }
         }
+        document.body.removeChild(input);
       };
       reader.readAsText(file);
     };
