@@ -21,13 +21,7 @@ class PassthroughEncryption(EncryptionAdapter):
   def decrypt(self, value: str) -> str:
     return value or ""
 
-def seed_initial_vault_if_empty(vault_service):
-  entries = vault_service.list_all_entries()
-  if len(entries) == 0:
-    vault_service.save_entry(title="GitHub", website="https://github.com", username="developer@mypass.app", password="ghp_98472938472938479238472398", notes="Main developer GitHub account.", category="Passwords", favorite=True)
-    vault_service.save_entry(title="Google", website="https://google.com", username="sameer@google.com", password="G00gl3-S3cur3-P@ss2026!", notes="Primary email account.", category="Passwords", favorite=False)
-    vault_service.save_entry(title="Apple ID", website="https://apple.com", username="sameer@icloud.com", password="Ap1e-S3cur3-Vault-Key!", notes="iCloud developer account.", category="Passwords", favorite=True)
-    vault_service.save_entry(title="OpenAI", website="https://openai.com", username="sameer@openai.com", password="sk-proj-98342798427394872934", notes="ChatGPT API keys.", category="Developer Keys", favorite=False)
+
 
 def main():
   db_dir = build_data_path(".mypass_data")
@@ -43,7 +37,6 @@ def main():
   generator = PasswordGenerator()
   backup_service = BackupService()
 
-  seed_initial_vault_if_empty(vault_service)
 
   while True:
     try:
