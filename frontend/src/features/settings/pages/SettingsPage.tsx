@@ -133,7 +133,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
               className={`flex items-center gap-2.5 px-3 py-2 text-[13px] font-medium rounded-lg transition-colors text-left ${
                 isSelected
                   ? "bg-[var(--accent)] text-white shadow-xs"
-                  : "text-[var(--text-primary)] hover:bg-[#2b2d31]"
+                  : "text-[var(--text-primary)] hover:bg-[var(--surface-card-hover)]"
               }`}
             >
               <Icon icon={item.icon} size="sm" tone={isSelected ? "inherit" : "muted"} />
@@ -361,10 +361,10 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
                 <h3 className="text-[14px] font-semibold text-[var(--text-primary)] px-1">Backup & Export</h3>
                 
                 {/* Security Warning */}
-                <div className="flex items-start gap-3 p-3 mb-2 rounded-xl bg-orange-500/10 border border-orange-500/20">
-                  <AlertTriangle size={16} className="text-orange-400 shrink-0 mt-0.5" />
-                  <p className="text-[12px] leading-relaxed text-orange-200">
-                    <strong className="font-semibold text-orange-400">Security Notice:</strong> Exported JSON files contain your vault data in <span className="font-semibold">plaintext</span>. Store them securely and delete temporary copies when no longer needed.
+                <div className="flex items-start gap-3 p-3 mb-2 rounded-xl bg-[var(--warning-surface)] border border-[var(--warning)]/20">
+                  <AlertTriangle size={16} className="text-[var(--warning)] shrink-0 mt-0.5" />
+                  <p className="text-[12px] leading-relaxed text-[var(--text-primary)]">
+                    <strong className="font-semibold text-[var(--warning)]">Security Notice:</strong> Exported JSON files contain your vault data in <span className="font-semibold">plaintext</span>. Store them securely and delete temporary copies when no longer needed.
                   </p>
                 </div>
                 
