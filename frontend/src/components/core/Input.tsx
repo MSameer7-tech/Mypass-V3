@@ -23,10 +23,10 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             {label}
           </label>
         )}
-        <div className="relative flex items-center w-full">
+        <div className="relative flex items-center w-full group">
           {leadingIcon && (
-            <div className="absolute left-3.5 pointer-events-none flex items-center">
-              <Icon icon={leadingIcon} size="sm" tone="muted" />
+            <div className="absolute left-3.5 pointer-events-none flex items-center text-[var(--text-muted)] group-focus-within:text-[var(--accent)] transition-colors duration-150">
+              <Icon icon={leadingIcon} size="sm" tone="inherit" />
             </div>
           )}
           <input
@@ -85,11 +85,18 @@ export const PasswordInput = React.forwardRef<HTMLInputElement, InputProps>(
         <button
           type="button"
           onClick={() => setShowPassword(!showPassword)}
-          className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1 text-[var(--text-muted)] hover:text-[var(--text-primary)] focus:outline-none transition-colors"
+          className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1 text-[var(--text-muted)] hover:text-[var(--text-primary)] focus:outline-none transition-colors duration-100"
           tabIndex={-1}
           aria-label={showPassword ? "Hide password" : "Show password"}
         >
-          <Icon icon={showPassword ? EyeOff : Eye} size="sm" tone="muted" />
+          <div className="relative w-4 h-4 flex items-center justify-center">
+             <div className={`absolute transition-opacity duration-100 ${showPassword ? 'opacity-100' : 'opacity-0'}`}>
+                <Icon icon={EyeOff} size="sm" tone="inherit" />
+             </div>
+             <div className={`absolute transition-opacity duration-100 ${!showPassword ? 'opacity-100' : 'opacity-0'}`}>
+                <Icon icon={Eye} size="sm" tone="inherit" />
+             </div>
+          </div>
         </button>
       </div>
     );

@@ -61,10 +61,10 @@ export const Dialog: React.FC<DialogProps> = ({
 
           {/* Dialog Window */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.96, y: 8 }}
+            initial={{ opacity: 0, scale: 0.97, y: 4 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.96, y: 8 }}
-            transition={{ type: "spring", stiffness: 350, damping: 28 }}
+            exit={{ opacity: 0, scale: 0.97, y: 4 }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
             className={`relative w-full bg-[var(--surface-panel)] border border-[var(--border-subtle)] rounded-2xl shadow-2xl overflow-hidden z-10 ${sizeStyles[size]} ${className}`}
             role="dialog"
             aria-modal="true"

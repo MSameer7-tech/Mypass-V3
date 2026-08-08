@@ -24,6 +24,7 @@ export const VaultCard: React.FC<VaultCardProps> = ({
   username,
   websiteUrl,
   favorite = false,
+  onToggleFavorite,
   updatedAt = "Recently",
   isSelected = false,
   onClick,
@@ -33,9 +34,9 @@ export const VaultCard: React.FC<VaultCardProps> = ({
 
   return (
     <motion.div
-      whileHover={{ y: -1 }}
+      whileHover={{ scale: 1.005, y: -0.5 }}
       whileTap={{ scale: 0.99 }}
-      transition={{ duration: 0.12 }}
+      transition={{ duration: 0.15, ease: "easeOut" }}
       onClick={onClick}
       className={`group relative flex items-center justify-between px-3.5 rounded-xl cursor-pointer transition-all border ${
         compactMode ? "h-[54px] py-1.5" : "h-[68px] py-2.5"
@@ -50,7 +51,16 @@ export const VaultCard: React.FC<VaultCardProps> = ({
         <div className="flex flex-col min-w-0 gap-0.5">
           <div className="flex items-center gap-1.5">
             <span className={`font-semibold text-[var(--text-primary)] truncate tracking-tight ${compactMode ? 'text-[14px]' : 'text-[16px]'}`}>{title}</span>
-            {favorite && <Icon icon={Star} size="xs" className="fill-amber-400 text-amber-400 shrink-0" />}
+            {favorite && (
+              <motion.button
+                whileTap={{ scale: 0.95, rotate: 5 }}
+                transition={{ duration: 0.1 }}
+                className="shrink-0 focus:outline-none cursor-pointer"
+                onClick={(e) => { e.stopPropagation(); onToggleFavorite?.(e); }}
+              >
+                <Icon icon={Star} size="xs" className="fill-amber-400 text-amber-400" />
+              </motion.button>
+            )}
           </div>
           {!compactMode && <span className="text-[14px] font-normal text-[var(--text-secondary)] truncate leading-none">{username || "No username"}</span>}
           <span className="text-[11px] text-[var(--text-muted)] leading-none mt-1">{compactMode ? username || "No username" : updatedAt}</span>

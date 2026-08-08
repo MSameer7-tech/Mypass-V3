@@ -1,0 +1,56 @@
+[
+  {
+    "title": "GitHub",
+    "username": "developer@mypass.app",
+    "password": "ghp_98472938472938479238472398",
+    "website_url": "https://github.com"
+  },
+  {
+    "title": "Google",
+    "username": "sameer@google.com",
+    "password": "G00gl3-S3cur3-P@ss2026!",
+    "website_url": "https://google.com"
+  },
+  {
+    "title": "Apple ID",
+    "username": "sameer@icloud.com",
+    "password": "Ap1e-S3cur3-Vault-Key!",
+    "website_url": "https://apple.com"
+  },
+  {
+    "title": "OpenAI",
+    "username": "sameer@openai.com",
+    "password": "sk-proj-98342798427394872934",
+    "website_url": "https://openai.com"
+  },
+  {
+    "title": "Sameer",
+    "username": "Isameerxo",
+    "password": "$yWZ4h(JE0mVnhdh",
+    "website_url": "https://isameerxo.vercel.app/"
+  },
+  {
+    "title": "AI Hub ",
+    "username": "Isameerxo",
+    "password": "Cm9%Qo6$=wMsmA#)",
+    "website_url": "https://ai-hub-20.vercel.app/"
+  },
+  {
+    "title": "YouTube",
+    "username": "Isameerxo",
+    "password": "Z69n9H8=^-$n&QWz",
+    "website_url": "https://www.youtube.com/"
+  },
+  {
+    "title": "Gmail",
+    "username": "Isameexo",
+    "password": "ev3JP5S+k?@$^MBv",
+    "website_url": "https://mail.google.com/"
+  },
+  {
+    "title": "Instagram",
+    "username": "Isameerxo",
+    "password": "-zMeZa7rbOOxGDUR",
+    "website_url": "https://www.instagram.com/"
+  }
+]

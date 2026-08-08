@@ -18,6 +18,8 @@ import {
   Info,
   Globe,
   AlertTriangle,
+  Check,
+  X,
 } from "lucide-react";
 import { Icon, IconProps } from "../../../components/core/Icon";
 
@@ -49,8 +51,8 @@ const navItems: { id: SettingsTab; label: string; icon: IconProps["icon"] }[] = 
 
 export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast }) => {
   const [activeTab, setActiveTab] = useState<SettingsTab>("general");
-  const [exporting, setExporting] = useState(false);
-  const [importing, setImporting] = useState(false);
+  const [exportStatus, setExportStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [importStatus, setImportStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const queryClient = useQueryClient();
 
   // Settings Store
@@ -68,20 +70,24 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
   const setConfirmBeforeDelete = useSettingsStore((s) => s.setConfirmBeforeDelete);
 
   const handleExport = async () => {
-    setExporting(true);
+    setExportStatus("loading");
     const res = await BackupRepository.exportVault("json");
-    setExporting(false);
-    if (res.success && onShowToast) {
-      const blob = new Blob([res.data.payload], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = res.data.filename || "mypass-vault-backup.json";
-      a.click();
-      URL.revokeObjectURL(url);
-      
-      onShowToast("success", "Vault Exported", `Exported ${res.data.itemCount} items to JSON.`);
+    if (res.success) {
+      setExportStatus("success");
+      if (onShowToast) {
+        const blob = new Blob([res.data.payload], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = res.data.filename || "mypass-vault-backup.json";
+        a.click();
+        URL.revokeObjectURL(url);
+        onShowToast("success", "Vault Exported", `Exported ${res.data.itemCount} items to JSON.`);
+      }
+    } else {
+      setExportStatus("error");
     }
+    setTimeout(() => setExportStatus("idle"), 2000);
   };
 
   const handleImport = async () => {
@@ -102,15 +108,19 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
       reader.onload = async (event) => {
         const content = event.target?.result as string;
         if (content) {
-          setImporting(true);
+          setImportStatus("loading");
           const res = await BackupRepository.importVault(content);
-          setImporting(false);
-          if (res.success && onShowToast) {
-            queryClient.invalidateQueries({ queryKey: VAULT_QUERY_KEY });
-            onShowToast("success", "Vault Imported", `Imported ${res.data.importedCount} entries into vault.`);
+          if (res.success) {
+            setImportStatus("success");
+            if (onShowToast) {
+              queryClient.invalidateQueries({ queryKey: VAULT_QUERY_KEY });
+              onShowToast("success", "Vault Imported", `Imported ${res.data.importedCount} entries into vault.`);
+            }
           } else {
+            setImportStatus("error");
             onShowToast?.("error", "Import Failed", "Could not parse JSON or save entries.");
           }
+          setTimeout(() => setImportStatus("idle"), 2000);
         }
         document.body.removeChild(input);
       };
@@ -430,8 +440,24 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
                         <span className="text-[12px] text-[var(--text-muted)]">Create a portable plaintext backup of your vault.</span>
                       </div>
                     </div>
-                    <Button variant="primary" size="sm" isLoading={exporting} onClick={handleExport} className="shrink-0">
-                      Export JSON
+                    <Button variant="primary" size="sm" isLoading={exportStatus === "loading"} onClick={handleExport} className="shrink-0 w-[120px] relative overflow-hidden" disabled={exportStatus !== "idle"}>
+                      <AnimatePresence mode="popLayout" initial={false}>
+                        {exportStatus === "idle" && (
+                          <motion.span key="idle" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
+                            Export JSON
+                          </motion.span>
+                        )}
+                        {exportStatus === "success" && (
+                          <motion.div key="success" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }} transition={{ duration: 0.2 }} className="flex items-center gap-1.5 text-green-100">
+                            <Check size={14} /> Exported
+                          </motion.div>
+                        )}
+                        {exportStatus === "error" && (
+                          <motion.div key="error" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }} transition={{ duration: 0.2 }} className="flex items-center gap-1.5 text-red-100">
+                            <X size={14} /> Failed
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
                     </Button>
                   </div>
 
@@ -446,8 +472,24 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
                         <span className="text-[12px] text-[var(--text-muted)]">Add entries to your existing vault from a JSON file.</span>
                       </div>
                     </div>
-                    <Button variant="secondary" size="sm" isLoading={importing} onClick={handleImport} className="shrink-0">
-                      Import JSON
+                    <Button variant="secondary" size="sm" isLoading={importStatus === "loading"} onClick={handleImport} className="shrink-0 w-[120px] relative overflow-hidden" disabled={importStatus !== "idle"}>
+                      <AnimatePresence mode="popLayout" initial={false}>
+                        {importStatus === "idle" && (
+                          <motion.span key="idle" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
+                            Import JSON
+                          </motion.span>
+                        )}
+                        {importStatus === "success" && (
+                          <motion.div key="success" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }} transition={{ duration: 0.2 }} className="flex items-center gap-1.5 text-green-600 dark:text-green-400">
+                            <Check size={14} /> Imported
+                          </motion.div>
+                        )}
+                        {importStatus === "error" && (
+                          <motion.div key="error" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }} transition={{ duration: 0.2 }} className="flex items-center gap-1.5 text-red-600 dark:text-red-400">
+                            <X size={14} /> Failed
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
                     </Button>
                   </div>
                 </div>
