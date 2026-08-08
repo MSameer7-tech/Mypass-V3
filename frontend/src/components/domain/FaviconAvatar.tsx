@@ -24,8 +24,8 @@ export const FaviconAvatar: React.FC<FaviconAvatarProps> = ({
       // Add protocol if missing to successfully parse URL
       const urlToParse = websiteUrl.startsWith("http") ? websiteUrl : `https://${websiteUrl}`;
       const url = new URL(urlToParse);
-      // Use Google's favicon service which is reliable and provides good quality
-      resolvedFaviconUrl = `https://s2.googleusercontent.com/s2/favicons?domain=${url.hostname}&sz=64`;
+      // Use DuckDuckGo's favicon service which has better coverage for less popular domains
+      resolvedFaviconUrl = `https://icons.duckduckgo.com/ip3/${url.hostname}.ico`;
     } catch (e) {
       // Invalid URL, fallback to initials
     }
