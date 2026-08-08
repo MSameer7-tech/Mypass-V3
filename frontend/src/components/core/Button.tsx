@@ -1,11 +1,12 @@
 import React from "react";
 import { Icon, IconProps } from "./Icon";
 import { Loader2 } from "lucide-react";
+import { motion, HTMLMotionProps } from "framer-motion";
 
 export type ButtonVariant = "primary" | "secondary" | "ghost" | "destructive" | "link";
 export type ButtonSize = "sm" | "md" | "lg" | "icon";
 
-export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+export interface ButtonProps extends Omit<HTMLMotionProps<"button">, "ref"> {
   variant?: ButtonVariant;
   size?: ButtonSize;
   isLoading?: boolean;
@@ -45,12 +46,16 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const isButtonDisabled = disabled || isLoading;
+    
+    const tapScale = variant === "primary" || variant === "destructive" ? 0.96 : 0.98;
 
     return (
-      <button
-        ref={ref}
+      <motion.button
+        ref={ref as any}
         disabled={isButtonDisabled}
-        className={`inline-flex items-center justify-center font-medium transition-all duration-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--border-focus)] active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none disabled:active:scale-100 ${variantStyles[variant]} ${sizeStyles[size]} ${className}`}
+        whileTap={isButtonDisabled ? undefined : { scale: tapScale }}
+        transition={{ type: "spring", stiffness: 400, damping: 25 }}
+        className={`inline-flex items-center justify-center font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--border-focus)] disabled:opacity-50 disabled:pointer-events-none ${variantStyles[variant]} ${sizeStyles[size]} ${className}`}
         {...props}
       >
         {isLoading ? (
@@ -62,7 +67,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             {trailingIcon && <Icon icon={trailingIcon} size={size === "sm" ? "xs" : "sm"} tone="inherit" />}
           </>
         )}
-      </button>
+      </motion.button>
     );
   }
 );

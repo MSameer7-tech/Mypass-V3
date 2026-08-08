@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+/* Global Theme Transitions (Apple-style smoothness for theme switching) */
+*, ::before, ::after {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 250ms;
+}
+
+
 :root {
   --background: #090B10;
   --surface-sidebar: #0D1016;

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useSettingsStore } from "../../../stores/settings/useSettingsStore";
 import { BackupRepository } from "../../../repositories/BackupRepository";
 import { Button } from "../../../components/core/Button";
@@ -130,23 +130,40 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id)}
-              className={`flex items-center gap-2.5 px-3 py-2 text-[13px] font-medium rounded-lg transition-colors text-left ${
+              className={`relative flex items-center gap-2.5 px-3 py-2 text-[13px] font-medium rounded-lg transition-colors text-left ${
                 isSelected
-                  ? "bg-[var(--accent)] text-white shadow-xs"
+                  ? "text-white"
                   : "text-[var(--text-primary)] hover:bg-[var(--surface-card-hover)]"
               }`}
             >
-              <Icon icon={item.icon} size="sm" tone={isSelected ? "inherit" : "muted"} />
-              <span>{item.label}</span>
+              {isSelected && (
+                <motion.div
+                  layoutId="settings-active-tab"
+                  className="absolute inset-0 bg-[var(--accent)] rounded-lg shadow-sm border border-[var(--accent)]"
+                  transition={{ type: "spring", stiffness: 500, damping: 35 }}
+                />
+              )}
+              <div className="relative z-10 flex items-center gap-2.5">
+                <Icon icon={item.icon} size="sm" tone={isSelected ? "inherit" : "muted"} />
+                <span>{item.label}</span>
+              </div>
             </button>
           );
         })}
       </aside>
 
       {/* Main Settings Content Pane */}
-      <main className="flex-1 p-6 overflow-y-auto flex flex-col justify-between select-text">
-        <div className="flex flex-col gap-6">
-          {/* General Tab */}
+      <main className="flex-1 p-6 overflow-y-auto flex flex-col justify-between select-text relative">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0, y: 4, scale: 0.995 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -4, scale: 0.995 }}
+            transition={{ duration: 0.15, ease: "easeOut" }}
+            className="flex flex-col gap-6"
+          >
+            {/* General Tab */}
           {activeTab === "general" && (
             <div className="flex flex-col gap-5">
               <h3 className="text-[14px] font-semibold text-[var(--text-primary)] px-1">Vault Interface</h3>
@@ -542,6 +559,8 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
               </div>
             </div>
           )}
+          </motion.div>
+        </AnimatePresence>
         </div>
 
         {/* Footer Area with Copyright and Done Button */}
