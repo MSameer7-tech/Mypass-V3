@@ -11,6 +11,7 @@ export interface VaultEntryDTO {
   category: string;
   is_breached?: boolean;
   updated_at?: string;
+  created_at?: string;
 }
 
 export function mapDTOToVaultEntry(dto: VaultEntryDTO): MockVaultEntry {
@@ -25,7 +26,8 @@ export function mapDTOToVaultEntry(dto: VaultEntryDTO): MockVaultEntry {
     category: (dto.category as MockVaultEntry["category"]) || "Passwords",
     securityStatus: dto.is_breached ? "breached" : "secure",
     strengthScore: dto.password && dto.password.length > 12 ? 4 : 2,
-    updatedAt: dto.updated_at || "Just now",
+    updatedAt: dto.updated_at ? new Date(dto.updated_at).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' }) : "Just now",
+    createdAt: dto.created_at ? new Date(dto.created_at).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : new Date(2024, 0, (dto.id % 28) + 1).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
   };
 }
 
@@ -41,5 +43,6 @@ export function mapVaultEntryToDTO(entry: MockVaultEntry): VaultEntryDTO {
     category: entry.category,
     is_breached: entry.securityStatus === "breached",
     updated_at: entry.updatedAt,
+    created_at: entry.createdAt,
   };
 }
