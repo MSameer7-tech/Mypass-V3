@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { motion } from "framer-motion";
 import { useSettingsStore } from "../../../stores/settings/useSettingsStore";
 import { BackupRepository } from "../../../repositories/BackupRepository";
 import { Button } from "../../../components/core/Button";
@@ -119,8 +120,8 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
 
   return (
     <div className="flex h-[560px] w-[860px] bg-[var(--surface-panel)] border border-[var(--border-subtle)] rounded-2xl shadow-2xl overflow-hidden select-none">
-      {/* Settings Sidebar Nav (220px) */}
-      <aside className="w-[220px] bg-[var(--surface-sidebar)] border-r border-[var(--border-subtle)] p-3 flex flex-col gap-1 shrink-0">
+      {/* Settings Sidebar Nav (180px) */}
+      <aside className="w-[180px] bg-[var(--surface-sidebar)] border-r border-[var(--border-subtle)] p-3 flex flex-col gap-1 shrink-0">
         <h2 className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider px-3 py-2">Preferences</h2>
         {navItems.map((item) => {
           const isSelected = activeTab === item.id;
@@ -128,13 +129,13 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id)}
-              className={`flex items-center gap-2.5 px-3 py-2 text-xs font-semibold rounded-lg transition-all text-left ${
+              className={`flex items-center gap-2.5 px-3 py-2 text-[13px] font-medium rounded-lg transition-colors text-left ${
                 isSelected
-                  ? "bg-[var(--surface-card-selected)] text-[var(--text-primary)] shadow-xs"
-                  : "text-[var(--text-secondary)] hover:bg-[var(--surface-card-hover)] hover:text-[var(--text-primary)]"
+                  ? "bg-[var(--accent)] text-white shadow-xs"
+                  : "text-[var(--text-primary)] hover:bg-[#2b2d31]"
               }`}
             >
-              <Icon icon={item.icon} size="sm" tone={isSelected ? "accent" : "muted"} />
+              <Icon icon={item.icon} size="sm" tone={isSelected ? "white" : "muted"} />
               <span>{item.label}</span>
             </button>
           );
@@ -146,13 +147,37 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
         <div className="flex flex-col gap-6">
           {/* General Tab */}
           {activeTab === "general" && (
-            <div className="flex flex-col gap-4">
-              <h3 className="text-base font-bold text-[var(--text-primary)] border-b border-[var(--border-subtle)] pb-2">General Settings</h3>
-              <FieldGroup label="Compact View Mode" description="Reduce line height and padding in vault item cards.">
-                <Button variant={compactMode ? "primary" : "secondary"} size="sm" onClick={() => setCompactMode(!compactMode)}>
-                  {compactMode ? "Compact Enabled ✓" : "Standard View"}
-                </Button>
-              </FieldGroup>
+            <div className="flex flex-col gap-5">
+              <h3 className="text-[14px] font-semibold text-[var(--text-primary)] px-1">Vault Interface</h3>
+              
+              <div className="flex flex-col rounded-xl overflow-hidden border border-[var(--border-subtle)] bg-[var(--surface-card)]">
+                <div className="flex items-center justify-between p-4">
+                  <div className="flex items-center gap-4">
+                    <div className="w-8 h-8 rounded-lg bg-[var(--surface-sidebar)] flex items-center justify-center shrink-0 border border-[var(--border-subtle)]">
+                      <Sliders size={16} className="text-[var(--text-primary)]" />
+                    </div>
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-[13px] font-medium text-[var(--text-primary)]">Compact View</span>
+                      <span className="text-[12px] text-[var(--text-muted)]">Reduce spacing and padding in vault lists.</span>
+                    </div>
+                  </div>
+                  
+                  {/* Toggle Switch */}
+                  <button
+                    onClick={() => setCompactMode(!compactMode)}
+                    className={`relative flex h-5 w-9 shrink-0 items-center rounded-full p-0.5 transition-colors duration-200 ease-in-out focus:outline-none ${
+                      compactMode ? "bg-blue-500" : "bg-[#333]"
+                    }`}
+                  >
+                    <motion.div
+                      layout
+                      className="h-4 w-4 rounded-full bg-white shadow-sm"
+                      animate={{ x: compactMode ? 16 : 0 }}
+                      transition={{ type: "spring", stiffness: 700, damping: 40 }}
+                    />
+                  </button>
+                </div>
+              </div>
             </div>
           )}
 
@@ -344,8 +369,8 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
           )}
         </div>
 
-        <div className="flex justify-end pt-4 border-t border-[var(--border-subtle)] mt-4">
-          <Button variant="primary" size="sm" leadingIcon={Check} onClick={onClose}>
+        <div className="flex justify-end pt-4 mt-auto">
+          <Button variant="secondary" size="sm" onClick={onClose}>
             Done
           </Button>
         </div>
