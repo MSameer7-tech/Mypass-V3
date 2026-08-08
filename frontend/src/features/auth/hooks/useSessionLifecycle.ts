@@ -1,9 +1,10 @@
 import { useEffect } from "react";
 import { useAuthStore } from "../../../stores/auth/useAuthStore";
+import { useSettingsStore } from "../../../stores/settings/useSettingsStore";
 
 export function useSessionLifecycle() {
   const sessionState = useAuthStore((s) => s.sessionState);
-  const autoLockMinutes = useAuthStore((s) => s.autoLockMinutes);
+  const autoLockMinutes = useSettingsStore((s) => s.autoLockMinutes);
   const lastActivityTimestamp = useAuthStore((s) => s.lastActivityTimestamp);
   const resetActivityTimer = useAuthStore((s) => s.resetActivityTimer);
   const lockVault = useAuthStore((s) => s.lockVault);

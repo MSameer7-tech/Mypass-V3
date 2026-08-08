@@ -72,6 +72,16 @@ def main():
       elif method == "auth.lock":
         response = {"jsonrpc": "2.0", "id": req_id, "result": {"success": True, "data": {"success": True}}}
 
+      elif method == "auth.biometric_unlock":
+        if auth_service.is_biometric_available():
+          if auth_service._provider.authenticate_user("Unlock MyPass Vault"):
+            response = {"jsonrpc": "2.0", "id": req_id, "result": {"success": True, "data": {"success": True}}}
+          else:
+            response = {"jsonrpc": "2.0", "id": req_id, "result": {"success": False, "error": {"code": "AUTH_BIOMETRIC_FAILED", "message": "Biometric authentication failed or canceled."}}}
+        else:
+          response = {"jsonrpc": "2.0", "id": req_id, "result": {"success": False, "error": {"code": "AUTH_BIOMETRIC_UNAVAILABLE", "message": "Biometrics not available on this device."}}}
+
+
       elif method == "vault.list_entries":
         entries = vault_service.list_all_entries()
         dtos = []

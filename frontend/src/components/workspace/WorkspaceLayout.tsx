@@ -24,11 +24,15 @@ import {
 import { GeneratorRepository } from "../../repositories/GeneratorRepository";
 import { RefreshCw } from "lucide-react";
 
+import { useAuthStore } from "../../stores/auth/useAuthStore";
+
 export const WorkspaceLayout: React.FC = () => {
   // Live Server State via React Query
   const { data: liveEntries = [], isLoading, isError, error } = useVaultEntriesQuery();
   const createMutation = useCreateEntryMutation();
   const deleteMutation = useDeleteEntryMutation();
+
+  const lockVault = useAuthStore((s) => s.lockVault);
 
   // Store Selectors (Presentation State)
   const selectedId = useVaultStore((s) => s.selectedEntryId);
@@ -45,12 +49,13 @@ export const WorkspaceLayout: React.FC = () => {
   const openDialog = useUIStore((s) => s.openDialog);
   const closeDialog = useUIStore((s) => s.closeDialog);
 
-  // Form State
+  // Form & UI State
   const [newTitle, setNewTitle] = useState("");
   const [newUsername, setNewUsername] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [newWebsite, setNewWebsite] = useState("");
   const [toasts, setToasts] = useState<any[]>([]);
+  const [sortOption, setSortOption] = useState("recent");
 
   // Default selection on load
   useEffect(() => {
@@ -59,19 +64,31 @@ export const WorkspaceLayout: React.FC = () => {
     }
   }, [liveEntries, selectedId, selectEntry]);
 
-  // Category & Search Filtering
+  // Category, Search Filtering & Sorting
   const filteredEntries = useMemo(() => {
-    return liveEntries.filter((entry) => {
+    const filtered = liveEntries.filter((entry) => {
       const matchesSearch =
         entry.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        entry.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        entry.websiteUrl.toLowerCase().includes(searchQuery.toLowerCase());
+        (entry.username || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (entry.websiteUrl || "").toLowerCase().includes(searchQuery.toLowerCase());
 
       if (activeCategory === "All") return matchesSearch;
       if (activeCategory === "Favorites") return matchesSearch && entry.favorite;
       return matchesSearch && entry.category === activeCategory;
     });
-  }, [liveEntries, activeCategory, searchQuery]);
+
+    if (sortOption === "recent") {
+      filtered.sort((a, b) => b.id - a.id);
+    } else if (sortOption === "az") {
+      filtered.sort((a, b) => a.title.localeCompare(b.title));
+    } else if (sortOption === "za") {
+      filtered.sort((a, b) => b.title.localeCompare(a.title));
+    } else if (sortOption === "oldest") {
+      filtered.sort((a, b) => a.id - b.id);
+    }
+
+    return filtered;
+  }, [liveEntries, activeCategory, searchQuery, sortOption]);
 
   const selectedEntry = liveEntries.find((e) => e.id === selectedId) || filteredEntries[0];
 
@@ -131,6 +148,14 @@ export const WorkspaceLayout: React.FC = () => {
     }
   };
 
+  const handleLockVault = () => {
+    addToast("warning", "Vault Locked", "Session cleared.");
+    // Small delay so toast is visible before transition
+    setTimeout(() => {
+      lockVault();
+    }, 500);
+  };
+
   return (
     <div className="h-screen w-screen bg-[var(--background)] text-[var(--text-primary)] flex flex-col overflow-hidden select-none">
       <PanelGroup direction="horizontal" className="h-full w-full">
@@ -140,7 +165,7 @@ export const WorkspaceLayout: React.FC = () => {
             activeCategory={activeCategory}
             onSelectCategory={setSelectedCategory}
             onOpenSettings={() => openDialog("settings")}
-            onLockVault={() => addToast("warning", "Vault Locked", "Session cleared.")}
+            onLockVault={handleLockVault}
             itemCounts={itemCounts}
           />
         </Panel>
@@ -163,8 +188,8 @@ export const WorkspaceLayout: React.FC = () => {
             {/* Column 2: Vault List (30% ≈ 354px baseline on 1180px window) */}
             <Panel defaultSize={30} minSize={25} maxSize={38} className="bg-[var(--surface-panel)] border-r border-[var(--border-subtle)] flex flex-col">
               <Toolbar
-                activeCategory={activeCategory}
-                itemCount={filteredEntries.length}
+                sortOption={sortOption}
+                onSortChange={setSortOption}
                 onNewEntry={() => openDialog("newEntry")}
               />
 
@@ -197,7 +222,7 @@ export const WorkspaceLayout: React.FC = () => {
                 onEdit={() => addToast("info", "Edit Mode", "Editor drawer active.")}
                 onDelete={() => openDialog("deleteConfirm")}
                 onOpenSettings={() => openDialog("settings")}
-                onLockVault={() => addToast("warning", "Vault Locked", "Session cleared.")}
+                onLockVault={handleLockVault}
               />
             </Panel>
           </>

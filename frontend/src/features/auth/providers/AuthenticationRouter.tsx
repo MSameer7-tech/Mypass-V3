@@ -19,6 +19,8 @@ export const AuthenticationRouter: React.FC = () => {
     checkVaultStatus();
   }, [checkVaultStatus]);
 
+  const unlockVaultWithBiometrics = useAuthStore((s) => s.unlockVaultWithBiometrics);
+
   if (sessionState === "BOOTING") {
     return (
       <div className="h-screen w-screen bg-[var(--background)] flex flex-col items-center justify-center gap-3">
@@ -43,6 +45,7 @@ export const AuthenticationRouter: React.FC = () => {
   return (
     <UnlockScreen
       onUnlock={unlockVault}
+      onBiometricUnlock={unlockVaultWithBiometrics}
       isUnlocking={sessionState === "UNLOCKING"}
       errorMessage={authError}
     />

@@ -17,4 +17,8 @@ export class AuthRepository {
   static async lock(): Promise<Result<{ success: boolean }>> {
     return sendIPCRequest<{ success: boolean }>("auth.lock");
   }
+
+  static async biometricUnlock(): Promise<Result<{ success: boolean }>> {
+    return sendIPCRequest<{ success: boolean }>("auth.biometric_unlock");
+  }
 }
