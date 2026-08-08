@@ -611,7 +611,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
                   <div className="text-[13px] text-[var(--text-secondary)]">Free forever</div>
                 </motion.div>
               </div>
-            </div>
+            </motion.div>
           )}
           </motion.div>
         </AnimatePresence>
