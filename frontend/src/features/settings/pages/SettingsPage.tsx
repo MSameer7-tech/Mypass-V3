@@ -493,17 +493,17 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
 
           {/* About Tab */}
           {activeTab === "about" && (
-            <div className="flex flex-col flex-1 gap-8 max-w-[540px]">
+            <div className="flex flex-col flex-1 gap-6 max-w-[540px]">
               {/* Header / Identity */}
               <div className="flex items-start gap-5">
-                <div className="w-[72px] h-[72px] rounded-[18px] bg-[#1a1b1e] border border-[var(--border-subtle)] shadow-sm flex items-center justify-center shrink-0">
-                  <img src="/mypass-icon.png" alt="MyPass" className="w-[48px] h-[48px] object-contain" onError={(e) => (e.currentTarget.style.display = 'none')} />
+                <div className="w-[72px] h-[72px] rounded-[16px] bg-[#1a1b1e] border border-[var(--border-subtle)] shadow-[0_0_15px_rgba(255,255,255,0.05)] overflow-hidden flex items-center justify-center shrink-0">
+                  <img src="/icon-128.png" alt="MyPass" className="w-[72px] h-[72px] object-cover" onError={(e) => (e.currentTarget.style.display = 'none')} />
                 </div>
-                <div className="flex flex-col pt-1">
-                  <h2 className="text-[22px] font-bold text-[var(--text-primary)] tracking-tight leading-none mb-1">MyPass</h2>
-                  <span className="text-[13px] font-semibold text-[var(--text-secondary)] mb-2">Local-first password manager</span>
-                  <p className="text-[13px] text-[var(--text-muted)] max-w-[360px] leading-[1.6]">
-                    Securely store, organize, and manage your passwords and sensitive information with a private, local-first vault.
+                <div className="flex flex-col pt-0.5">
+                  <h2 className="text-[22px] font-bold text-[var(--text-primary)] tracking-tight leading-none mb-1.5">MyPass</h2>
+                  <span className="text-[13px] font-semibold text-[var(--text-secondary)] mb-2">Private by design. Simple by default.</span>
+                  <p className="text-[13px] text-[var(--text-muted)] max-w-[360px] leading-[1.5]">
+                    A local-first password manager built to keep your credentials secure, organized, and entirely under your control.
                   </p>
                 </div>
               </div>
@@ -511,58 +511,45 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
               <div className="border-t border-[var(--border-subtle)]" />
 
               {/* Details Grid */}
-              <div className="grid grid-cols-2 gap-x-8 gap-y-8">
-                {/* Column 1 */}
-                <div className="flex flex-col gap-6">
-                  <div className="flex flex-col gap-2">
-                    <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider">Version</span>
-                    <div className="flex flex-col gap-1">
-                      <div className="text-[13px] font-bold text-[var(--text-primary)]">MyPass v3.0.0</div>
-                      <div className="text-[13px] text-[var(--text-secondary)]">Stable Release</div>
-                    </div>
-                  </div>
-                  
-                  <div className="flex flex-col gap-2">
-                    <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider">Technology</span>
-                    <div className="flex flex-col gap-1">
-                      <div className="text-[13px] text-[var(--text-secondary)]">React + TypeScript</div>
-                      <div className="text-[13px] text-[var(--text-secondary)]">Tauri</div>
-                      <div className="text-[13px] text-[var(--text-secondary)]">Tailwind CSS</div>
-                      <div className="text-[13px] text-[var(--text-secondary)]">Framer Motion</div>
-                    </div>
-                  </div>
+              <div className="grid grid-cols-2 gap-3 mt-1">
+                {/* Version Card */}
+                <div className="flex flex-col gap-1 p-3 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)]">
+                  <span className="text-[11px] font-medium text-[var(--text-muted)] uppercase tracking-wider">Version</span>
+                  <div className="text-[15px] font-semibold text-[var(--text-primary)]">MyPass v3.0.0</div>
+                  <div className="text-[13px] text-[var(--text-secondary)]">Stable Release</div>
                 </div>
 
-                {/* Column 2 */}
-                <div className="flex flex-col gap-6">
-                  <div className="flex flex-col gap-2">
-                    <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider">Security</span>
-                    <div className="flex flex-col gap-1">
-                      <div className="text-[13px] text-[var(--text-secondary)]">AES-256-GCM encryption</div>
-                      <div className="text-[13px] text-[var(--text-secondary)]">Argon2id key derivation</div>
-                      <div className="text-[13px] text-[var(--text-secondary)]">Local-first architecture</div>
-                      <div className="text-[13px] text-[var(--text-secondary)]">No account or cloud dependency</div>
-                    </div>
-                  </div>
-                  
-                  <div className="flex flex-col gap-2">
-                    <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider">Open Source</span>
-                    <div className="flex flex-col gap-1">
-                      <div className="text-[13px] text-[var(--text-secondary)]">MIT License</div>
-                    </div>
-                  </div>
+                {/* Security Card */}
+                <div className="flex flex-col gap-1 p-3 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)]">
+                  <span className="text-[11px] font-medium text-[var(--text-muted)] uppercase tracking-wider">Security</span>
+                  <div className="text-[15px] font-semibold text-[var(--text-primary)]">AES-256-GCM</div>
+                  <div className="text-[13px] text-[var(--text-secondary)]">Argon2id + Local-first</div>
                 </div>
-              </div>
 
-              <div className="mt-auto pt-8 text-center text-[11px] text-[var(--text-muted)] font-medium">
-                © 2026 MyPass • Built with privacy in mind
+                {/* Technology Card */}
+                <div className="flex flex-col gap-1 p-3 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)]">
+                  <span className="text-[11px] font-medium text-[var(--text-muted)] uppercase tracking-wider">Technology</span>
+                  <div className="text-[15px] font-semibold text-[var(--text-primary)]">React + Tauri</div>
+                  <div className="text-[13px] text-[var(--text-secondary)]">Tailwind + Framer Motion</div>
+                </div>
+
+                {/* Open Source Card */}
+                <div className="flex flex-col gap-1 p-3 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)]">
+                  <span className="text-[11px] font-medium text-[var(--text-muted)] uppercase tracking-wider">Open Source</span>
+                  <div className="text-[15px] font-semibold text-[var(--text-primary)]">MIT License</div>
+                  <div className="text-[13px] text-[var(--text-secondary)]">Free forever</div>
+                </div>
               </div>
             </div>
           )}
         </div>
 
-        <div className="flex justify-end pt-4 mt-auto">
-          <Button variant="secondary" size="sm" onClick={onClose}>
+        {/* Footer Area with Copyright and Done Button */}
+        <div className="flex items-center justify-between pt-4 mt-auto">
+          <span className="text-[11px] font-medium text-[var(--text-muted)] ml-1">
+            © 2026 MyPass · Built with privacy in mind
+          </span>
+          <Button variant="secondary" onClick={onClose} className="h-[38px] px-6 text-[13px]">
             Done
           </Button>
         </div>
