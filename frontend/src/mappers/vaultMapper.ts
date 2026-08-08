@@ -26,8 +26,8 @@ export function mapDTOToVaultEntry(dto: VaultEntryDTO): MockVaultEntry {
     category: (dto.category as MockVaultEntry["category"]) || "Passwords",
     securityStatus: dto.is_breached ? "breached" : "secure",
     strengthScore: dto.password && dto.password.length > 12 ? 4 : 2,
-    updatedAt: dto.updated_at ? new Date(dto.updated_at).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' }) : "Just now",
-    createdAt: dto.created_at ? new Date(dto.created_at).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : new Date(2024, 0, (dto.id % 28) + 1).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+    updatedAt: (dto.updated_at && dto.updated_at.trim() !== "" && dto.updated_at !== "Updated just now") ? new Date(dto.updated_at).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' }) : "Just now",
+    createdAt: (dto.created_at && dto.created_at.trim() !== "") ? new Date(dto.created_at).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : new Date(2024, 0, (dto.id % 28) + 1).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
   };
 }
 
