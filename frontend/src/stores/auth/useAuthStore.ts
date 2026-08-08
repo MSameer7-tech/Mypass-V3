@@ -20,6 +20,7 @@ export interface AuthState {
   // Actions
   checkVaultStatus: () => Promise<void>;
   unlockVault: (masterPassword: string) => Promise<boolean>;
+  unlockVaultWithBiometrics: () => Promise<boolean>;
   lockVault: () => void;
   createVault: (masterPassword: string) => Promise<boolean>;
   resetActivityTimer: () => void;
@@ -55,6 +56,22 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({
       sessionState: "LOCKED",
       authError: res.success ? "Invalid password" : res.error.message,
+    });
+    return false;
+  },
+
+  unlockVaultWithBiometrics: async () => {
+    set({ sessionState: "UNLOCKING", authError: null });
+    const res = await AuthRepository.biometricUnlock();
+
+    if (res.success && res.data.success) {
+      set({ sessionState: "UNLOCKED", lastActivityTimestamp: Date.now() });
+      return true;
+    }
+
+    set({
+      sessionState: "LOCKED",
+      authError: res.success ? "Biometric authentication failed" : res.error.message,
     });
     return false;
   },

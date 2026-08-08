@@ -8,6 +8,7 @@ import { Icon } from "../../../components/core/Icon";
 
 export interface UnlockScreenProps {
   onUnlock: (password: string) => Promise<boolean>;
+  onBiometricUnlock?: () => Promise<boolean>;
   isUnlocking?: boolean;
   errorMessage?: string | null;
   onForgotPassword?: () => void;
@@ -15,6 +16,7 @@ export interface UnlockScreenProps {
 
 export const UnlockScreen: React.FC<UnlockScreenProps> = ({
   onUnlock,
+  onBiometricUnlock,
   isUnlocking = false,
   errorMessage,
   onForgotPassword,
@@ -27,6 +29,17 @@ export const UnlockScreen: React.FC<UnlockScreenProps> = ({
     if (!password || isUnlocking) return;
 
     const success = await onUnlock(password);
+    if (!success) {
+      setShake(true);
+      setTimeout(() => setShake(false), 500);
+    }
+  };
+
+  const handleTouchID = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (isUnlocking || !onBiometricUnlock) return;
+    
+    const success = await onBiometricUnlock();
     if (!success) {
       setShake(true);
       setTimeout(() => setShake(false), 500);
@@ -76,10 +89,12 @@ export const UnlockScreen: React.FC<UnlockScreenProps> = ({
         {/* Touch ID Alternative */}
         <div className="w-full flex flex-col items-center gap-3 pt-4 border-t border-[var(--border-subtle)]">
           <Button
+            type="button"
             variant="secondary"
             size="sm"
             leadingIcon={Fingerprint}
-            onClick={() => onUnlock("correct")}
+            onClick={handleTouchID}
+            isLoading={isUnlocking}
             className="w-full"
           >
             Unlock with Touch ID

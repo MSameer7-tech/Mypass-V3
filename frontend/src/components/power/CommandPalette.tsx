@@ -19,24 +19,33 @@ export interface CommandPaletteProps {
   commands?: CommandItem[];
 }
 
-const defaultCommands: CommandItem[] = [
-  { id: "new-password", title: "Create New Password", category: "Actions", icon: Plus, shortcut: "⌘N", onSelect: () => {} },
-  { id: "generate", title: "Generate Strong Password", category: "Actions", icon: Key, shortcut: "⌘G", onSelect: () => {} },
-  { id: "lock-vault", title: "Lock Vault Immediately", category: "Actions", icon: Lock, shortcut: "⌘L", onSelect: () => {} },
-  { id: "nav-favorites", title: "Go to Favorites", category: "Navigation", icon: Star, onSelect: () => {} },
-  { id: "nav-all", title: "Go to All Passwords", category: "Navigation", icon: Shield, onSelect: () => {} },
-  { id: "nav-settings", title: "Open Security Settings", category: "Navigation", icon: Settings, shortcut: "⌘,", onSelect: () => {} },
-];
+import { useAuthStore } from "../../stores/auth/useAuthStore";
+
+const useCommands = (): CommandItem[] => {
+  const lockVault = useAuthStore((s) => s.lockVault);
+  
+  return [
+    { id: "new-password", title: "Create New Password", category: "Actions", icon: Plus, shortcut: "⌘N", onSelect: () => {} },
+    { id: "generate", title: "Generate Strong Password", category: "Actions", icon: Key, shortcut: "⌘G", onSelect: () => {} },
+    { id: "lock-vault", title: "Lock Vault Immediately", category: "Actions", icon: Lock, shortcut: "⌘L", onSelect: () => lockVault() },
+    { id: "nav-favorites", title: "Go to Favorites", category: "Navigation", icon: Star, onSelect: () => {} },
+    { id: "nav-all", title: "Go to All Passwords", category: "Navigation", icon: Shield, onSelect: () => {} },
+    { id: "nav-settings", title: "Open Security Settings", category: "Navigation", icon: Settings, shortcut: "⌘,", onSelect: () => {} },
+  ];
+};
 
 export const CommandPalette: React.FC<CommandPaletteProps> = ({
   open,
   onClose,
-  commands = defaultCommands,
+  commands,
 }) => {
+  const defaultCommands = useCommands();
+  const activeCommands = commands || defaultCommands;
+  
   const [query, setQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
 
-  const filteredCommands = commands.filter((cmd) =>
+  const filteredCommands = activeCommands.filter((cmd) =>
     cmd.title.toLowerCase().includes(query.toLowerCase()) || cmd.category.toLowerCase().includes(query.toLowerCase())
   );
 

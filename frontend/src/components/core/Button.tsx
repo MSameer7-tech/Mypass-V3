@@ -15,7 +15,7 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 }
 
 const variantStyles: Record<ButtonVariant, string> = {
-  primary: "bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-[var(--text-primary)] shadow-sm border border-[var(--accent)]",
+  primary: "bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white shadow-sm border border-[var(--accent)]",
   secondary: "bg-[var(--surface-card)] hover:bg-[var(--surface-card-hover)] text-[var(--text-primary)] border border-[var(--border-subtle)]",
   ghost: "bg-transparent hover:bg-[var(--surface-card-hover)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-transparent",
   destructive: "bg-[var(--danger-surface)] hover:bg-red-950/40 text-[var(--danger)] border border-red-900/40",
@@ -57,9 +57,9 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           <Loader2 className="animate-spin h-4 w-4 shrink-0 text-current" />
         ) : (
           <>
-            {leadingIcon && <Icon icon={leadingIcon} size={size === "sm" ? "xs" : "sm"} tone="primary" />}
+            {leadingIcon && <Icon icon={leadingIcon} size={size === "sm" ? "xs" : "sm"} tone="inherit" />}
             {children}
-            {trailingIcon && <Icon icon={trailingIcon} size={size === "sm" ? "xs" : "sm"} tone="primary" />}
+            {trailingIcon && <Icon icon={trailingIcon} size={size === "sm" ? "xs" : "sm"} tone="inherit" />}
           </>
         )}
       </button>

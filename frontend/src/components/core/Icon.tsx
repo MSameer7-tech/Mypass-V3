@@ -2,7 +2,7 @@ import React from "react";
 import { LucideIcon } from "lucide-react";
 
 export type IconSize = "xs" | "sm" | "md" | "lg" | "xl";
-export type IconTone = "primary" | "secondary" | "muted" | "accent" | "danger" | "success" | "warning";
+export type IconTone = "primary" | "secondary" | "muted" | "accent" | "danger" | "success" | "warning" | "inherit";
 
 export interface IconProps extends React.SVGProps<SVGSVGElement> {
   icon: LucideIcon;
@@ -27,6 +27,7 @@ const toneMap: Record<IconTone, string> = {
   danger: "var(--danger)",
   success: "var(--success)",
   warning: "var(--warning)",
+  inherit: "currentColor",
 };
 
 export const Icon: React.FC<IconProps> = ({

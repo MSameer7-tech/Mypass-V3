@@ -117,7 +117,7 @@ export const Inspector: React.FC<InspectorProps> = ({
                   <IconButton icon={Edit3} label="Edit Entry" size="sm" variant="secondary" onClick={onEdit} className="h-8 w-8 rounded-lg bg-[var(--surface-card)] border-transparent hover:bg-[var(--surface-card-hover)]" />
                 )}
                 {onDelete && (
-                  <IconButton icon={Trash2} label="Delete Entry" size="sm" variant="destructive" onClick={onDelete} className="h-8 w-8 rounded-lg bg-red-950/40 border-transparent hover:bg-red-900/60 text-red-400" />
+                  <IconButton icon={Trash2} label="Delete Entry" size="sm" variant="destructive" onClick={onDelete} className="h-8 w-8 rounded-lg bg-[var(--danger-surface)] border-transparent hover:bg-[var(--danger)]/20 text-[var(--danger)]" />
                 )}
               </div>
             </div>
@@ -185,18 +185,18 @@ export const Inspector: React.FC<InspectorProps> = ({
               <Card variant="default" className="flex flex-col gap-2.5 p-3.5 bg-[var(--surface-card)] border-transparent hover:bg-[var(--surface-card-hover)] transition-colors rounded-xl shadow-xs">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-semibold text-[var(--text-secondary)]">Password Strength</span>
-                  <div className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-950/60 border border-emerald-800/60 text-[10px] font-bold text-emerald-400">
-                    <Icon icon={Check} size="xs" className="text-emerald-400" />
+                  <div className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-[var(--success-surface)] border border-[var(--success)]/30 text-[10px] font-bold text-[var(--success)]">
+                    <Icon icon={Check} size="xs" className="text-[var(--success)]" />
                     <span>Very Strong</span>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-1.5 h-1.5 w-full mt-0.5">
-                  <div className="flex-1 h-full rounded-full bg-emerald-500" />
-                  <div className="flex-1 h-full rounded-full bg-emerald-500" />
-                  <div className="flex-1 h-full rounded-full bg-emerald-500" />
-                  <div className="flex-1 h-full rounded-full bg-emerald-500" />
-                  <div className="flex-1 h-full rounded-full bg-emerald-500" />
+                  <div className="flex-1 h-full rounded-full bg-[var(--success)]" />
+                  <div className="flex-1 h-full rounded-full bg-[var(--success)]" />
+                  <div className="flex-1 h-full rounded-full bg-[var(--success)]" />
+                  <div className="flex-1 h-full rounded-full bg-[var(--success)]" />
+                  <div className="flex-1 h-full rounded-full bg-[var(--success)]" />
                 </div>
               </Card>
             </div>

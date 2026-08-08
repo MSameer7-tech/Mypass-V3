@@ -29,14 +29,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
     <aside className="h-full w-full bg-[var(--surface-sidebar)] p-3 flex flex-col justify-between select-none overflow-y-auto border-r border-[var(--border-subtle)]">
       <div className="flex flex-col gap-5">
         {/* Sleek Minimal Branding Header */}
-        <div className="flex items-center gap-2.5 px-2 py-1.5">
-          <div className="h-8 w-8 rounded-lg bg-[var(--accent)] flex items-center justify-center shadow-md shadow-blue-500/20 shrink-0">
-            <Icon icon={Shield} size="sm" tone="primary" />
-          </div>
-          <div className="flex flex-col">
-            <span className="font-bold text-sm tracking-tight text-[var(--text-primary)]">MyPass</span>
-            <span className="text-[11px] text-[var(--text-muted)] tracking-tight">Local Vault</span>
-          </div>
+        <div className="flex items-center gap-2.5 px-2 py-1.5 mb-1">
+          <img src="/favicon.png" alt="MyPass Icon" className="h-8 w-8 rounded-lg shadow-md shadow-blue-500/20 shrink-0 object-cover" />
+          <span className="font-bold text-[15px] tracking-tight text-[var(--text-primary)]">MyPass</span>
         </div>
 
         {/* Main Navigation - Larger 13px words for better readability */}
