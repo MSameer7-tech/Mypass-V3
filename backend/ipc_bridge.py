@@ -105,8 +105,13 @@ def main():
         password = params.get("password", "")
         website_url = params.get("website_url", "")
         notes = params.get("notes", "")
+        category = params.get("category", "")
+        favorite = params.get("favorite", False)
 
-        record = vault_service.save_entry(title=title, website=website_url, username=username, password=password, notes=notes)
+        record = vault_service.save_entry(
+            title=title, website=website_url, username=username, password=password, notes=notes,
+            category=category, favorite=favorite
+        )
         response = {"jsonrpc": "2.0", "id": req_id, "result": {"success": True, "data": {"id": record.id, "title": record.title}}}
 
       elif method == "vault.update_entry":
@@ -116,15 +121,19 @@ def main():
         password = params.get("password")
         website_url = params.get("website_url")
         notes = params.get("notes")
+        category = params.get("category")
+        favorite = params.get("favorite")
 
         record = vault_service.get_entry(entry_id)
         if record:
           vault_service.save_entry(
-            title=title or record.title,
-            website=website_url or record.website,
-            username=username or record.username,
-            password=password or record.password,
-            notes=notes or record.notes,
+            title=title if title is not None else record.title,
+            website=website_url if website_url is not None else record.website,
+            username=username if username is not None else record.username,
+            password=password if password is not None else record.password,
+            notes=notes if notes is not None else record.notes,
+            category=category if category is not None else record.category,
+            favorite=favorite if favorite is not None else record.favorite,
             entry_id=entry_id,
           )
         response = {"jsonrpc": "2.0", "id": req_id, "result": {"success": True, "data": {"success": True}}}
@@ -132,6 +141,22 @@ def main():
       elif method == "vault.delete_entry":
         entry_id = params.get("id")
         vault_service.delete_entry(entry_id)
+        response = {"jsonrpc": "2.0", "id": req_id, "result": {"success": True, "data": {"success": True}}}
+
+      elif method == "vault.toggle_favorite":
+        entry_id = params.get("id")
+        record = vault_service.get_entry(entry_id)
+        if record:
+            vault_service.save_entry(
+                title=record.title,
+                website=record.website,
+                username=record.username,
+                password=record.password,
+                notes=record.notes,
+                category=record.category,
+                favorite=not record.favorite,
+                entry_id=entry_id,
+            )
         response = {"jsonrpc": "2.0", "id": req_id, "result": {"success": True, "data": {"success": True}}}
 
       elif method == "generator.generate":

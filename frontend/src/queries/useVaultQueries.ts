@@ -28,6 +28,7 @@ export function useCreateEntryMutation() {
       websiteUrl?: string;
       notes?: string;
       category?: string;
+      favorite?: boolean;
     }) => {
       const res = await VaultRepository.createEntry(entryData);
       if (!res.success) throw new Error(res.error.message);
@@ -62,6 +63,20 @@ export function useDeleteEntryMutation() {
       const res = await VaultRepository.deleteEntry(id);
       if (!res.success) throw new Error(res.error.message);
       return id;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: VAULT_QUERY_KEY });
+    },
+  });
+}
+export function useToggleFavoriteMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: number) => {
+      const res = await VaultRepository.toggleFavorite(id);
+      if (!res.success) throw new Error(res.error.message);
+      return res.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: VAULT_QUERY_KEY });

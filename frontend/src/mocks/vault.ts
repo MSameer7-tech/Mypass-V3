@@ -10,6 +10,7 @@ export interface MockVaultEntry {
   securityStatus: "secure" | "weak" | "breached";
   strengthScore: number;
   updatedAt: string;
+  createdAt?: string;
 }
 
 export const mockVaultEntries: MockVaultEntry[] = [

@@ -227,10 +227,7 @@ export const Inspector: React.FC<InspectorProps> = ({
                 <div className="flex flex-col px-3">
                   <span className="text-[10px] text-[var(--text-muted)] font-medium">Created</span>
                   <span className="font-semibold text-[var(--text-primary)] mt-0.5 truncate">
-                    {(() => {
-                      const date = new Date(Date.now() - (entry.id * 86400000 * 3));
-                      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-                    })()}
+                    {entry.createdAt}
                   </span>
                 </div>
                 <div className="flex flex-col pl-3">

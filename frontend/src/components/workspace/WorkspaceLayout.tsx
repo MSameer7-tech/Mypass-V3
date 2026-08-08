@@ -20,6 +20,8 @@ import {
   useVaultEntriesQuery,
   useCreateEntryMutation,
   useDeleteEntryMutation,
+  useUpdateEntryMutation,
+  useToggleFavoriteMutation,
 } from "../../queries/useVaultQueries";
 import { GeneratorRepository } from "../../repositories/GeneratorRepository";
 import { RefreshCw } from "lucide-react";
@@ -30,7 +32,9 @@ export const WorkspaceLayout: React.FC = () => {
   // Live Server State via React Query
   const { data: liveEntries = [], isLoading, isError, error } = useVaultEntriesQuery();
   const createMutation = useCreateEntryMutation();
+  const updateMutation = useUpdateEntryMutation();
   const deleteMutation = useDeleteEntryMutation();
+  const toggleFavoriteMutation = useToggleFavoriteMutation();
 
   const lockVault = useAuthStore((s) => s.lockVault);
 
@@ -38,7 +42,6 @@ export const WorkspaceLayout: React.FC = () => {
   const selectedId = useVaultStore((s) => s.selectedEntryId);
   const activeCategory = useVaultStore((s) => s.selectedCategory);
   const selectEntry = useVaultStore((s) => s.selectEntry);
-  const toggleFavorite = useVaultStore((s) => s.toggleFavorite);
   const setSelectedCategory = useVaultStore((s) => s.setSelectedCategory);
 
   const searchQuery = useSearchStore((s) => s.query);
@@ -55,6 +58,7 @@ export const WorkspaceLayout: React.FC = () => {
   const [newPassword, setNewPassword] = useState("");
   const [newWebsite, setNewWebsite] = useState("");
   const [newCategory, setNewCategory] = useState("Passwords");
+  const [newFavorite, setNewFavorite] = useState(false);
   const [toasts, setToasts] = useState<any[]>([]);
   const [sortOption, setSortOption] = useState("recent");
 
@@ -125,6 +129,7 @@ export const WorkspaceLayout: React.FC = () => {
         password: newPassword,
         websiteUrl: newWebsite,
         category: newCategory,
+        favorite: newFavorite,
       });
 
       setNewTitle("");
@@ -132,10 +137,33 @@ export const WorkspaceLayout: React.FC = () => {
       setNewPassword("");
       setNewWebsite("");
       setNewCategory("Passwords");
+      setNewFavorite(false);
       closeDialog();
       addToast("success", "Entry Created", `'${newTitle}' stored in SQLite database.`);
     } catch (err: any) {
       addToast("error", "Creation Failed", err.message);
+    }
+  };
+
+  const handleEditSubmit = async () => {
+    if (!newTitle.trim() || !selectedEntry) return;
+
+    try {
+      await updateMutation.mutateAsync({
+        id: selectedEntry.id,
+        updates: {
+          title: newTitle,
+          username: newUsername,
+          password: newPassword,
+          websiteUrl: newWebsite,
+          category: newCategory as any,
+          favorite: newFavorite,
+        }
+      });
+      closeDialog();
+      addToast("success", "Entry Updated", `'${newTitle}' has been updated.`);
+    } catch (err: any) {
+      addToast("error", "Update Failed", err.message);
     }
   };
 
@@ -209,7 +237,7 @@ export const WorkspaceLayout: React.FC = () => {
                     onSelectEntry={selectEntry}
                     onToggleFavorite={(id, e) => {
                       e.stopPropagation();
-                      toggleFavorite(id);
+                      toggleFavoriteMutation.mutate(id);
                     }}
                   />
                 </div>
@@ -222,9 +250,17 @@ export const WorkspaceLayout: React.FC = () => {
             <Panel defaultSize={52} minSize={42} className="bg-[var(--background)]">
               <Inspector
                 entry={selectedEntry}
-                onEdit={() => addToast("info", "Edit Mode", "Editor drawer active.")}
+                onEdit={() => {
+                  setNewTitle(selectedEntry?.title || "");
+                  setNewUsername(selectedEntry?.username || "");
+                  setNewPassword(selectedEntry?.password || "");
+                  setNewWebsite(selectedEntry?.websiteUrl || "");
+                  setNewCategory(selectedEntry?.category || "Passwords");
+                  setNewFavorite(selectedEntry?.favorite || false);
+                  openDialog("editEntry");
+                }}
                 onDelete={() => openDialog("deleteConfirm")}
-                onToggleFavorite={() => selectedEntry && toggleFavorite(selectedEntry.id)}
+                onToggleFavorite={() => selectedEntry && toggleFavoriteMutation.mutate(selectedEntry.id)}
                 onOpenSettings={() => openDialog("settings")}
                 onLockVault={handleLockVault}
               />
@@ -243,12 +279,12 @@ export const WorkspaceLayout: React.FC = () => {
         </div>
       )}
 
-      {/* New Entry Modal */}
+      {/* Entry Modal (New & Edit) */}
       <Dialog
-        open={activeDialog === "newEntry"}
+        open={activeDialog === "newEntry" || activeDialog === "editEntry"}
         onClose={closeDialog}
-        title="New Vault Entry"
-        description="Add credentials to store locally in your AES-256 encrypted SQLite vault."
+        title={activeDialog === "editEntry" ? "Edit Vault Entry" : "New Vault Entry"}
+        description={activeDialog === "editEntry" ? "Update your credentials." : "Add credentials to store locally in your AES-256 encrypted SQLite vault."}
         footer={
           <>
             <Button variant="ghost" size="sm" onClick={closeDialog}>
@@ -257,10 +293,10 @@ export const WorkspaceLayout: React.FC = () => {
             <Button
               variant="primary"
               size="sm"
-              isLoading={createMutation.isPending}
-              onClick={handleCreateSubmit}
+              isLoading={activeDialog === "editEntry" ? updateMutation.isPending : createMutation.isPending}
+              onClick={activeDialog === "editEntry" ? handleEditSubmit : handleCreateSubmit}
             >
-              Save Entry
+              {activeDialog === "editEntry" ? "Save Changes" : "Save Entry"}
             </Button>
           </>
         }
@@ -287,6 +323,17 @@ export const WorkspaceLayout: React.FC = () => {
               <option value="Social">Social</option>
               <option value="Developer Keys">Developer Keys</option>
             </select>
+          </FieldGroup>
+          <FieldGroup label="Favorite">
+            <label className="flex items-center gap-2 text-sm text-[var(--text-primary)] cursor-pointer">
+              <input
+                type="checkbox"
+                checked={newFavorite}
+                onChange={(e) => setNewFavorite(e.target.checked)}
+                className="h-4 w-4 rounded border-[var(--border-subtle)] text-[var(--accent)] focus:ring-[var(--border-focus)] bg-[var(--surface-input,var(--surface-card))]"
+              />
+              Mark as Favorite
+            </label>
           </FieldGroup>
           <FieldGroup label="Username / Email">
             <Input
