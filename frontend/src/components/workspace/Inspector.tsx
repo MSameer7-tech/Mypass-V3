@@ -14,6 +14,7 @@ export interface InspectorProps {
   entry?: MockVaultEntry | null;
   onEdit?: () => void;
   onDelete?: () => void;
+  onToggleFavorite?: () => void;
   onOpenSettings?: () => void;
   onLockVault?: () => void;
 }
@@ -22,6 +23,7 @@ export const Inspector: React.FC<InspectorProps> = ({
   entry,
   onEdit,
   onDelete,
+  onToggleFavorite,
   onOpenSettings,
   onLockVault,
 }) => {
@@ -113,6 +115,15 @@ export const Inspector: React.FC<InspectorProps> = ({
               </div>
 
               <div className="flex items-center gap-2">
+                {onToggleFavorite && (
+                  <button
+                    onClick={onToggleFavorite}
+                    title={entry.favorite ? "Remove from Favorites" : "Add to Favorites"}
+                    className="flex items-center justify-center h-9 w-9 rounded-lg hover:bg-[var(--surface-card-hover)] transition-colors focus:outline-none"
+                  >
+                    <Icon icon={Star} size="md" className={entry.favorite ? "text-amber-400 fill-amber-400" : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"} />
+                  </button>
+                )}
                 {onEdit && (
                   <IconButton icon={Edit3} label="Edit Entry" variant="ghost" onClick={onEdit} className="rounded-lg" />
                 )}
@@ -129,7 +140,7 @@ export const Inspector: React.FC<InspectorProps> = ({
                 <h4 className="text-[11px] font-bold uppercase tracking-wider">Credentials</h4>
               </div>
 
-              <Card variant="default" className="flex flex-col gap-2 p-3.5 transition-colors shadow-sm bg-white/60 dark:bg-[#171C26]/60 backdrop-blur-lg border border-[var(--border-subtle)]">
+              <Card variant="default" className="flex flex-col gap-2 p-3.5 transition-all shadow-[0_8px_32px_rgba(0,0,0,0.08)] bg-white/40 dark:bg-black/20 backdrop-blur-2xl border border-white/40 dark:border-white/10">
                 {/* Username Row */}
                 <div className="flex items-center justify-between h-9">
                   <div className="flex flex-col gap-0.5 min-w-0">
@@ -171,7 +182,7 @@ export const Inspector: React.FC<InspectorProps> = ({
                 <h4 className="text-[11px] font-bold uppercase tracking-wider">Security Analysis</h4>
               </div>
 
-              <Card variant="default" className="flex flex-col gap-2.5 p-3.5 transition-colors shadow-sm bg-white/60 dark:bg-[#171C26]/60 backdrop-blur-lg border border-[var(--border-subtle)]">
+              <Card variant="default" className="flex flex-col gap-2.5 p-3.5 transition-all shadow-[0_8px_32px_rgba(0,0,0,0.08)] bg-white/40 dark:bg-black/20 backdrop-blur-2xl border border-white/40 dark:border-white/10">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-semibold text-[var(--text-secondary)]">Password Strength</span>
                   <div className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-[var(--success-surface)] text-[10px] font-bold text-[var(--success)]">
@@ -198,7 +209,7 @@ export const Inspector: React.FC<InspectorProps> = ({
                   <h4 className="text-[11px] font-bold uppercase tracking-wider">Secure Notes</h4>
                 </div>
 
-                <Card variant="default" className="flex items-center justify-between p-3.5 transition-colors shadow-sm text-xs font-medium text-[var(--text-secondary)] bg-white/60 dark:bg-[#171C26]/60 backdrop-blur-lg border border-[var(--border-subtle)]">
+                <Card variant="default" className="flex items-center justify-between p-3.5 transition-all shadow-[0_8px_32px_rgba(0,0,0,0.08)] text-xs font-medium text-[var(--text-secondary)] bg-white/40 dark:bg-black/20 backdrop-blur-2xl border border-white/40 dark:border-white/10">
                   <span className="leading-relaxed">{entry.notes}</span>
                   {onEdit && (
                     <IconButton icon={Edit3} label="Edit Notes" variant="ghost" onClick={onEdit} className="text-[var(--text-muted)] hover:text-[var(--text-primary)] shrink-0" />
@@ -214,7 +225,7 @@ export const Inspector: React.FC<InspectorProps> = ({
                 <h4 className="text-[11px] font-bold uppercase tracking-wider">Metadata</h4>
               </div>
 
-              <Card variant="default" className="grid grid-cols-3 divide-x divide-[var(--border-subtle)] transition-colors shadow-sm p-3.5 text-xs bg-white/60 dark:bg-[#171C26]/60 backdrop-blur-lg border border-[var(--border-subtle)]">
+              <Card variant="default" className="grid grid-cols-3 divide-x divide-[var(--border-subtle)] transition-all shadow-[0_8px_32px_rgba(0,0,0,0.08)] p-3.5 text-xs bg-white/40 dark:bg-black/20 backdrop-blur-2xl border border-white/40 dark:border-white/10">
                 <div className="flex flex-col pr-3">
                   <span className="text-[10px] text-[var(--text-muted)] font-medium">Updated</span>
                   <span className="font-semibold text-[var(--text-primary)] mt-0.5 truncate">{entry.updatedAt || "Just now"}</span>
@@ -222,7 +233,10 @@ export const Inspector: React.FC<InspectorProps> = ({
                 <div className="flex flex-col px-3">
                   <span className="text-[10px] text-[var(--text-muted)] font-medium">Created</span>
                   <span className="font-semibold text-[var(--text-primary)] mt-0.5 truncate">
-                    {new Date(2024, 0, (entry.id % 28) + 1).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    {(() => {
+                      const date = new Date(Date.now() - (entry.id * 86400000 * 3));
+                      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                    })()}
                   </span>
                 </div>
                 <div className="flex flex-col pl-3">
