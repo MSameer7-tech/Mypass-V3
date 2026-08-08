@@ -4,6 +4,8 @@ import { BackupRepository } from "../../../repositories/BackupRepository";
 import { Button } from "../../../components/core/Button";
 
 import { FieldGroup } from "../../../components/layout/FieldGroup";
+import { useQueryClient } from "@tanstack/react-query";
+import { VAULT_QUERY_KEY } from "../../../queries/useVaultQueries";
 import {
   Sliders,
   Palette,
@@ -49,6 +51,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
   const [activeTab, setActiveTab] = useState<SettingsTab>("general");
   const [exporting, setExporting] = useState(false);
   const [importing, setImporting] = useState(false);
+  const queryClient = useQueryClient();
 
   // Settings Store
   const theme = useSettingsStore((s) => s.theme);
@@ -95,6 +98,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
           const res = await BackupRepository.importVault(content);
           setImporting(false);
           if (res.success && onShowToast) {
+            queryClient.invalidateQueries({ queryKey: VAULT_QUERY_KEY });
             onShowToast("success", "Vault Imported", `Imported ${res.data.importedCount} entries into vault.`);
           } else {
             onShowToast?.("error", "Import Failed", "Could not parse JSON or save entries.");
