@@ -17,3 +17,6 @@ backend/.local_data/
 # Python artifacts
 **/__pycache__/
 **/*.pyc
+
+# PyInstaller onedir build output
+frontend/src-tauri/resources/ipc_bridge_app/

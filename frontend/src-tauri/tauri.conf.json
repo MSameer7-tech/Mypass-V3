@@ -28,7 +28,7 @@
     "active": true,
     "targets": ["app", "dmg"],
     "copyright": "© 2026 Sameer",
-    "externalBin": ["binaries/ipc_bridge"],
+    "resources": ["resources/ipc_bridge_app/**/*"],
     "macOS": {
       "minimumSystemVersion": "10.15"
     },

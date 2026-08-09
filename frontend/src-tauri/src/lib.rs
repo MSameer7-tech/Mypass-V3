@@ -18,8 +18,11 @@ fn python_ipc(payload: String, state: State<'_, AppState>, app: AppHandle) -> Re
     let mut proc_guard = state.process.lock().unwrap();
 
     if proc_guard.is_none() {
-        let sidecar_cmd = app.shell().sidecar("ipc_bridge").unwrap();
-        let mut child: Command = sidecar_cmd.into();
+        use tauri::Manager;
+        let resource_dir = app.path().resource_dir().map_err(|e| e.to_string())?;
+        let sidecar_path = resource_dir.join("resources").join("ipc_bridge_app").join("ipc_bridge");
+        
+        let mut child = Command::new(sidecar_path);
         
         child.stdin(Stdio::piped())
             .stdout(Stdio::piped())

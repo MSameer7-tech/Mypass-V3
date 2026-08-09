@@ -22,23 +22,18 @@ def main():
     base_dir = os.path.dirname(os.path.abspath(__file__))
     entry_point = os.path.join(base_dir, "ipc_bridge.py")
     
-    # Target directory for Tauri binaries
-    binaries_dir = os.path.join(base_dir, "..", "frontend", "src-tauri", "binaries")
-    os.makedirs(binaries_dir, exist_ok=True)
-    
-    # Expected filename by Tauri (e.g., ipc_bridge-aarch64-apple-darwin)
-    final_binary_name = f"ipc_bridge-{target}"
-    final_binary_path = os.path.join(binaries_dir, final_binary_name)
+    # Target directory for Tauri resources
+    resources_dir = os.path.join(base_dir, "..", "frontend", "src-tauri", "resources")
+    os.makedirs(resources_dir, exist_ok=True)
+    final_resource_path = os.path.join(resources_dir, "ipc_bridge_app")
 
     print(f"Building {entry_point} with PyInstaller...")
 
     # Run PyInstaller
-    # --onefile to make a single binary
-    # --name ipc_bridge to set the output name
-    # --distpath to set output folder
+    # --onedir to make a folder instead of unpacking on launch
     pyinstaller_cmd = [
         "pyinstaller",
-        "--onefile",
+        "--onedir",
         "--name", "ipc_bridge",
         "--distpath", os.path.join(base_dir, "dist"),
         "--clean",
@@ -57,13 +52,15 @@ def main():
         print(f"PyInstaller failed with code {e.returncode}")
         sys.exit(1)
         
-    # Copy to tauri binaries dir with correct name
-    built_binary = os.path.join(base_dir, "dist", "ipc_bridge")
-    if os.path.exists(built_binary):
-        shutil.copy2(built_binary, final_binary_path)
-        print(f"Successfully copied sidecar to: {final_binary_path}")
+    # Copy to tauri resources dir
+    built_dir = os.path.join(base_dir, "dist", "ipc_bridge")
+    if os.path.exists(built_dir):
+        if os.path.exists(final_resource_path):
+            shutil.rmtree(final_resource_path)
+        shutil.copytree(built_dir, final_resource_path)
+        print(f"Successfully copied sidecar folder to: {final_resource_path}")
     else:
-        print(f"Error: Could not find built binary at {built_binary}")
+        print(f"Error: Could not find built directory at {built_dir}")
         sys.exit(1)
 
 if __name__ == "__main__":
