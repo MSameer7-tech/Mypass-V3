@@ -1,10 +1,19 @@
 venv/
 build/
 dist/
-__pycache__/
-*.pyc
 .DS_Store
 .idea/
 *.spec
-
 mypass-website/
+
+# Sensitive / local data
+*.db
+*.sqlite
+*.sqlite3
+.local_data/
+backend/.local_data/
+.env
+
+# Python artifacts
+**/__pycache__/
+**/*.pyc
