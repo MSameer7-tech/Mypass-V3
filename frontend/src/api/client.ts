@@ -42,7 +42,9 @@ export async function sendIPCRequest<T>(
     }
 
     if (process.env.NODE_ENV !== "production") {
-      console.log(`[IPC] ${method} (${duration}ms):`, parsed.result?.success ? "OK" : "ERROR");
+      if (import.meta.env.DEV) {
+        console.log(`[IPC] ${method} (${duration}ms):`, parsed.result?.success ? "OK" : "ERROR");
+      }
     }
 
     if (parsed.result) {
