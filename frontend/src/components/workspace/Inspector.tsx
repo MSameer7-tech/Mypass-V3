@@ -162,7 +162,7 @@ export const Inspector: React.FC<InspectorProps> = ({
                 <div className="flex items-center justify-between h-9">
                   <div className="flex flex-col gap-0.5 min-w-0">
                     <span className="text-[11px] font-medium text-[var(--text-muted)]">Password</span>
-                    <span className="text-[15px] font-mono font-semibold text-[var(--text-primary)] tracking-wider">
+                    <span id="password-value" className="text-[15px] font-mono font-semibold text-[var(--text-primary)] tracking-wider">
                       {showPassword ? entry.password || "••••••••••••" : "••••••••••••••••"}
                     </span>
                   </div>
@@ -174,6 +174,8 @@ export const Inspector: React.FC<InspectorProps> = ({
                       variant="ghost"
                       onClick={() => setShowPassword(!showPassword)}
                       className="text-[var(--text-muted)] hover:text-[var(--text-primary)]"
+                      aria-expanded={showPassword}
+                      aria-controls="password-value"
                     />
                     <CopyButton valueToCopy={entry.password || ""} label="" size="icon" className="p-0 min-w-0" />
                   </div>

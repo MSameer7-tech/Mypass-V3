@@ -50,6 +50,12 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     
     const tapScale = 0.98;
 
+    if (process.env.NODE_ENV === "development") {
+      if (size === "icon" && !children && !props["aria-label"]) {
+        console.warn("Button with size='icon' should have an aria-label for accessibility.");
+      }
+    }
+
     return (
       <motion.button
         ref={ref as any}

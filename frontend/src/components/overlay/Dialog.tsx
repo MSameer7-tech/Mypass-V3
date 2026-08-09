@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
 import { Icon } from "../core/Icon";
@@ -34,17 +34,59 @@ export const Dialog: React.FC<DialogProps> = ({
   children,
   className = "",
 }) => {
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
+
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && open) {
-        onClose();
-      }
-    };
     if (open) {
-      window.addEventListener("keydown", handleKeyDown);
+      previousFocusRef.current = document.activeElement as HTMLElement;
+      
+      const timer = setTimeout(() => {
+        if (!dialogRef.current) return;
+        const focusable = dialogRef.current.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        );
+        // Only autofocus if the child doesn't already have autofocus, or just focus the first
+        // Actually, if a child has autofocus, React might have focused it already.
+        // Let's just focus the dialog wrapper itself to avoid stealing focus if a child is already focused.
+        if (!dialogRef.current.contains(document.activeElement)) {
+           if (focusable.length > 0) focusable[0].focus();
+           else dialogRef.current.focus();
+        }
+      }, 50);
+      return () => clearTimeout(timer);
+    } else if (previousFocusRef.current) {
+      previousFocusRef.current.focus();
+      previousFocusRef.current = null;
     }
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [open, onClose]);
+  }, [open]);
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Escape") {
+      e.stopPropagation();
+      onClose();
+    }
+    if (e.key === "Tab" && dialogRef.current) {
+      const focusable = Array.from(dialogRef.current.querySelectorAll<HTMLElement>(
+        'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      ));
+      if (focusable.length === 0) {
+        e.preventDefault();
+        return;
+      }
+      
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+  };
 
   return (
     <AnimatePresence>
@@ -62,6 +104,9 @@ export const Dialog: React.FC<DialogProps> = ({
 
           {/* Dialog Window */}
           <motion.div
+            ref={dialogRef}
+            tabIndex={-1}
+            onKeyDown={handleKeyDown}
             initial={{ opacity: 0, scale: 0.97, y: 4 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.97, y: 4 }}

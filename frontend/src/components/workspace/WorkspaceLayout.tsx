@@ -220,14 +220,29 @@ export const WorkspaceLayout: React.FC = () => {
     const handleKeyDown = (e: KeyboardEvent) => {
       // ⌘ on Mac, Ctrl on Windows
       if (e.metaKey || e.ctrlKey) {
-        switch (e.key.toLowerCase()) {
+        const key = e.key.toLowerCase();
+        
+        // ⌘L should work everywhere (Lock Vault)
+        if (key === "l") {
+          e.preventDefault();
+          handleLockVault();
+          return;
+        }
+
+        // Ignore other shortcuts if we are typing in an input or textarea
+        const activeEl = document.activeElement as HTMLElement;
+        const isInputFocused = 
+          activeEl && 
+          (activeEl.tagName === "INPUT" || 
+           activeEl.tagName === "TEXTAREA" || 
+           activeEl.isContentEditable);
+
+        if (isInputFocused) return;
+
+        switch (key) {
           case "k":
             e.preventDefault();
             setCommandPaletteOpen(true);
-            break;
-          case "l":
-            e.preventDefault();
-            handleLockVault();
             break;
           case "n":
             e.preventDefault();

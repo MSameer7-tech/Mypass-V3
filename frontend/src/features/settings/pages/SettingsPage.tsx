@@ -230,6 +230,9 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
                   
                   {/* Toggle Switch */}
                   <button
+                    role="switch"
+                    aria-checked={compactMode}
+                    aria-label="Compact View"
                     onClick={() => setCompactMode(!compactMode)}
                     className={`relative flex h-5 w-9 shrink-0 items-center rounded-full p-0.5 transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--border-focus)] ${
                       compactMode ? "bg-[var(--accent)]" : "bg-[var(--surface-input)] border border-[var(--border-subtle)]"
@@ -306,6 +309,9 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
                   
                   {/* Toggle Switch */}
                   <button
+                    role="switch"
+                    aria-checked={showFavicons}
+                    aria-label="Website Favicons"
                     onClick={() => setShowFavicons(!showFavicons)}
                     className={`relative flex h-5 w-9 shrink-0 items-center rounded-full p-0.5 transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--border-focus)] ${
                       showFavicons ? "bg-[var(--accent)]" : "bg-[var(--surface-input)] border border-[var(--border-subtle)]"
@@ -348,6 +354,9 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
                   
                   {/* Toggle Switch */}
                   <button
+                    role="switch"
+                    aria-checked={biometricEnabled}
+                    aria-label="Biometric Unlock"
                     disabled={!biometricAvailable || biometricLoading}
                     onClick={handleToggleBiometrics}
                     className={`relative flex h-5 w-9 shrink-0 items-center rounded-full p-0.5 transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--border-focus)] ${
@@ -419,6 +428,9 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
                   
                   {/* Toggle Switch */}
                   <button
+                    role="switch"
+                    aria-checked={confirmBeforeDelete}
+                    aria-label="Confirm Deletions"
                     onClick={() => setConfirmBeforeDelete(!confirmBeforeDelete)}
                     className={`relative flex h-5 w-9 shrink-0 items-center rounded-full p-0.5 transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--border-focus)] ${
                       confirmBeforeDelete ? "bg-[var(--accent)]" : "bg-[var(--surface-input)] border border-[var(--border-subtle)]"

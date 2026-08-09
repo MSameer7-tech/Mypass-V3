@@ -46,6 +46,8 @@ export const CopyButton: React.FC<CopyButtonProps> = ({
       onClick={handleCopy}
       leadingIcon={copied ? Check : Copy}
       className={`transition-all duration-100 ${className}`}
+      aria-label={copied ? "Copied" : (label || "Copy to clipboard")}
+      aria-live="polite"
       {...props}
     >
       {copied && label ? "Copied!" : label}

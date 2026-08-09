@@ -147,3 +147,9 @@ body {
 .shadow-button-glow {
   box-shadow: var(--shadow-button-glow);
 }
+
+/* Ensure keyboard focus is always visible and not clipped */
+*:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}

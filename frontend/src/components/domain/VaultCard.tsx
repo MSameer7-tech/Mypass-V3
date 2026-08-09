@@ -21,6 +21,7 @@ export interface VaultCardProps {
 }
 
 export const VaultCard: React.FC<VaultCardProps> = ({
+  id,
   title,
   username,
   websiteUrl,
@@ -35,6 +36,7 @@ export const VaultCard: React.FC<VaultCardProps> = ({
 
   return (
     <motion.div
+      data-id={id}
       whileHover={{ scale: 1.005, y: -0.5 }}
       whileTap={{ scale: 0.99 }}
       transition={{ duration: MOTION_TOKENS.duration.hover, ease: "easeOut" }}

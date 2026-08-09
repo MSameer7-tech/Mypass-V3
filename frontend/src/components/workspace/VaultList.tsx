@@ -39,8 +39,44 @@ export const VaultList: React.FC<VaultListProps> = ({
     );
   }
 
+  const listRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    if (selectedId && listRef.current) {
+      const selectedEl = listRef.current.querySelector(`[data-id="${selectedId}"]`);
+      if (selectedEl) {
+        selectedEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+  }, [selectedId]);
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      e.preventDefault();
+      if (entries.length === 0) return;
+      
+      const currentIndex = entries.findIndex(entry => entry.id === selectedId);
+      let nextIndex = 0;
+
+      if (e.key === "ArrowDown") {
+        nextIndex = currentIndex < entries.length - 1 ? currentIndex + 1 : currentIndex;
+      } else if (e.key === "ArrowUp") {
+        nextIndex = currentIndex > 0 ? currentIndex - 1 : 0;
+      }
+
+      onSelectEntry(entries[nextIndex].id);
+    }
+  };
+
   return (
-    <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-2">
+    <div 
+      className="flex-1 overflow-y-auto p-3 flex flex-col gap-2 focus:outline-none"
+      ref={listRef}
+      tabIndex={0}
+      onKeyDown={handleKeyDown}
+      role="listbox"
+      aria-label="Vault entries"
+    >
       <AnimatePresence initial={false}>
         {entries.map((entry) => (
           <motion.div

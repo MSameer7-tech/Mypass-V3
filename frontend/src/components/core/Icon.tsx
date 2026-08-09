@@ -46,6 +46,7 @@ export const Icon: React.FC<IconProps> = ({
       size={pixelSize}
       style={{ color, strokeWidth: 1.75, ...style }}
       className={`inline-block shrink-0 transition-colors duration-150 ${className}`}
+      aria-hidden={props["aria-label"] ? undefined : "true"}
       {...props}
     />
   );

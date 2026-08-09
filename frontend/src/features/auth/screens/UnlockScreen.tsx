@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { PasswordInput } from "../../../components/core/Input";
 import { Button } from "../../../components/core/Button";
@@ -23,6 +23,14 @@ export const UnlockScreen: React.FC<UnlockScreenProps> = ({
 }) => {
   const [password, setPassword] = useState("");
   const [shake, setShake] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    // Ensure the input gets focus when the screen mounts
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,6 +73,7 @@ export const UnlockScreen: React.FC<UnlockScreenProps> = ({
         {/* Unlock Form */}
         <form onSubmit={handleSubmit} className="w-full flex flex-col gap-4">
           <PasswordInput
+            ref={inputRef}
             label="Master Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
