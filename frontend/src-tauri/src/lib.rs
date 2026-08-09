@@ -1,7 +1,8 @@
 use std::process::{Command, Stdio, ChildStdin, ChildStdout};
 use std::io::{BufRead, BufReader, Write};
 use std::sync::Mutex;
-use tauri::State;
+use tauri::{State, AppHandle};
+use tauri_plugin_shell::ShellExt;
 
 struct PythonProcess {
     stdin: ChildStdin,
@@ -13,19 +14,18 @@ struct AppState {
 }
 
 #[tauri::command]
-fn python_ipc(payload: String, state: State<'_, AppState>) -> Result<String, String> {
+fn python_ipc(payload: String, state: State<'_, AppState>, app: AppHandle) -> Result<String, String> {
     let mut proc_guard = state.process.lock().unwrap();
 
     if proc_guard.is_none() {
-        let python_bin = "/Users/sameer/Documents/Password-Manager-App/.venv/bin/python";
-        let script_path = "/Users/sameer/Documents/Password-Manager-App/backend/ipc_bridge.py";
-
-        let mut child = Command::new(python_bin)
-            .arg(script_path)
-            .stdin(Stdio::piped())
+        let sidecar_cmd = app.shell().sidecar("ipc_bridge").unwrap();
+        let mut child: Command = sidecar_cmd.into();
+        
+        child.stdin(Stdio::piped())
             .stdout(Stdio::piped())
-            .stderr(Stdio::inherit())
-            .spawn()
+            .stderr(Stdio::inherit());
+        
+        let mut child = child.spawn()
             .map_err(|e| format!("Failed to spawn Python bridge: {}", e))?;
 
         let stdin = child.stdin.take().ok_or("Failed to open stdin")?;
@@ -55,6 +55,7 @@ pub fn run() {
         .manage(AppState {
             process: Mutex::new(None),
         })
+        .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_opener::init())
         .invoke_handler(tauri::generate_handler![python_ipc])
         .run(tauri::generate_context!())

@@ -1,0 +1,242 @@
+{
+  "timestamp": "2026-08-09T18:23:28+0530",
+  "datasets": [
+    100,
+    500,
+    1000,
+    5000
+  ],
+  "100_entries": {
+    "seed_time_ms": 57.36,
+    "seed_per_entry_ms": 0.57,
+    "list_entries": {
+      "mean_ms": 1.34,
+      "median_ms": 1.32,
+      "p95_ms": 1.49,
+      "min_ms": 1.27,
+      "max_ms": 1.49
+    },
+    "search": {
+      "google": {
+        "mean_ms": 1.43,
+        "hits": 5
+      },
+      "bank": {
+        "mean_ms": 1.31,
+        "hits": 5
+      },
+      "test": {
+        "mean_ms": 1.37,
+        "hits": 0
+      },
+      "xyz-no-match": {
+        "mean_ms": 1.33,
+        "hits": 0
+      },
+      "a": {
+        "mean_ms": 1.3,
+        "hits": 100
+      }
+    },
+    "crud": {
+      "create": {
+        "mean_ms": 0.61,
+        "max_ms": 0.72
+      },
+      "update": {
+        "mean_ms": 1.15,
+        "max_ms": 1.24
+      },
+      "delete": {
+        "mean_ms": 0.49,
+        "max_ms": 0.53
+      }
+    },
+    "backup_export": {
+      "json": {
+        "mean_ms": 1.32,
+        "max_ms": 1.41
+      },
+      "mypass": {
+        "mean_ms": 1.69,
+        "max_ms": 1.89
+      }
+    }
+  },
+  "500_entries": {
+    "seed_time_ms": 226.93,
+    "seed_per_entry_ms": 0.57,
+    "list_entries": {
+      "mean_ms": 5.48,
+      "median_ms": 5.48,
+      "p95_ms": 5.7,
+      "min_ms": 5.32,
+      "max_ms": 5.7
+    },
+    "search": {
+      "google": {
+        "mean_ms": 5.46,
+        "hits": 25
+      },
+      "bank": {
+        "mean_ms": 5.5,
+        "hits": 25
+      },
+      "test": {
+        "mean_ms": 5.49,
+        "hits": 0
+      },
+      "xyz-no-match": {
+        "mean_ms": 5.44,
+        "hits": 0
+      },
+      "a": {
+        "mean_ms": 5.38,
+        "hits": 500
+      }
+    },
+    "crud": {
+      "create": {
+        "mean_ms": 0.57,
+        "max_ms": 0.67
+      },
+      "update": {
+        "mean_ms": 1.16,
+        "max_ms": 1.29
+      },
+      "delete": {
+        "mean_ms": 0.48,
+        "max_ms": 0.54
+      }
+    },
+    "backup_export": {
+      "json": {
+        "mean_ms": 5.4,
+        "max_ms": 5.67
+      },
+      "mypass": {
+        "mean_ms": 6.78,
+        "max_ms": 6.88
+      }
+    }
+  },
+  "1000_entries": {
+    "seed_time_ms": 284.68,
+    "seed_per_entry_ms": 0.57,
+    "list_entries": {
+      "mean_ms": 10.7,
+      "median_ms": 10.69,
+      "p95_ms": 10.87,
+      "min_ms": 10.48,
+      "max_ms": 10.87
+    },
+    "search": {
+      "google": {
+        "mean_ms": 10.87,
+        "hits": 50
+      },
+      "bank": {
+        "mean_ms": 10.62,
+        "hits": 50
+      },
+      "test": {
+        "mean_ms": 10.75,
+        "hits": 0
+      },
+      "xyz-no-match": {
+        "mean_ms": 10.69,
+        "hits": 0
+      },
+      "a": {
+        "mean_ms": 10.7,
+        "hits": 1000
+      }
+    },
+    "crud": {
+      "create": {
+        "mean_ms": 0.69,
+        "max_ms": 0.93
+      },
+      "update": {
+        "mean_ms": 1.27,
+        "max_ms": 1.99
+      },
+      "delete": {
+        "mean_ms": 0.67,
+        "max_ms": 0.82
+      }
+    },
+    "backup_export": {
+      "json": {
+        "mean_ms": 10.76,
+        "max_ms": 11.04
+      },
+      "mypass": {
+        "mean_ms": 13.41,
+        "max_ms": 13.75
+      }
+    }
+  },
+  "5000_entries": {
+    "seed_time_ms": 2134.27,
+    "seed_per_entry_ms": 0.53,
+    "list_entries": {
+      "mean_ms": 53.83,
+      "median_ms": 52.98,
+      "p95_ms": 58.31,
+      "min_ms": 52.31,
+      "max_ms": 58.31
+    },
+    "search": {
+      "google": {
+        "mean_ms": 53.33,
+        "hits": 250
+      },
+      "bank": {
+        "mean_ms": 53.33,
+        "hits": 250
+      },
+      "test": {
+        "mean_ms": 54.53,
+        "hits": 0
+      },
+      "xyz-no-match": {
+        "mean_ms": 53.55,
+        "hits": 0
+      },
+      "a": {
+        "mean_ms": 53.06,
+        "hits": 5000
+      }
+    },
+    "crud": {
+      "create": {
+        "mean_ms": 0.72,
+        "max_ms": 1.04
+      },
+      "update": {
+        "mean_ms": 1.2,
+        "max_ms": 1.32
+      },
+      "delete": {
+        "mean_ms": 0.45,
+        "max_ms": 0.5
+      }
+    },
+    "backup_export": {
+      "json": {
+        "mean_ms": 50.82,
+        "max_ms": 51.11
+      },
+      "mypass": {
+        "mean_ms": 67.04,
+        "max_ms": 68.47
+      }
+    }
+  },
+  "unlock_time_5000": {
+    "mean_ms": 318.72,
+    "median_ms": 288.49,
+    "max_ms": 429.71
+  }
+}
