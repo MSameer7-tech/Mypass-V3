@@ -58,6 +58,12 @@ pub fn run() {
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_opener::init())
         .invoke_handler(tauri::generate_handler![python_ipc])
+        .on_window_event(|_window, event| match event {
+            tauri::WindowEvent::CloseRequested { .. } => {
+                std::process::exit(0);
+            }
+            _ => {}
+        })
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
