@@ -30,6 +30,14 @@ class BackupService:
         payload = json.loads(vault_service.encryption_service.decrypt(encrypted_payload))
         if payload.get("format_version") != self.format_version:
             raise ValueError("Unsupported backup format.")
-        entries = [VaultEntryRecord(**entry) for entry in payload.get("entries", [])]
+            
+        entries = []
+        for entry_dict in payload.get("entries", []):
+            if "tags" not in entry_dict:
+                entry_dict["tags"] = ""
+            if "icon" not in entry_dict:
+                entry_dict["icon"] = ""
+            entries.append(VaultEntryRecord(**entry_dict))
+            
         history = [PasswordHistoryRecord(**item) for item in payload.get("history", [])]
         vault_service.replace_vault_contents(entries, history)
