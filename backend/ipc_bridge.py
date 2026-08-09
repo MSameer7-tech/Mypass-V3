@@ -116,8 +116,8 @@ def main():
             vault_service = master_pwd_service.create_vault_service(master_password)
             response = {"jsonrpc": "2.0", "id": req_id, "result": {"success": True, "data": {"success": True}}}
           except Exception as e:
-            logging.error(f"Error unlocking vault: {e}", exc_info=True)
-            response = {"jsonrpc": "2.0", "id": req_id, "result": {"success": False, "error": {"code": "AUTH_INVALID_PASSWORD", "message": str(e)}}}
+            logging.error(f"Error unlocking vault. (Exception details omitted for security)")
+            response = {"jsonrpc": "2.0", "id": req_id, "result": {"success": False, "error": {"code": "AUTH_INVALID_PASSWORD", "message": "Failed to unlock vault."}}}
           finally:
             del master_password
         else:
@@ -394,7 +394,7 @@ def main():
       print(json.dumps(response), flush=True)
 
     except Exception as err:
-      logging.error(f"Internal application error: {err}", exc_info=True)
+      logging.error(f"Internal application error. (Exception details omitted for security)")
       err_resp = {"jsonrpc": "2.0", "id": req_id if 'req_id' in locals() else None, "result": {"success": False, "error": {"code": "INTERNAL_ERROR", "message": "An internal application error occurred."}}}
       print(json.dumps(err_resp), flush=True)
 
