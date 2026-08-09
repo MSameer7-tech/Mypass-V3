@@ -55,7 +55,7 @@ export const UnlockScreen: React.FC<UnlockScreenProps> = ({
       >
         {/* Branding Header */}
         <div className="flex flex-col items-center gap-2 text-center">
-          <div className="h-14 w-14 rounded-2xl bg-[var(--accent)] flex items-center justify-center shadow-lg shadow-blue-500/20 mb-1">
+          <div className="h-14 w-14 rounded-2xl bg-[var(--accent)] flex items-center justify-center shadow-lg shadow-[var(--accent-glowing)] mb-1">
             <Icon icon={Shield} size="lg" tone="primary" />
           </div>
           <h1 className="text-xl font-bold text-[var(--text-primary)] tracking-tight">MyPass v3</h1>

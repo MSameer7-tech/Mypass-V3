@@ -34,7 +34,7 @@ export function useCreateEntryMutation() {
       if (!res.success) throw new Error(res.error.message);
       return res.data;
     },
-    onSuccess: () => {
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: VAULT_QUERY_KEY });
     },
   });
@@ -49,7 +49,7 @@ export function useUpdateEntryMutation() {
       if (!res.success) throw new Error(res.error.message);
       return res.data;
     },
-    onSuccess: () => {
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: VAULT_QUERY_KEY });
     },
   });
@@ -64,7 +64,7 @@ export function useDeleteEntryMutation() {
       if (!res.success) throw new Error(res.error.message);
       return id;
     },
-    onSuccess: () => {
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: VAULT_QUERY_KEY });
     },
   });
@@ -78,7 +78,7 @@ export function useToggleFavoriteMutation() {
       if (!res.success) throw new Error(res.error.message);
       return res.data;
     },
-    onSuccess: () => {
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: VAULT_QUERY_KEY });
     },
   });

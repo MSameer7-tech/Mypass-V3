@@ -49,7 +49,7 @@ export const CreateVaultScreen: React.FC<CreateVaultScreenProps> = ({
     <div className="h-screen w-screen bg-[var(--background)] flex items-center justify-center p-4 select-none">
       <div className="w-full max-w-md bg-[var(--surface-panel)] border border-[var(--border-subtle)] rounded-2xl shadow-2xl p-8 flex flex-col items-center gap-6">
         <div className="flex flex-col items-center gap-2 text-center">
-          <div className="h-14 w-14 rounded-2xl bg-[var(--accent)] flex items-center justify-center shadow-lg shadow-blue-500/20 mb-1">
+          <div className="h-14 w-14 rounded-2xl bg-[var(--accent)] flex items-center justify-center shadow-lg shadow-[var(--accent-glowing)] mb-1">
             <Icon icon={Shield} size="lg" tone="primary" />
           </div>
           <h1 className="text-xl font-bold text-[var(--text-primary)] tracking-tight">Create Local Vault</h1>

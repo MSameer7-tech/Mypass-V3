@@ -1,5 +1,45 @@
 @import "tailwindcss";
 
+@theme {
+  --color-background: var(--background);
+  --color-surface-sidebar: var(--surface-sidebar);
+  --color-surface-panel: var(--surface-panel);
+  --color-surface-card: var(--surface-card);
+  --color-surface-card-hover: var(--surface-card-hover);
+  --color-surface-card-selected: var(--surface-card-selected);
+  --color-surface-input: var(--surface-input);
+  --color-surface-elevated: var(--surface-elevated);
+
+  --color-border-subtle: var(--border-subtle);
+  --color-border-focus: var(--border-focus);
+
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-glowing: var(--accent-glowing);
+
+  --color-danger: var(--danger);
+  --color-danger-surface: var(--danger-surface);
+  --color-danger-border: var(--danger-border);
+  --color-danger-hover: var(--danger-hover);
+  --color-danger-muted: var(--danger-muted);
+
+  --color-success: var(--success);
+  --color-success-surface: var(--success-surface);
+  --color-success-border: var(--success-border);
+  --color-success-hover: var(--success-hover);
+  --color-success-muted: var(--success-muted);
+
+  --color-warning: var(--warning);
+  --color-warning-surface: var(--warning-surface);
+  --color-warning-border: var(--warning-border);
+  --color-warning-hover: var(--warning-hover);
+  --color-warning-muted: var(--warning-muted);
+}
+
 /* Global Theme Transitions (Apple-style smoothness for theme switching) */
 *, ::before, ::after {
   transition-property: background-color, border-color, color, fill, stroke, box-shadow;
@@ -31,10 +71,19 @@
   
   --danger: #EF4444;
   --danger-surface: rgba(239, 68, 68, 0.1);
+  --danger-border: rgba(239, 68, 68, 0.4);
+  --danger-hover: rgba(239, 68, 68, 0.15);
+  --danger-muted: rgba(239, 68, 68, 0.6);
   --success: #10B981;
   --success-surface: rgba(16, 185, 129, 0.1);
+  --success-border: rgba(16, 185, 129, 0.4);
+  --success-hover: rgba(16, 185, 129, 0.15);
+  --success-muted: rgba(16, 185, 129, 0.6);
   --warning: #F59E0B;
   --warning-surface: rgba(245, 158, 11, 0.1);
+  --warning-border: rgba(245, 158, 11, 0.4);
+  --warning-hover: rgba(245, 158, 11, 0.15);
+  --warning-muted: rgba(245, 158, 11, 0.6);
 
   --shadow-card-selected: 0 0 30px rgba(59, 130, 246, 0.08), 0 4px 20px rgba(0, 0, 0, 0.25);
   --shadow-button-glow: 0 6px 20px rgba(59, 130, 246, 0.12);
@@ -63,10 +112,19 @@
   
   --danger: #FF3B30;
   --danger-surface: rgba(255, 59, 48, 0.08);
+  --danger-border: rgba(255, 59, 48, 0.3);
+  --danger-hover: rgba(255, 59, 48, 0.12);
+  --danger-muted: rgba(255, 59, 48, 0.6);
   --success: #1A9B55;
   --success-surface: rgba(26, 155, 85, 0.08);
+  --success-border: rgba(26, 155, 85, 0.3);
+  --success-hover: rgba(26, 155, 85, 0.12);
+  --success-muted: rgba(26, 155, 85, 0.6);
   --warning: #FF9F0A;
   --warning-surface: rgba(255, 159, 10, 0.08);
+  --warning-border: rgba(255, 159, 10, 0.3);
+  --warning-hover: rgba(255, 159, 10, 0.12);
+  --warning-muted: rgba(255, 159, 10, 0.6);
 
   --shadow-card-selected: 0 2px 8px rgba(0, 113, 227, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04);
   --shadow-button-glow: 0 4px 12px rgba(0, 113, 227, 0.15);

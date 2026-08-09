@@ -14,21 +14,36 @@ export function useSessionLifecycle() {
     if (sessionState !== "UNLOCKED") return;
 
     const handleUserActivity = () => {
+      const { sessionState, lastActivityTimestamp, lockVault } = useAuthStore.getState();
+      const maxIdleMs = useSettingsStore.getState().autoLockMinutes * 60 * 1000;
+      
+      if (sessionState === "UNLOCKED" && maxIdleMs > 0) {
+        if (Date.now() - lastActivityTimestamp >= maxIdleMs) {
+          lockVault();
+          return;
+        }
+      }
       resetActivityTimer();
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        handleUserActivity();
+      }
     };
 
     window.addEventListener("mousemove", handleUserActivity);
     window.addEventListener("keydown", handleUserActivity);
     window.addEventListener("mousedown", handleUserActivity);
     window.addEventListener("focus", handleUserActivity);
-    document.addEventListener("visibilitychange", handleUserActivity);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
       window.removeEventListener("mousemove", handleUserActivity);
       window.removeEventListener("keydown", handleUserActivity);
       window.removeEventListener("mousedown", handleUserActivity);
       window.removeEventListener("focus", handleUserActivity);
-      document.removeEventListener("visibilitychange", handleUserActivity);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, [sessionState, resetActivityTimer]);
 
@@ -36,16 +51,22 @@ export function useSessionLifecycle() {
   useEffect(() => {
     if (sessionState !== "UNLOCKED" || autoLockMinutes <= 0) return;
 
-    const interval = setInterval(() => {
+    const checkLock = () => {
       const idleTimeMs = Date.now() - lastActivityTimestamp;
       const maxIdleMs = autoLockMinutes * 60 * 1000;
 
       if (idleTimeMs >= maxIdleMs) {
-        console.log("[AutoLock] Vault idle timeout reached. Locking vault...");
         lockVault();
       }
-    }, 5000);
+    };
 
-    return () => clearInterval(interval);
+    const interval = setInterval(checkLock, 5000);
+    
+    // We removed the duplicate focus/visibilitychange listeners here because
+    // they are properly handled with preemptive locking in handleUserActivity.
+    
+    return () => {
+      clearInterval(interval);
+    };
   }, [sessionState, autoLockMinutes, lastActivityTimestamp, lockVault]);
 }

@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { useAuthStore } from "../../../stores/auth/useAuthStore";
+import { MOTION_TOKENS } from "../../../constants/motion";
 import { motion, AnimatePresence } from "framer-motion";
 import { UnlockScreen } from "../screens/UnlockScreen";
 import { CreateVaultScreen } from "../screens/CreateVaultScreen";
@@ -25,7 +26,7 @@ export const AuthenticationRouter: React.FC = () => {
   const renderContent = () => {
     if (sessionState === "BOOTING") {
       return (
-        <motion.div key="booting" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }} className="h-screen w-screen bg-[var(--background)] flex flex-col items-center justify-center gap-3">
+        <motion.div key="booting" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: MOTION_TOKENS.duration.stateChange }} className="h-screen w-screen bg-[var(--background)] flex flex-col items-center justify-center gap-3">
           <Spinner size="lg" />
           <span className="text-xs font-semibold text-[var(--text-muted)] tracking-wide">Initializing Security Engine...</span>
         </motion.div>
@@ -34,7 +35,7 @@ export const AuthenticationRouter: React.FC = () => {
 
     if (sessionState === "NO_VAULT") {
       return (
-        <motion.div key="no_vault" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }} className="h-full w-full">
+        <motion.div key="no_vault" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: MOTION_TOKENS.duration.stateChange }} className="h-full w-full">
           <CreateVaultScreen onCreateVault={createVault} />
         </motion.div>
       );
@@ -49,7 +50,7 @@ export const AuthenticationRouter: React.FC = () => {
     }
 
     return (
-      <motion.div key="locked" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }} className="h-full w-full">
+      <motion.div key="locked" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: MOTION_TOKENS.duration.stateChange }} className="h-full w-full">
         <UnlockScreen
           onUnlock={unlockVault}
           onBiometricUnlock={unlockVaultWithBiometrics}

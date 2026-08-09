@@ -30,7 +30,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <div className="flex flex-col gap-5">
         {/* Sleek Minimal Branding Header */}
         <div className="flex items-center gap-2.5 px-2 py-1.5 mb-1">
-          <img src="/favicon.png" alt="MyPass Icon" className="h-8 w-8 rounded-lg shadow-md shadow-blue-500/20 shrink-0 object-cover" />
+          <img src="/favicon.png" alt="MyPass Icon" className="h-8 w-8 rounded-lg shadow-sm shrink-0 object-cover" />
           <span className="font-bold text-[15px] tracking-tight text-[var(--text-primary)]">MyPass</span>
         </div>
 

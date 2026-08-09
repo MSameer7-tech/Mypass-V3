@@ -3,6 +3,7 @@ import { VaultCard } from "../domain/VaultCard";
 import { EmptyState } from "../layout/EmptyState";
 import { Skeleton } from "../core/Skeleton";
 import { MockVaultEntry } from "../../mocks/vault";
+import { MOTION_TOKENS } from "../../constants/motion";
 import { motion, AnimatePresence } from "framer-motion";
 
 export interface VaultListProps {
@@ -48,7 +49,7 @@ export const VaultList: React.FC<VaultListProps> = ({
             initial={{ opacity: 0, y: 4 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.97, height: 0, marginTop: 0, marginBottom: 0, overflow: "hidden" }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
+            transition={{ duration: MOTION_TOKENS.duration.toggle, ease: "easeOut" }}
           >
             <VaultCard
               id={entry.id}

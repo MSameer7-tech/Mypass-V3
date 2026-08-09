@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { MockVaultEntry, mockVaultEntries } from "../../mocks/vault";
+import { MockVaultEntry } from "../../mocks/vault";
 
 export interface VaultState {
   entries: MockVaultEntry[];
@@ -21,7 +21,7 @@ export interface VaultState {
 }
 
 export const useVaultStore = create<VaultState>((set) => ({
-  entries: mockVaultEntries,
+  entries: [],
   selectedEntryId: 1,
   selectedCategory: "All",
   sortOrder: "title",

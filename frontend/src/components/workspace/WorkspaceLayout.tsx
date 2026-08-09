@@ -288,8 +288,17 @@ export const WorkspaceLayout: React.FC = () => {
               />
 
               {isError ? (
-                <div className="p-4 text-xs text-[var(--danger)] text-center font-mono">
-                  Database Error: {(error as Error)?.message}
+                <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
+                  <div className="w-12 h-12 rounded-full bg-[var(--danger-surface)] flex items-center justify-center mb-4">
+                    <RefreshCw className="text-[var(--danger)]" size={24} />
+                  </div>
+                  <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-2">Vault Data Unavailable</h3>
+                  <p className="text-xs text-[var(--text-muted)] mb-4 max-w-[280px]">
+                    {(error as Error)?.message || "Failed to communicate with local SQLite database."}
+                  </p>
+                  <Button variant="secondary" size="sm" onClick={() => window.location.reload()} leadingIcon={RefreshCw}>
+                    Reload Workspace
+                  </Button>
                 </div>
               ) : (
                 <div className="flex-1 flex flex-col justify-between overflow-hidden">

@@ -7,11 +7,11 @@ export interface PasswordStrengthProps {
 }
 
 const scoreConfig: Record<number, { label: string; color: string }> = {
-  0: { label: "Very Weak", color: "bg-red-500" },
-  1: { label: "Weak", color: "bg-red-400" },
-  2: { label: "Moderate", color: "bg-amber-400" },
-  3: { label: "Strong", color: "bg-emerald-400" },
-  4: { label: "Very Strong", color: "bg-emerald-500" },
+  0: { label: "Very Weak", color: "bg-[var(--danger)]" },
+  1: { label: "Weak", color: "bg-[var(--danger)]" },
+  2: { label: "Moderate", color: "bg-[var(--warning)]" },
+  3: { label: "Strong", color: "bg-[var(--success)]" },
+  4: { label: "Very Strong", color: "bg-[var(--success)]" },
 };
 
 export const PasswordStrength: React.FC<PasswordStrengthProps> = ({

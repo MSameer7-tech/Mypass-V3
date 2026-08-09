@@ -29,7 +29,7 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
   return (
     <button
       disabled={isDisabled}
-      className={`flex items-center justify-between w-full h-[34px] px-3 text-[13px] rounded-lg transition-all duration-150 select-none focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--border-focus)] disabled:opacity-40 disabled:pointer-events-none ${activeStyle} ${className}`}
+      className={`flex items-center justify-between w-full h-[34px] px-3 text-[13px] rounded-lg transition-all duration-150 select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--border-focus)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--surface-sidebar)] disabled:opacity-40 disabled:pointer-events-none ${activeStyle} ${className}`}
       {...props}
     >
       <div className="flex items-center gap-2.5 min-w-0">

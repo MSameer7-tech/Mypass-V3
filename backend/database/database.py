@@ -19,6 +19,9 @@ class DatabaseManager:
     def connect(self) -> Iterator[sqlite3.Connection]:
         connection = sqlite3.connect(self.db_file)
         try:
+            connection.execute("PRAGMA foreign_keys = ON")
+            connection.execute("PRAGMA journal_mode = WAL")
+            connection.execute("PRAGMA synchronous = NORMAL")
             yield connection
             connection.commit()
         finally:
@@ -27,7 +30,6 @@ class DatabaseManager:
     def init_db(self) -> None:
         with self.connect() as connection:
             cursor = connection.cursor()
-            cursor.execute("PRAGMA foreign_keys = ON")
             cursor.execute(
                 """
                 CREATE TABLE IF NOT EXISTS vault_entries (
@@ -143,6 +145,8 @@ class DatabaseManager:
             cursor.execute("ALTER TABLE app_metadata ADD COLUMN biometric_prompt_state TEXT NOT NULL DEFAULT 'never'")
         if "last_master_password_change" not in column_names:
             cursor.execute("ALTER TABLE app_metadata ADD COLUMN last_master_password_change TEXT")
+        if "biometric_wrapped_key" not in column_names:
+            cursor.execute("ALTER TABLE app_metadata ADD COLUMN biometric_wrapped_key TEXT")
 
     def _timestamp(self) -> str:
         return datetime.now(UTC).isoformat()

@@ -17,9 +17,11 @@ class VaultService:
         self,
         repository: VaultRepository,
         encryption_service: EncryptionAdapter,
+        backup_encryption_service: Optional[EncryptionAdapter] = None,
     ):
         self.repository = repository
         self.encryption_service = encryption_service
+        self.backup_encryption_service = backup_encryption_service or encryption_service
 
     def get_total_credentials(self) -> int:
         return self.repository.count_entries()

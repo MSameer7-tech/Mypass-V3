@@ -1,7 +1,9 @@
 import React, { useState } from "react";
+import { MOTION_TOKENS } from "../../../constants/motion";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSettingsStore } from "../../../stores/settings/useSettingsStore";
 import { BackupRepository } from "../../../repositories/BackupRepository";
+import { AuthRepository } from "../../../repositories/AuthRepository";
 import { Button } from "../../../components/core/Button";
 import { useQueryClient } from "@tanstack/react-query";
 import { VAULT_QUERY_KEY } from "../../../queries/useVaultQueries";
@@ -56,6 +58,34 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
   const [importStatus, setImportStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const queryClient = useQueryClient();
 
+  // Biometric State
+  const [biometricAvailable, setBiometricAvailable] = useState(false);
+  const [biometricEnabled, setBiometricEnabled] = useState(false);
+  const [biometricLoading, setBiometricLoading] = useState(false);
+
+  React.useEffect(() => {
+    AuthRepository.biometricStatus().then((res) => {
+      if (res.success) {
+        setBiometricAvailable(res.data.available);
+        setBiometricEnabled(res.data.enabled);
+      }
+    });
+  }, []);
+
+  const handleToggleBiometrics = async () => {
+    setBiometricLoading(true);
+    if (biometricEnabled) {
+      const res = await AuthRepository.disableBiometrics();
+      if (res.success) setBiometricEnabled(false);
+      else onShowToast?.("error", "Disable Failed", res.error?.message);
+    } else {
+      const res = await AuthRepository.enableBiometrics();
+      if (res.success) setBiometricEnabled(true);
+      else onShowToast?.("error", "Setup Failed", res.error?.message);
+    }
+    setBiometricLoading(false);
+  };
+
   // Settings Store
   const theme = useSettingsStore((s) => s.theme);
   const setTheme = useSettingsStore((s) => s.setTheme);
@@ -70,20 +100,21 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
   const confirmBeforeDelete = useSettingsStore((s) => s.confirmBeforeDelete);
   const setConfirmBeforeDelete = useSettingsStore((s) => s.setConfirmBeforeDelete);
 
-  const handleExport = async () => {
+  const handleExport = async (format: "json" | "mypass") => {
     setExportStatus("loading");
-    const res = await BackupRepository.exportVault("json");
+    const res = await BackupRepository.exportVault(format);
     if (res.success) {
       setExportStatus("success");
       if (onShowToast) {
-        const blob = new Blob([res.data.payload], { type: "application/json" });
+        const mimeType = format === "json" ? "application/json" : "application/octet-stream";
+        const blob = new Blob([res.data.payload], { type: mimeType });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = res.data.filename || "mypass-vault-backup.json";
+        a.download = res.data.filename || `mypass-vault-backup.${format}`;
         a.click();
         URL.revokeObjectURL(url);
-        onShowToast("success", "Vault Exported", `Exported ${res.data.itemCount} items to JSON.`);
+        onShowToast("success", "Vault Exported", `Exported ${res.data.itemCount} items (${format.toUpperCase()}).`);
       }
     } else {
       setExportStatus("error");
@@ -94,7 +125,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
   const handleImport = async () => {
     const input = document.createElement("input");
     input.type = "file";
-    input.accept = "application/json,.json";
+    input.accept = ".mypass,.json,application/json";
     input.style.display = "none";
     document.body.appendChild(input);
     
@@ -177,7 +208,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -6 }}
-            transition={{ duration: 0.25, ease: "easeOut" }}
+            transition={{ duration: MOTION_TOKENS.duration.transition, ease: "easeOut" }}
             className="flex flex-col gap-6"
           >
             {/* General Tab */}
@@ -200,7 +231,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
                   {/* Toggle Switch */}
                   <button
                     onClick={() => setCompactMode(!compactMode)}
-                    className={`relative flex h-5 w-9 shrink-0 items-center rounded-full p-0.5 transition-colors duration-200 ease-in-out focus:outline-none ${
+                    className={`relative flex h-5 w-9 shrink-0 items-center rounded-full p-0.5 transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--border-focus)] ${
                       compactMode ? "bg-[var(--accent)]" : "bg-[var(--surface-input)] border border-[var(--border-subtle)]"
                     }`}
                   >
@@ -276,7 +307,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
                   {/* Toggle Switch */}
                   <button
                     onClick={() => setShowFavicons(!showFavicons)}
-                    className={`relative flex h-5 w-9 shrink-0 items-center rounded-full p-0.5 transition-colors duration-200 ease-in-out focus:outline-none ${
+                    className={`relative flex h-5 w-9 shrink-0 items-center rounded-full p-0.5 transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--border-focus)] ${
                       showFavicons ? "bg-[var(--accent)]" : "bg-[var(--surface-input)] border border-[var(--border-subtle)]"
                     }`}
                   >
@@ -298,6 +329,43 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
               <h3 className="text-[14px] font-semibold text-[var(--text-primary)] px-1">Security & Access</h3>
               
               <div className="flex flex-col rounded-xl overflow-hidden border border-[var(--border-subtle)] bg-[var(--surface-card)]">
+                {/* Biometric Unlock Row */}
+                <div className="flex items-center justify-between p-4 border-b border-[var(--border-subtle)]">
+                  <div className="flex items-center gap-4">
+                    <div className="w-8 h-8 rounded-lg bg-[var(--surface-sidebar)] flex items-center justify-center shrink-0 border border-[var(--border-subtle)]">
+                      <Shield size={16} className="text-[var(--text-primary)]" />
+                    </div>
+                    <div className="flex flex-col gap-0.5">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[13px] font-medium text-[var(--text-primary)]">Biometric Unlock</span>
+                        {!biometricAvailable && (
+                          <span className="px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-[var(--text-muted)] bg-[var(--surface-sidebar)] border border-[var(--border-subtle)] rounded shadow-sm">Not Available</span>
+                        )}
+                      </div>
+                      <span className="text-[12px] text-[var(--text-muted)]">Use Touch ID or Fingerprint to unlock your vault.</span>
+                    </div>
+                  </div>
+                  
+                  {/* Toggle Switch */}
+                  <button
+                    disabled={!biometricAvailable || biometricLoading}
+                    onClick={handleToggleBiometrics}
+                    className={`relative flex h-5 w-9 shrink-0 items-center rounded-full p-0.5 transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--border-focus)] ${
+                      !biometricAvailable ? "opacity-50 cursor-not-allowed bg-[var(--surface-input)] border border-[var(--border-subtle)]" :
+                      biometricEnabled ? "bg-[var(--accent)]" : "bg-[var(--surface-input)] border border-[var(--border-subtle)]"
+                    }`}
+                  >
+                    <motion.div
+                      layout
+                      className="h-4 w-4 rounded-full bg-white shadow-sm flex items-center justify-center"
+                      animate={{ x: biometricEnabled ? 16 : 0, scaleX: biometricEnabled ? 1.05 : 1 }}
+                      transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                    >
+                      {biometricLoading && <Loader2 size={10} className="animate-spin text-black" />}
+                    </motion.div>
+                  </button>
+                </div>
+
                 {/* Auto-Lock Row */}
                 <div className="flex items-center justify-between p-4 border-b border-[var(--border-subtle)]">
                   <div className="flex items-center gap-4">
@@ -352,7 +420,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
                   {/* Toggle Switch */}
                   <button
                     onClick={() => setConfirmBeforeDelete(!confirmBeforeDelete)}
-                    className={`relative flex h-5 w-9 shrink-0 items-center rounded-full p-0.5 transition-colors duration-200 ease-in-out focus:outline-none ${
+                    className={`relative flex h-5 w-9 shrink-0 items-center rounded-full p-0.5 transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--border-focus)] ${
                       confirmBeforeDelete ? "bg-[var(--accent)]" : "bg-[var(--surface-input)] border border-[var(--border-subtle)]"
                     }`}
                   >
@@ -422,11 +490,25 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
                 <h3 className="text-[14px] font-semibold text-[var(--text-primary)] px-1">Backup & Export</h3>
                 
                 {/* Security Warning */}
-                <div className="flex items-start gap-3 p-3 mb-2 rounded-xl bg-[var(--warning-surface)] border border-[var(--warning)]/20">
-                  <AlertTriangle size={16} className="text-[var(--warning)] shrink-0 mt-0.5" />
-                  <p className="text-[12px] leading-relaxed text-[var(--text-primary)]">
-                    <strong className="font-semibold text-[var(--warning)]">Security Notice:</strong> Exported JSON files contain your vault data in <span className="font-semibold">plaintext</span>. Store them securely and delete temporary copies when no longer needed.
-                  </p>
+                <div className="flex flex-col gap-3 p-3 mb-3 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)]">
+                  <div className="flex items-start gap-3">
+                    <Shield size={18} className="text-[var(--success)] shrink-0 mt-0.5" />
+                    <div className="flex flex-col gap-1">
+                      <strong className="text-[13px] font-bold text-[var(--success)]">Encrypted Backup (Recommended)</strong>
+                      <p className="text-[12px] leading-relaxed text-[var(--text-muted)]">
+                        The .mypass format is securely encrypted with AES-256-GCM using your master password. It is safe to store in the cloud.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3 p-3 rounded-xl bg-[var(--danger-surface)] border border-[var(--danger-border)]">
+                    <AlertTriangle size={18} className="text-[var(--danger)] shrink-0 mt-0.5" />
+                    <div className="flex flex-col gap-1">
+                      <strong className="text-[13px] font-bold text-[var(--danger)]">JSON Export (Dangerous)</strong>
+                      <p className="text-[12px] leading-relaxed text-[var(--danger)]">
+                        Exported JSON files contain your entire vault in <span className="font-bold underline">UNENCRYPTED PLAINTEXT</span>. Anyone who accesses this file will have immediate access to all your passwords.
+                      </p>
+                    </div>
+                  </div>
                 </div>
                 
                 <div className="flex flex-col rounded-xl overflow-hidden border border-[var(--border-subtle)] bg-[var(--surface-card)]">
@@ -438,33 +520,38 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
                       </div>
                       <div className="flex flex-col gap-0.5">
                         <span className="text-[13px] font-medium text-[var(--text-primary)]">Export Vault</span>
-                        <span className="text-[12px] text-[var(--text-muted)]">Create a portable plaintext backup of your vault.</span>
+                        <span className="text-[12px] text-[var(--text-muted)]">Create a backup of your vault data.</span>
                       </div>
                     </div>
-                    <Button variant="primary" size="sm" onClick={handleExport} className="shrink-0 w-[130px] relative overflow-hidden" disabled={exportStatus !== "idle"}>
-                      <AnimatePresence mode="popLayout" initial={false}>
-                        {exportStatus === "idle" && (
-                          <motion.span key="idle" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
-                            Export JSON
-                          </motion.span>
-                        )}
-                        {exportStatus === "loading" && (
-                          <motion.div key="loading" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }} transition={{ duration: 0.2 }} className="flex items-center gap-1.5 text-[var(--text-primary)]">
-                             <Loader2 size={14} className="animate-spin" /> Exporting...
-                          </motion.div>
-                        )}
-                        {exportStatus === "success" && (
-                          <motion.div key="success" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }} transition={{ duration: 0.2 }} className="flex items-center gap-1.5 text-green-100">
-                            <Check size={14} /> Exported
-                          </motion.div>
-                        )}
-                        {exportStatus === "error" && (
-                          <motion.div key="error" initial={{ opacity: 0, filter: 'blur(2px)' }} animate={{ opacity: 1, filter: 'blur(0px)' }} exit={{ opacity: 0, filter: 'blur(2px)' }} transition={{ duration: 0.2 }} className="flex items-center gap-1.5 text-red-100">
-                            <X size={14} /> Failed
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      <Button variant="secondary" size="sm" onClick={() => handleExport("json")} className="shrink-0 w-[110px] relative overflow-hidden border-[var(--danger-border)] hover:border-[var(--danger)] hover:bg-[var(--danger-hover)] text-[var(--danger)]" disabled={exportStatus !== "idle"}>
+                        Export JSON
+                      </Button>
+                      <Button variant="primary" size="sm" onClick={() => handleExport("mypass")} className="shrink-0 w-[140px] relative overflow-hidden" disabled={exportStatus !== "idle"}>
+                        <AnimatePresence mode="popLayout" initial={false}>
+                          {exportStatus === "idle" && (
+                            <motion.span key="idle" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: MOTION_TOKENS.duration.toggle }}>
+                              Export .mypass
+                            </motion.span>
+                          )}
+                          {exportStatus === "loading" && (
+                            <motion.div key="loading" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }} transition={{ duration: MOTION_TOKENS.duration.toggle }} className="flex items-center gap-1.5 text-[var(--text-primary)]">
+                               <Loader2 size={14} className="animate-spin" /> Exporting...
+                            </motion.div>
+                          )}
+                          {exportStatus === "success" && (
+                            <motion.div key="success" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }} transition={{ duration: MOTION_TOKENS.duration.toggle }} className="flex items-center gap-1.5 text-[var(--success)]">
+                              <Check size={14} /> Exported
+                            </motion.div>
+                          )}
+                          {exportStatus === "error" && (
+                            <motion.div key="error" initial={{ opacity: 0, filter: 'blur(2px)' }} animate={{ opacity: 1, filter: 'blur(0px)' }} exit={{ opacity: 0, filter: 'blur(2px)' }} transition={{ duration: MOTION_TOKENS.duration.toggle }} className="flex items-center gap-1.5 text-[var(--danger)]">
+                              <X size={14} /> Failed
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </Button>
+                    </div>
                   </div>
 
                   {/* Import Row */}
@@ -475,28 +562,28 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
                       </div>
                       <div className="flex flex-col gap-0.5">
                         <span className="text-[13px] font-medium text-[var(--text-primary)]">Import Vault</span>
-                        <span className="text-[12px] text-[var(--text-muted)]">Add entries to your existing vault from a JSON file.</span>
+                        <span className="text-[12px] text-[var(--text-muted)]">Add entries to your existing vault from a .mypass or JSON file.</span>
                       </div>
                     </div>
                     <Button variant="secondary" size="sm" onClick={handleImport} className="shrink-0 w-[130px] relative overflow-hidden border-transparent" disabled={importStatus !== "idle"}>
                       <AnimatePresence mode="popLayout" initial={false}>
                         {importStatus === "idle" && (
-                          <motion.span key="idle" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
-                            Import JSON
+                          <motion.span key="idle" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: MOTION_TOKENS.duration.toggle }}>
+                            Select File
                           </motion.span>
                         )}
                         {importStatus === "loading" && (
-                          <motion.div key="loading" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }} transition={{ duration: 0.2 }} className="flex items-center gap-1.5 text-[var(--text-primary)]">
+                          <motion.div key="loading" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }} transition={{ duration: MOTION_TOKENS.duration.toggle }} className="flex items-center gap-1.5 text-[var(--text-primary)]">
                              <Loader2 size={14} className="animate-spin" /> Importing...
                           </motion.div>
                         )}
                         {importStatus === "success" && (
-                          <motion.div key="success" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }} transition={{ duration: 0.2 }} className="flex items-center gap-1.5 text-green-600 dark:text-green-400">
+                          <motion.div key="success" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }} transition={{ duration: MOTION_TOKENS.duration.toggle }} className="flex items-center gap-1.5 text-[var(--success)]">
                             <Check size={14} /> Imported
                           </motion.div>
                         )}
                         {importStatus === "error" && (
-                          <motion.div key="error" initial={{ opacity: 0, filter: 'blur(2px)' }} animate={{ opacity: 1, filter: 'blur(0px)' }} exit={{ opacity: 0, filter: 'blur(2px)' }} transition={{ duration: 0.2 }} className="flex items-center gap-1.5 text-red-600 dark:text-red-400">
+                          <motion.div key="error" initial={{ opacity: 0, filter: 'blur(2px)' }} animate={{ opacity: 1, filter: 'blur(0px)' }} exit={{ opacity: 0, filter: 'blur(2px)' }} transition={{ duration: MOTION_TOKENS.duration.toggle }} className="flex items-center gap-1.5 text-[var(--danger)]">
                             <X size={14} /> Failed
                           </motion.div>
                         )}
@@ -530,11 +617,11 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
                       <motion.span 
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.2 }}
-                        className="relative text-[11px] font-bold tracking-wider text-green-400 bg-green-500/10 px-2 py-0.5 rounded-md border border-green-500/20"
+                        transition={{ duration: MOTION_TOKENS.duration.toggle }}
+                        className="relative text-[11px] font-bold tracking-wider text-[var(--success)] bg-[var(--success-surface)] px-2 py-0.5 rounded-md border border-[var(--success-border)]"
                       >
                         <motion.div
-                          className="absolute inset-0 bg-green-400 rounded-md"
+                          className="absolute inset-0 bg-[var(--success)] rounded-md"
                           initial={{ opacity: 0.3, scale: 1 }}
                           animate={{ opacity: 0, scale: 1.3 }}
                           transition={{ duration: 0.5, ease: "easeOut", delay: 0.1 }}
@@ -620,45 +707,45 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
             >
               {/* Header / Identity */}
               <div className="flex items-start gap-5">
-                <motion.div variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, transition: { duration: 0.3 } } }} className="w-[72px] h-[72px] rounded-[16px] bg-[#1a1b1e] border border-[var(--border-subtle)] shadow-[0_0_15px_rgba(255,255,255,0.05)] overflow-hidden flex items-center justify-center shrink-0">
+                <motion.div variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, transition: { duration: MOTION_TOKENS.duration.stateChange } } }} className="w-[72px] h-[72px] rounded-[16px] bg-[#1a1b1e] border border-[var(--border-subtle)] shadow-[0_0_15px_rgba(255,255,255,0.05)] overflow-hidden flex items-center justify-center shrink-0">
                   <img src="/icon-128.png" alt="MyPass" className="w-[72px] h-[72px] object-cover" onError={(e) => (e.currentTarget.style.display = 'none')} />
                 </motion.div>
                 <div className="flex flex-col pt-0.5">
-                  <motion.h2 variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, transition: { duration: 0.3 } } }} className="text-[22px] font-bold text-[var(--text-primary)] tracking-tight leading-none mb-1.5">MyPass</motion.h2>
-                  <motion.span variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, transition: { duration: 0.3 } } }} className="text-[13px] font-semibold text-[var(--text-secondary)] mb-2">Private by design. Simple by default.</motion.span>
-                  <motion.p variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, transition: { duration: 0.3 } } }} className="text-[13px] text-[var(--text-muted)] max-w-[360px] leading-[1.5]">
+                  <motion.h2 variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, transition: { duration: MOTION_TOKENS.duration.stateChange } } }} className="text-[22px] font-bold text-[var(--text-primary)] tracking-tight leading-none mb-1.5">MyPass</motion.h2>
+                  <motion.span variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, transition: { duration: MOTION_TOKENS.duration.stateChange } } }} className="text-[13px] font-semibold text-[var(--text-secondary)] mb-2">Private by design. Simple by default.</motion.span>
+                  <motion.p variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, transition: { duration: MOTION_TOKENS.duration.stateChange } } }} className="text-[13px] text-[var(--text-muted)] max-w-[360px] leading-[1.5]">
                     A local-first password manager built to keep your credentials secure, organized, and entirely under your control.
                   </motion.p>
                 </div>
               </div>
 
-              <motion.div variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, transition: { duration: 0.3 } } }} className="border-t border-[var(--border-subtle)]" />
+              <motion.div variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, transition: { duration: MOTION_TOKENS.duration.stateChange } } }} className="border-t border-[var(--border-subtle)]" />
 
               {/* Details Grid */}
               <div className="grid grid-cols-2 gap-3 mt-1">
                 {/* Version Card */}
-                <motion.div variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, transition: { duration: 0.3 } } }} className="flex flex-col gap-1 p-3 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)]">
+                <motion.div variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, transition: { duration: MOTION_TOKENS.duration.stateChange } } }} className="flex flex-col gap-1 p-3 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)]">
                   <span className="text-[11px] font-medium text-[var(--text-muted)] uppercase tracking-wider">Version</span>
                   <div className="text-[15px] font-semibold text-[var(--text-primary)]">MyPass v3.0.0</div>
                   <div className="text-[13px] text-[var(--text-secondary)]">Stable Release</div>
                 </motion.div>
 
                 {/* Security Card */}
-                <motion.div variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, transition: { duration: 0.3 } } }} className="flex flex-col gap-1 p-3 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)]">
+                <motion.div variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, transition: { duration: MOTION_TOKENS.duration.stateChange } } }} className="flex flex-col gap-1 p-3 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)]">
                   <span className="text-[11px] font-medium text-[var(--text-muted)] uppercase tracking-wider">Security</span>
                   <div className="text-[15px] font-semibold text-[var(--text-primary)]">AES-256-GCM</div>
                   <div className="text-[13px] text-[var(--text-secondary)]">Argon2id + Local-first</div>
                 </motion.div>
 
                 {/* Technology Card */}
-                <motion.div variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, transition: { duration: 0.3 } } }} className="flex flex-col gap-1 p-3 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)]">
+                <motion.div variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, transition: { duration: MOTION_TOKENS.duration.stateChange } } }} className="flex flex-col gap-1 p-3 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)]">
                   <span className="text-[11px] font-medium text-[var(--text-muted)] uppercase tracking-wider">Technology</span>
                   <div className="text-[15px] font-semibold text-[var(--text-primary)]">React + Tauri</div>
                   <div className="text-[13px] text-[var(--text-secondary)]">Tailwind + Framer Motion</div>
                 </motion.div>
 
                 {/* Open Source Card */}
-                <motion.div variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, transition: { duration: 0.3 } } }} className="flex flex-col gap-1 p-3 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)]">
+                <motion.div variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, transition: { duration: MOTION_TOKENS.duration.stateChange } } }} className="flex flex-col gap-1 p-3 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)]">
                   <span className="text-[11px] font-medium text-[var(--text-muted)] uppercase tracking-wider">Open Source</span>
                   <div className="text-[15px] font-semibold text-[var(--text-primary)]">MIT License</div>
                   <div className="text-[13px] text-[var(--text-secondary)]">Free forever</div>

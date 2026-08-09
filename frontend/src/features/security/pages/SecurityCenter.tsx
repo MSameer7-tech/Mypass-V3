@@ -17,10 +17,10 @@ export const SecurityCenter: React.FC<SecurityCenterProps> = ({ entries, onFixEn
 
   const scoreColor =
     report.overallScore >= 80
-      ? "text-[var(--success)] border-emerald-900/40"
+      ? "text-[var(--success)] border-[var(--success-border)]"
       : report.overallScore >= 50
-      ? "text-[var(--warning)] border-amber-900/40"
-      : "text-[var(--danger)] border-red-900/40";
+      ? "text-[var(--warning)] border-[var(--warning-border)]"
+      : "text-[var(--danger)] border-[var(--danger-border)]";
 
   return (
     <div className="h-full w-full bg-[var(--background)] p-8 overflow-y-auto flex flex-col gap-8 select-text">
@@ -63,7 +63,7 @@ export const SecurityCenter: React.FC<SecurityCenterProps> = ({ entries, onFixEn
         {/* Metric 4: Reused */}
         <Card variant="default" className="flex flex-col p-4">
           <span className="text-xs text-[var(--text-muted)] font-medium">Reused Passwords</span>
-          <span className="text-2xl font-bold text-amber-500 mt-1">{report.reusedCount}</span>
+          <span className="text-2xl font-bold text-[var(--warning)] mt-1">{report.reusedCount}</span>
           <span className="text-[11px] text-[var(--text-muted)] mt-1">Duplicate Hashes</span>
         </Card>
 

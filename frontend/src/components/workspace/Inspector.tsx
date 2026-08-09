@@ -125,7 +125,7 @@ export const Inspector: React.FC<InspectorProps> = ({
                   <button
                     onClick={onToggleFavorite}
                     title={entry.favorite ? "Remove from Favorites" : "Add to Favorites"}
-                    className="flex items-center justify-center h-9 w-9 rounded-lg hover:bg-[var(--surface-card-hover)] transition-colors focus:outline-none"
+                    className="flex items-center justify-center h-9 w-9 rounded-lg hover:bg-[var(--surface-card-hover)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--border-focus)]"
                   >
                     <Icon icon={Star} size="md" className={entry.favorite ? "text-amber-400 fill-amber-400" : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"} />
                   </button>

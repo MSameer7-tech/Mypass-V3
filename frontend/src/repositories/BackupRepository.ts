@@ -8,7 +8,7 @@ export interface ExportData {
 }
 
 export class BackupRepository {
-  static async exportVault(format: "json" | "csv" = "json"): Promise<Result<ExportData>> {
+  static async exportVault(format: "json" | "mypass" = "mypass"): Promise<Result<ExportData>> {
     return sendIPCRequest<ExportData>("backup.export", { format });
   }
 

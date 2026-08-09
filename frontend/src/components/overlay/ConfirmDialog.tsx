@@ -44,7 +44,7 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   return (
     <Dialog open={open} onClose={onClose} size={size} footer={footer} {...props}>
       <div className="flex items-start gap-4">
-        <div className="p-3 rounded-xl bg-[var(--danger-surface)] border border-red-900/30 shrink-0">
+        <div className="p-3 rounded-xl bg-[var(--danger-surface)] border border-[var(--danger-border)] shrink-0">
           <Icon icon={AlertTriangle} size="md" tone="danger" />
         </div>
         <div className="flex flex-col gap-1">

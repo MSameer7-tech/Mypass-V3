@@ -1,4 +1,5 @@
 import React from "react";
+import { MOTION_TOKENS } from "../../constants/motion";
 import { motion } from "framer-motion";
 import { FaviconAvatar } from "./FaviconAvatar";
 import { Star } from "lucide-react";
@@ -36,7 +37,7 @@ export const VaultCard: React.FC<VaultCardProps> = ({
     <motion.div
       whileHover={{ scale: 1.005, y: -0.5 }}
       whileTap={{ scale: 0.99 }}
-      transition={{ duration: 0.15, ease: "easeOut" }}
+      transition={{ duration: MOTION_TOKENS.duration.hover, ease: "easeOut" }}
       onClick={onClick}
       className={`group relative flex items-center justify-between px-3.5 rounded-xl cursor-pointer transition-all border ${
         compactMode ? "h-[54px] py-1.5" : "h-[68px] py-2.5"
@@ -54,8 +55,8 @@ export const VaultCard: React.FC<VaultCardProps> = ({
             {favorite && (
               <motion.button
                 whileTap={{ scale: 0.95, rotate: 5 }}
-                transition={{ duration: 0.1 }}
-                className="shrink-0 focus:outline-none cursor-pointer"
+                transition={{ duration: MOTION_TOKENS.duration.press }}
+                className="shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--border-focus)] focus-visible:rounded cursor-pointer"
                 onClick={(e) => { e.stopPropagation(); onToggleFavorite?.(e); }}
               >
                 <Icon icon={Star} size="xs" className="fill-amber-400 text-amber-400" />

@@ -22,7 +22,7 @@ class VaultRepository:
                 """
                 SELECT version, created, vault_id, argon_parameters, salt, 
                        biometric_enabled, biometric_platform, biometric_enrolled_at,
-                       biometric_prompt_state, last_master_password_change
+                       biometric_prompt_state, last_master_password_change, biometric_wrapped_key
                 FROM app_metadata
                 WHERE id = 1
                 """
@@ -39,6 +39,7 @@ class VaultRepository:
                 biometric_enrolled_at=row[7],
                 biometric_prompt_state=row[8],
                 last_master_password_change=row[9],
+                biometric_wrapped_key=row[10],
             )
 
     def update_metadata_security(
@@ -66,16 +67,17 @@ class VaultRepository:
         enabled: bool,
         platform: str | None = None,
         enrolled_at: float | None = None,
+        wrapped_key: str | None = None,
     ) -> None:
         with self.database_manager.connect() as connection:
             cursor = connection.cursor()
             cursor.execute(
                 """
                 UPDATE app_metadata
-                SET biometric_enabled = ?, biometric_platform = ?, biometric_enrolled_at = ?
+                SET biometric_enabled = ?, biometric_platform = ?, biometric_enrolled_at = ?, biometric_wrapped_key = ?
                 WHERE id = 1
                 """,
-                (int(enabled), platform, enrolled_at),
+                (int(enabled), platform, enrolled_at, wrapped_key),
             )
 
     def update_vault_crypto_transaction(self, version, vault_id, argon_parameters, salt, encrypted_entries_data, encrypted_history_data) -> None:

@@ -1,5 +1,6 @@
 import os
 import uuid
+import time
 
 from crypto.encryption import FernetEncryptionService
 from crypto.key_derivation import Argon2KeyDerivationService
@@ -26,6 +27,7 @@ class MasterPasswordService:
         self.encryption_service_factory = encryption_service_factory or self._default_encryption_factory()
         self.legacy_encryption_service_factory = FernetEncryptionService
         self.legacy_key_file = legacy_key_file
+        self._failed_attempts = 0
 
     def is_configured(self) -> bool:
         metadata = self.repository.get_metadata()
@@ -38,6 +40,11 @@ class MasterPasswordService:
         parameters = self.key_derivation_service.default_parameters()
         salt = self.key_derivation_service.generate_salt(parameters.salt_length)
         encryption_service = self._build_encryption_service(master_password, salt, parameters)
+        
+        # Derive a backup key using a static salt for disaster recovery portability
+        backup_salt = b"mypass_backup_static_salt_v1_000"
+        backup_encryption_service = self._build_encryption_service(master_password, backup_salt, parameters)
+        
         vault_id = encryption_service.encrypt(str(uuid.uuid4()))
         self.repository.update_metadata_security(
             version=SCHEMA_VERSION,
@@ -46,9 +53,13 @@ class MasterPasswordService:
             salt=self.key_derivation_service.encode_salt(salt),
         )
         self._migrate_legacy_key_if_present(encryption_service)
-        return VaultService(self.repository, encryption_service)
+        return VaultService(self.repository, encryption_service, backup_encryption_service)
 
     def unlock_vault(self, master_password: str) -> VaultService:
+        if self._failed_attempts > 0:
+            delay = min(2 ** (self._failed_attempts - 1), 10)
+            time.sleep(delay)
+
         metadata = self.repository.get_metadata()
         parameters = self.key_derivation_service.deserialize_parameters(metadata.argon_parameters)
         salt = self.key_derivation_service.decode_salt(metadata.salt)
@@ -67,8 +78,12 @@ class MasterPasswordService:
                 upgraded_legacy_vault = True
             else:
                 encryption_service.decrypt(metadata.vault_id)
-        except Exception as error:
-            raise InvalidMasterPasswordError("Wrong master password.") from error
+        except Exception:
+            self._failed_attempts += 1
+            raise InvalidMasterPasswordError("Wrong master password.")
+
+        # Success: reset the counter
+        self._failed_attempts = 0
 
         if not upgraded_legacy_vault and self._needs_secure_notes_upgrade(metadata.version):
             self._encrypt_existing_notes(encryption_service)
@@ -78,7 +93,10 @@ class MasterPasswordService:
                 argon_parameters=metadata.argon_parameters,
                 salt=metadata.salt,
             )
-        return VaultService(self.repository, encryption_service)
+            
+        backup_salt = b"mypass_backup_static_salt_v1_000"
+        backup_encryption_service = self._build_encryption_service(master_password, backup_salt, parameters)
+        return VaultService(self.repository, encryption_service, backup_encryption_service)
 
     def change_master_password(self, current_password: str, new_password: str) -> VaultService:
         if current_password == new_password:
@@ -88,11 +106,18 @@ class MasterPasswordService:
         parameters = self.key_derivation_service.deserialize_parameters(metadata.argon_parameters)
         salt = self.key_derivation_service.decode_salt(metadata.salt)
 
+        if self._failed_attempts > 0:
+            delay = min(2 ** (self._failed_attempts - 1), 10)
+            time.sleep(delay)
+
         try:
             old_encryption_service = self._build_encryption_service(current_password, salt, parameters)
             decrypted_vault_id = old_encryption_service.decrypt(metadata.vault_id)
-        except Exception as error:
-            raise InvalidMasterPasswordError("Wrong current master password.") from error
+        except Exception:
+            self._failed_attempts += 1
+            raise InvalidMasterPasswordError("Wrong current master password.")
+
+        self._failed_attempts = 0
 
         # Validate that the derived vault_id is correct (extra safety)
         try:
@@ -142,7 +167,17 @@ class MasterPasswordService:
             encrypted_history_data=encrypted_history_data,
         )
 
-        return VaultService(self.repository, new_encryption_service)
+        # Invalidate biometric credential if any, since it wraps the old key
+        self.repository.update_biometric_metadata(
+            enabled=False,
+            platform=None,
+            enrolled_at=None,
+            wrapped_key=None,
+        )
+
+        backup_salt = b"mypass_backup_static_salt_v1_000"
+        backup_encryption_service = self._build_encryption_service(new_password, backup_salt, new_parameters)
+        return VaultService(self.repository, new_encryption_service, backup_encryption_service)
 
     def _build_encryption_service(self, master_password: str, salt: bytes, parameters):
         key = self.key_derivation_service.derive_key(master_password, salt, parameters)

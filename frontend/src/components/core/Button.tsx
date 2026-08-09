@@ -20,7 +20,7 @@ const variantStyles: Record<ButtonVariant, string> = {
   primary: "bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white shadow-sm border border-[var(--accent)]",
   secondary: "bg-[var(--surface-card)] hover:bg-[var(--surface-card-hover)] text-[var(--text-primary)] border border-[var(--border-subtle)]",
   ghost: "bg-transparent hover:bg-[var(--surface-card-hover)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-transparent",
-  destructive: "bg-[var(--danger-surface)] hover:bg-red-950/40 text-[var(--danger)] border border-red-900/40",
+  destructive: "bg-[var(--danger-surface)] hover:bg-[var(--danger-hover)] text-[var(--danger)] border border-[var(--danger-border)]",
   link: "bg-transparent text-[var(--accent)] hover:underline border border-transparent p-0",
 };
 

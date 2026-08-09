@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
 import { Icon } from "../core/Icon";
+import { MOTION_TOKENS } from "../../constants/motion";
 
 export type DialogSize = "sm" | "md" | "lg" | "xl";
 
@@ -54,7 +55,7 @@ export const Dialog: React.FC<DialogProps> = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.15 }}
+            transition={{ duration: MOTION_TOKENS.duration.hover }}
             onClick={onClose}
             className="fixed inset-0 bg-black/60 backdrop-blur-xs"
           />
@@ -64,14 +65,14 @@ export const Dialog: React.FC<DialogProps> = ({
             initial={{ opacity: 0, scale: 0.97, y: 4 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.97, y: 4 }}
-            transition={{ duration: 0.25, ease: "easeOut" }}
+            transition={{ duration: MOTION_TOKENS.duration.transition, ease: MOTION_TOKENS.ease.out }}
             className={`relative w-full bg-[var(--surface-panel)] border border-[var(--border-subtle)] rounded-2xl shadow-2xl overflow-hidden z-10 ${sizeStyles[size]} ${className}`}
             role="dialog"
             aria-modal="true"
           >
             {/* Header */}
             {(title || description) && (
-              <div className="flex items-start justify-between p-5 pb-3 border-b border-[var(--border-subtle)]">
+              <div className="flex items-start justify-between p-6 pb-4 border-b border-[var(--border-subtle)]">
                 <div className="flex flex-col gap-0.5 pr-6">
                   {title && <h2 className="text-base font-bold text-[var(--text-primary)]">{title}</h2>}
                   {description && <p className="text-xs text-[var(--text-muted)]">{description}</p>}
@@ -88,11 +89,11 @@ export const Dialog: React.FC<DialogProps> = ({
             )}
 
             {/* Body */}
-            <div className="p-5 overflow-y-auto max-h-[75vh]">{children}</div>
+            <div className="p-6 overflow-y-auto max-h-[75vh]">{children}</div>
 
             {/* Footer */}
             {footer && (
-              <div className="flex items-center justify-end gap-2 p-4 bg-[var(--surface-card)] border-t border-[var(--border-subtle)]">
+              <div className="flex items-center justify-end gap-2 p-6 pt-4 bg-[var(--surface-card)] border-t border-[var(--border-subtle)]">
                 {footer}
               </div>
             )}

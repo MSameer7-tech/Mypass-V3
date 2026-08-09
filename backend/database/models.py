@@ -30,6 +30,7 @@ class AppMetadataRecord:
     biometric_enrolled_at: float | None = None
     biometric_prompt_state: str = "never"
     last_master_password_change: str | None = None
+    biometric_wrapped_key: str | None = None
 
 
 @dataclass(frozen=True)

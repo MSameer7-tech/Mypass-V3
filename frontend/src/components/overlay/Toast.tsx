@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { MOTION_TOKENS } from "../../constants/motion";
 import { motion } from "framer-motion";
 import { CheckCircle2, AlertCircle, AlertTriangle, Info, X } from "lucide-react";
 import { Icon, IconProps } from "../core/Icon";
@@ -21,10 +22,10 @@ export interface ToastProps {
 }
 
 const variantConfig: Record<ToastVariant, { icon: IconProps["icon"]; tone: IconProps["tone"]; border: string }> = {
-  success: { icon: CheckCircle2, tone: "success", border: "border-emerald-900/50" },
-  error: { icon: AlertCircle, tone: "danger", border: "border-red-900/50" },
-  warning: { icon: AlertTriangle, tone: "warning", border: "border-amber-900/50" },
-  info: { icon: Info, tone: "accent", border: "border-blue-900/50" },
+  success: { icon: CheckCircle2, tone: "success", border: "border-[var(--success-border)]" },
+  error: { icon: AlertCircle, tone: "danger", border: "border-[var(--danger-border)]" },
+  warning: { icon: AlertTriangle, tone: "warning", border: "border-[var(--warning-border)]" },
+  info: { icon: Info, tone: "accent", border: "border-[var(--border-subtle)]" },
 };
 
 export const Toast: React.FC<ToastProps> = ({ toast, onDismiss }) => {
@@ -43,7 +44,7 @@ export const Toast: React.FC<ToastProps> = ({ toast, onDismiss }) => {
       initial={{ opacity: 0, y: 12, scale: 0.95 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: 12, scale: 0.95 }}
-      transition={{ duration: 0.15 }}
+      transition={{ duration: MOTION_TOKENS.duration.hover }}
       className={`flex items-start gap-3 w-[340px] p-3.5 bg-[var(--surface-card)] text-[var(--text-primary)] border rounded-xl shadow-xl z-50 ${config.border}`}
     >
       <div className="mt-0.5 shrink-0">

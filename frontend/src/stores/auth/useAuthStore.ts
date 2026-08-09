@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { AuthRepository } from "../../repositories/AuthRepository";
+import { useClipboardStore } from "../clipboard/useClipboardStore";
 
 export type SessionState =
   | "BOOTING"
@@ -16,6 +17,7 @@ export interface AuthState {
   autoLockMinutes: number;
   lastActivityTimestamp: number;
   authError: string | null;
+  failedUnlockAttempts: number;
 
   // Actions
   checkVaultStatus: () => Promise<void>;
@@ -33,6 +35,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   autoLockMinutes: 15,
   lastActivityTimestamp: Date.now(),
   authError: null,
+  failedUnlockAttempts: 0,
 
   checkVaultStatus: async () => {
     set({ sessionState: "BOOTING", authError: null });
@@ -46,16 +49,18 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   unlockVault: async (masterPassword) => {
     set({ sessionState: "UNLOCKING", authError: null });
+    
     const res = await AuthRepository.unlock(masterPassword);
 
     if (res.success && res.data.success) {
-      set({ sessionState: "UNLOCKED", lastActivityTimestamp: Date.now() });
+      set({ sessionState: "UNLOCKED", lastActivityTimestamp: Date.now(), failedUnlockAttempts: 0 });
       return true;
     }
 
     set({
       sessionState: "LOCKED",
       authError: res.success ? "Invalid password" : res.error.message,
+      failedUnlockAttempts: get().failedUnlockAttempts + 1
     });
     return false;
   },
@@ -79,6 +84,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   lockVault: () => {
     set({ sessionState: "LOCKING" });
     AuthRepository.lock();
+    useClipboardStore.getState().clearIfOwned();
     set({ sessionState: "LOCKED", lastActivityTimestamp: Date.now() });
   },
 
