@@ -1,3 +1,0 @@
-FAST = 150
-MEDIUM = 300
-SLOW = 500
