@@ -33,37 +33,25 @@ v3.0.0 is a complete rewrite — from a legacy Python/CustomTkinter application 
 ## 🖥️ Interface
 
 <p align="center">
-  <img src="docs/screenshots/vault.png" alt="MyPass — Vault" width="800" />
+  <img src="docs/screenshots/vault-annotated.jpg" alt="MyPass — Vault" width="800" />
 </p>
 
 <p align="center">
-  <em>Three-panel layout: sidebar categories, credential list with favicons, and entry inspector with strength analysis.</em>
+  <img src="docs/screenshots/login-annotated.jpg" alt="MyPass — Unlock" width="700" />
 </p>
 
 <p align="center">
-  <img src="docs/screenshots/login.png" alt="MyPass — Unlock" width="600" />
+  <img src="docs/screenshots/security-center-annotated.jpg" alt="MyPass — Security Center" width="800" />
 </p>
 
 <p align="center">
-  <em>Master password or Touch ID unlock. The encryption badge confirms AES-256-GCM is active.</em>
-</p>
-
-<p align="center">
-  <img src="docs/screenshots/security-center.png" alt="MyPass — Security Center" width="800" />
-</p>
-
-<p align="center">
-  <em>Security Center — offline vault health scoring, weak password detection, reuse detection, and breach auditing.</em>
-</p>
-
-<p align="center">
-  <img src="docs/screenshots/password-details.png" alt="MyPass — Entry Details" width="450" />
+  <img src="docs/screenshots/password-details.png" alt="MyPass — Entry Details" width="400" />
   &nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="docs/screenshots/settings.png" alt="MyPass — Settings" width="450" />
+  <img src="docs/screenshots/settings.png" alt="MyPass — Settings" width="400" />
 </p>
 
 <p align="center">
-  <em>Entry inspector with strength analysis &nbsp;·&nbsp; Settings with theme, security, clipboard, and backup preferences.</em>
+  <em>Entry inspector with strength analysis &nbsp;·&nbsp; Preferences panel</em>
 </p>
 
 ---
