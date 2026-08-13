@@ -96,6 +96,9 @@ class TestAuthenticationServiceWithKeyring:
         mock_metadata = Mock()
         mock_metadata.biometric_enabled = True
         mock_metadata.biometric_platform = "macOS"
+        mock_metadata.biometric_wrapped_key = (
+            '{"nonce": "AAAAAAAAAAAAAAAA", "ciphertext": "AQIDBA=="}'
+        )
         mock_metadata.vault_id = "test-vault-id"
         mock_repo.get_metadata.return_value = mock_metadata
 
@@ -104,15 +107,26 @@ class TestAuthenticationServiceWithKeyring:
         service._provider.is_biometric_available.return_value = True
         service._provider.authenticate_user.return_value = True
         service._provider.get_platform_name.return_value = "macOS"
-        service.retrieve_secret = Mock(return_value=b"32bytekey" + b"0" * 23)
 
-        with patch("services.authentication_service.AesGcmEncryptionService") as mock_aes:
-            # Mock the decrypt to not raise an error
-            mock_aes.return_value.decrypt.return_value = "decrypted"
-            vault_service = service.unlock_vault_with_biometrics("Prompt")
-            
-            assert vault_service is not None
-            mock_aes.return_value.decrypt.assert_called_with("test-vault-id")
+        service.retrieve_secret = Mock(
+            return_value=b"32bytekey" + b"0" * 23
+        )
+
+        with patch("cryptography.hazmat.primitives.ciphers.aead.AESGCM") as mock_aesgcm:
+            mock_aesgcm.return_value.decrypt.return_value = b"master-key"
+
+            with patch(
+                "services.authentication_service.AesGcmEncryptionService"
+            ) as mock_encryption:
+                mock_encryption.return_value.decrypt.return_value = "decrypted"
+
+                vault_service = service.unlock_vault_with_biometrics("Prompt")
+
+                assert vault_service is not None
+                mock_aesgcm.return_value.decrypt.assert_called_once()
+                mock_encryption.return_value.decrypt.assert_called_once_with(
+                    "test-vault-id"
+                )
             
     @patch("platform_auth.mac_auth.keyring")
     @patch("platform.system", return_value="Darwin")
