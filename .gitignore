@@ -1,6 +1,9 @@
 venv/
+.venv/
 build/
 dist/
+node_modules/
+target/
 .DS_Store
 .idea/
 *.spec
@@ -13,6 +16,7 @@ mypass-website/
 .local_data/
 backend/.local_data/
 .env
+.env*
 
 # Python artifacts
 **/__pycache__/
@@ -20,3 +24,4 @@ backend/.local_data/
 
 # PyInstaller onedir build output
 frontend/src-tauri/resources/ipc_bridge_app/
+
