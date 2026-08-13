@@ -32,9 +32,68 @@ v3.0.0 is a complete rewrite — from a legacy Python/CustomTkinter application 
 
 ## 🖥️ Interface
 
-> *v3.0.0 screenshots will be added in a future update.*
->
-> The current interface includes a resizable panel layout with sidebar navigation, credential inspector, security center, and settings.
+<p align="center">
+  <img src="docs/screenshots/vault.png" alt="MyPass — Vault" width="800" />
+</p>
+
+<p align="center">
+  <em>Three-panel layout: sidebar categories, credential list with favicons, and entry inspector with strength analysis.</em>
+</p>
+
+<details>
+<summary><strong>More screenshots</strong></summary>
+
+<br/>
+
+### Unlock Screen
+
+<p align="center">
+  <img src="docs/screenshots/login.png" alt="MyPass — Unlock" width="700" />
+</p>
+
+Master password or Touch ID. The encryption badge confirms AES-256-GCM is active.
+
+---
+
+### Entry Details
+
+<p align="center">
+  <img src="docs/screenshots/password-details.png" alt="MyPass — Entry Details" width="500" />
+</p>
+
+Credential inspector with copy controls, password visibility toggle, strength indicator, and entry metadata.
+
+---
+
+### Security Center
+
+<p align="center">
+  <img src="docs/screenshots/security-center.png" alt="MyPass — Security Center" width="800" />
+</p>
+
+Offline vault health scoring — weak passwords, reused credentials, and breach detection with actionable recommendations.
+
+---
+
+### Settings
+
+<p align="center">
+  <img src="docs/screenshots/settings.png" alt="MyPass — Settings" width="700" />
+</p>
+
+Preferences for appearance, security & lock, clipboard behavior, backup & export, diagnostics, and shortcuts.
+
+---
+
+### Backup & Export
+
+<p align="center">
+  <img src="docs/screenshots/backup.png" alt="MyPass — Backup" width="700" />
+</p>
+
+Encrypted `.mypass` export or plaintext JSON (with clear danger warnings). Import from either format.
+
+</details>
 
 ---
 
