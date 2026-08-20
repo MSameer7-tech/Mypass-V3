@@ -12,8 +12,16 @@ def get_target_triple():
                 return line.split(":")[1].strip()
     except Exception as e:
         print(f"Failed to get target triple from rustc: {e}")
-        # Fallback to standard apple silicon if rustc fails
-        return "aarch64-apple-darwin"
+
+    # Platform-aware fallback if rustc fails
+    import platform
+    machine = platform.machine().lower()
+    if sys.platform == "darwin":
+        return "aarch64-apple-darwin" if machine in ("arm64", "aarch64") else "x86_64-apple-darwin"
+    elif sys.platform == "win32":
+        return "aarch64-pc-windows-msvc" if machine in ("arm64", "aarch64") else "x86_64-pc-windows-msvc"
+    else:
+        return "aarch64-unknown-linux-gnu" if machine in ("arm64", "aarch64") else "x86_64-unknown-linux-gnu"
 
 def main():
     target = get_target_triple()
@@ -42,7 +50,9 @@ def main():
     ]
     
     # We must ensure we're using the pyinstaller from our venv
-    venv_pyinstaller = os.path.join(base_dir, "venv", "bin", "pyinstaller")
+    venv_bin = "Scripts" if sys.platform == "win32" else "bin"
+    pyinstaller_exe = "pyinstaller.exe" if sys.platform == "win32" else "pyinstaller"
+    venv_pyinstaller = os.path.join(base_dir, "venv", venv_bin, pyinstaller_exe)
     if os.path.exists(venv_pyinstaller):
         pyinstaller_cmd[0] = venv_pyinstaller
         

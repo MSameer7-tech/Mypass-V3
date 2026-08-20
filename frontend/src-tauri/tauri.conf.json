@@ -26,12 +26,13 @@
   },
   "bundle": {
     "active": true,
-    "targets": ["app", "dmg"],
+    "targets": ["app", "dmg", "nsis"],
     "copyright": "© 2026 Sameer",
     "resources": ["resources/ipc_bridge_app/**/*"],
     "macOS": {
       "minimumSystemVersion": "10.15"
     },
+    "nsis": {},
     "fileAssociations": [
       {
         "ext": ["mypass"],

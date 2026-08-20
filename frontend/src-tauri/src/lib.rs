@@ -19,8 +19,15 @@ fn python_ipc(payload: String, state: State<'_, AppState>, app: AppHandle) -> Re
 
     if proc_guard.is_none() {
         use tauri::Manager;
-        let resource_dir = app.path().resource_dir().map_err(|e| e.to_string())?;
-        let sidecar_path = resource_dir.join("resources").join("ipc_bridge_app").join("ipc_bridge");
+        let exe_name = if cfg!(target_os = "windows") {
+            "ipc_bridge.exe"
+        } else {
+            "ipc_bridge"
+        };
+        let sidecar_path = resource_dir
+            .join("resources")
+            .join("ipc_bridge_app")
+            .join(exe_name);
         
         let mut child = Command::new(sidecar_path);
         
