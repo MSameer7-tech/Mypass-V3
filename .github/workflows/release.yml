@@ -80,7 +80,8 @@ jobs:
       - name: Build macOS Python Sidecar
         run: |
           python3 -m venv backend/venv
-          ./backend/venv/bin/pip install -r backend/requirements.txt pyinstaller
+          ./backend/venv/bin/pip install --upgrade pip
+          ./backend/venv/bin/pip install -r backend/requirements.txt
           python3 backend/build_sidecar.py
 
       - name: Set up Node.js & pnpm
@@ -98,21 +99,29 @@ jobs:
 
       - name: Build Tauri macOS DMG
         run: |
+          echo "{\"version\":\"${{ env.RELEASE_VERSION }}\"}" > frontend/src-tauri/tauri.release.json
           cd frontend
           pnpm install --frozen-lockfile
-          pnpm tauri build --target aarch64-apple-darwin --config "{\"version\":\"${{ env.RELEASE_VERSION }}\"}"
+          pnpm tauri build --target aarch64-apple-darwin --config tauri.release.json
 
       - name: Verify Binary Architecture
         run: |
           echo "Verifying Mach-O ARM64 architecture..."
-          APP_BIN="frontend/src-tauri/target/aarch64-apple-darwin/release/bundle/macos/MyPass.app/Contents/MacOS/MyPass"
+          APP_BIN=$(find frontend/src-tauri/target -path "*/Contents/MacOS/MyPass" | head -n 1)
+          if [ -z "$APP_BIN" ]; then
+            echo "Binary MyPass not found!"
+            exit 1
+          fi
           file "$APP_BIN" | grep "arm64"
 
       - name: Stage macOS Release Artifact
         run: |
           mkdir -p dist-artifacts
-          DMG_FILE=$(find frontend/src-tauri/target/aarch64-apple-darwin/release/bundle/dmg -name "*.dmg" | head -n 1)
-          test -f "$DMG_FILE"
+          DMG_FILE=$(find frontend/src-tauri/target -name "*.dmg" | head -n 1)
+          if [ -z "$DMG_FILE" ]; then
+            echo "DMG file not found!"
+            exit 1
+          fi
           cp "$DMG_FILE" "dist-artifacts/MyPass_${{ env.RELEASE_VERSION }}_aarch64.dmg"
 
       - name: Upload macOS Artifact
@@ -150,7 +159,8 @@ jobs:
         shell: pwsh
         run: |
           python -m venv backend/venv
-          .\backend\venv\Scripts\pip.exe install -r backend/requirements.txt pyinstaller
+          .\backend\venv\Scripts\python.exe -m pip install --upgrade pip
+          .\backend\venv\Scripts\pip.exe install -r backend/requirements.txt
           python backend/build_sidecar.py
 
       - name: Set up Node.js & pnpm
@@ -170,9 +180,10 @@ jobs:
       - name: Build Tauri Windows x64 NSIS Installer
         shell: pwsh
         run: |
+          Set-Content -Path frontend/src-tauri/tauri.release.json -Value (@{ version = $env:RELEASE_VERSION } | ConvertTo-Json)
           cd frontend
           pnpm install --frozen-lockfile
-          pnpm tauri build --target x86_64-pc-windows-msvc --config "{`"version`":`"$env:RELEASE_VERSION`"}"
+          pnpm tauri build --target x86_64-pc-windows-msvc --config tauri.release.json
 
       - name: Verify PE x64 Binary Architecture
         shell: pwsh
@@ -192,7 +203,7 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path dist-artifacts
-          $exe = Get-ChildItem -Path frontend/src-tauri/target/x86_64-pc-windows-msvc/release/bundle/nsis/*.exe | Select-Object -First 1
+          $exe = Get-ChildItem -Path frontend/src-tauri/target -Filter "*.exe" -Recurse | Where-Object { $_.DirectoryName -like "*nsis*" } | Select-Object -First 1
           if (-not $exe) { throw "NSIS Installer exe not found!" }
           Copy-Item $exe.FullName -Destination "dist-artifacts/MyPass_$env:RELEASE_VERSION`_x64-setup.exe"
 
@@ -231,7 +242,8 @@ jobs:
         shell: pwsh
         run: |
           python -m venv backend/venv
-          .\backend\venv\Scripts\pip.exe install -r backend/requirements.txt pyinstaller
+          .\backend\venv\Scripts\python.exe -m pip install --upgrade pip
+          .\backend\venv\Scripts\pip.exe install -r backend/requirements.txt
           python backend/build_sidecar.py
 
       - name: Set up Node.js & pnpm
@@ -251,9 +263,10 @@ jobs:
       - name: Build Tauri Windows ARM64 NSIS Installer
         shell: pwsh
         run: |
+          Set-Content -Path frontend/src-tauri/tauri.release.json -Value (@{ version = $env:RELEASE_VERSION } | ConvertTo-Json)
           cd frontend
           pnpm install --frozen-lockfile
-          pnpm tauri build --target aarch64-pc-windows-msvc --config "{`"version`":`"$env:RELEASE_VERSION`"}"
+          pnpm tauri build --target aarch64-pc-windows-msvc --config tauri.release.json
 
       - name: Verify PE ARM64 Binary Architecture
         shell: pwsh
@@ -273,7 +286,7 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path dist-artifacts
-          $exe = Get-ChildItem -Path frontend/src-tauri/target/aarch64-pc-windows-msvc/release/bundle/nsis/*.exe | Select-Object -First 1
+          $exe = Get-ChildItem -Path frontend/src-tauri/target -Filter "*.exe" -Recurse | Where-Object { $_.DirectoryName -like "*nsis*" } | Select-Object -First 1
           if (-not $exe) { throw "NSIS Installer exe not found!" }
           Copy-Item $exe.FullName -Destination "dist-artifacts/MyPass_$env:RELEASE_VERSION`_arm64-setup.exe"
 
