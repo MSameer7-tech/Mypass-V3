@@ -30,7 +30,7 @@ jobs:
       - name: Install Backend Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r backend/requirements.txt pytest
+          pip install --prefer-binary -r backend/requirements.txt pytest
 
       - name: Run Backend Tests
         run: |
@@ -81,7 +81,7 @@ jobs:
         run: |
           python3 -m venv backend/venv
           ./backend/venv/bin/pip install --upgrade pip
-          ./backend/venv/bin/pip install -r backend/requirements.txt
+          ./backend/venv/bin/pip install --prefer-binary -r backend/requirements.txt
           python3 backend/build_sidecar.py
 
       - name: Set up Node.js & pnpm
@@ -160,7 +160,7 @@ jobs:
         run: |
           python -m venv backend/venv
           .\backend\venv\Scripts\python.exe -m pip install --upgrade pip
-          .\backend\venv\Scripts\pip.exe install -r backend/requirements.txt
+          .\backend\venv\Scripts\pip.exe install --prefer-binary -r backend/requirements.txt
           python backend/build_sidecar.py
 
       - name: Set up Node.js & pnpm
@@ -243,7 +243,7 @@ jobs:
         run: |
           python -m venv backend/venv
           .\backend\venv\Scripts\python.exe -m pip install --upgrade pip
-          .\backend\venv\Scripts\pip.exe install -r backend/requirements.txt
+          .\backend\venv\Scripts\pip.exe install --prefer-binary -r backend/requirements.txt
           python backend/build_sidecar.py
 
       - name: Set up Node.js & pnpm
