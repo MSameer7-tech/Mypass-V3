@@ -50,5 +50,11 @@
     "typescript": "5.7.3",
     "vite": "6.1.0",
     "vitest": "3.0.5"
+  },
+  "optionalDependencies": {
+    "@rollup/rollup-win32-arm64-msvc": "^4.62.4",
+    "@tailwindcss/oxide-win32-arm64-msvc": "^4.1.18",
+    "@tauri-apps/cli-win32-arm64-msvc": "^2.11.4",
+    "lightningcss-win32-arm64-msvc": "^1.30.2"
   }
 }
