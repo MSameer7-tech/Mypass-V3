@@ -19,6 +19,7 @@ fn python_ipc(payload: String, state: State<'_, AppState>, app: AppHandle) -> Re
 
     if proc_guard.is_none() {
         use tauri::Manager;
+        let resource_dir = app.path().resource_dir().map_err(|e| e.to_string())?;
         let exe_name = if cfg!(target_os = "windows") {
             "ipc_bridge.exe"
         } else {
