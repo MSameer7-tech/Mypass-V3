@@ -8,7 +8,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from database.database import DatabaseManager
 from database.repository import VaultRepository
-from services.master_password_service import MasterPasswordService
+from services.master_password_service import MasterPasswordService, InvalidMasterPasswordError
 from services.authentication_service import AuthenticationService
 from services.vault_service import VaultService, EncryptionAdapter
 from services.password_generator import PasswordGenerator, PasswordGeneratorOptions
@@ -127,6 +127,31 @@ def main():
             del master_password
         else:
           response = {"jsonrpc": "2.0", "id": req_id, "result": {"success": False, "error": {"code": "AUTH_INVALID_PASSWORD", "message": "Invalid master password."}}}
+
+      elif method == "auth.change_master_password":
+        current_pwd = params.get("currentPassword", "")
+        new_pwd = params.get("newPassword", "")
+        if "currentPassword" in params:
+          del params["currentPassword"]
+        if "newPassword" in params:
+          del params["newPassword"]
+
+        try:
+          master_pwd_service.change_master_password(current_pwd, new_pwd, get_auth_service())
+          vault_service = None
+          response = {"jsonrpc": "2.0", "id": req_id, "result": {"success": True, "data": {"success": True}}}
+        except InvalidMasterPasswordError as e:
+          response = {"jsonrpc": "2.0", "id": req_id, "result": {"success": False, "error": {"code": "AUTH_INVALID_PASSWORD", "message": str(e)}}}
+        except ValueError as e:
+          msg = str(e)
+          code = "AUTH_SAME_PASSWORD" if "different" in msg.lower() else "AUTH_INVALID_LENGTH"
+          response = {"jsonrpc": "2.0", "id": req_id, "result": {"success": False, "error": {"code": code, "message": msg}}}
+        except Exception as e:
+          logging.error("Failed to rotate master password: %s", type(e).__name__)
+          response = {"jsonrpc": "2.0", "id": req_id, "result": {"success": False, "error": {"code": "INTERNAL_ERROR", "message": "Failed to change master password."}}}
+        finally:
+          del current_pwd
+          del new_pwd
 
       elif method == "auth.lock":
         vault_service = None
