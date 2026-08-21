@@ -98,7 +98,18 @@ class MasterPasswordService:
         backup_encryption_service = self._build_encryption_service(master_password, backup_salt, parameters)
         return VaultService(self.repository, encryption_service, backup_encryption_service)
 
-    def change_master_password(self, current_password: str, new_password: str) -> VaultService:
+    def change_master_password(
+        self,
+        current_password: str,
+        new_password: str,
+        auth_service=None,
+    ) -> VaultService:
+        if not current_password or not isinstance(current_password, str):
+            raise ValueError("Current master password is required.")
+
+        if not new_password or not isinstance(new_password, str) or len(new_password) < 8:
+            raise ValueError("New master password must be at least 8 characters long.")
+
         if current_password == new_password:
             raise ValueError("New password must be different from current password.")
 
@@ -119,45 +130,53 @@ class MasterPasswordService:
 
         self._failed_attempts = 0
 
-        # Validate that the derived vault_id is correct (extra safety)
+        # Validate that the derived vault_id is correct UUID (extra safety)
         try:
             uuid.UUID(decrypted_vault_id)
         except ValueError:
             raise InvalidMasterPasswordError("Vault ID decryption failed. Wrong current master password.")
 
+        # --- Phase 1: Pre-Validation (In-Memory Decryption of 100% of Records) ---
+        # Guarantees no database mutation occurs before every existing encrypted record has been successfully decrypted.
+        entries = self.repository.list_all_entries()
+        decrypted_entries = []
+        for entry in entries:
+            dec_password = old_encryption_service.decrypt(entry.password)
+            dec_notes = old_encryption_service.decrypt(entry.notes) if entry.notes else ""
+            decrypted_entries.append((entry.id, dec_password, dec_notes))
+
+        decrypted_history = []
+        for entry in entries:
+            history = self.repository.list_password_history(entry.id)
+            for h in history:
+                dec_h_password = old_encryption_service.decrypt(h.password)
+                decrypted_history.append((h.id, dec_h_password))
+
+        # --- Phase 2: Derive New Key and Verify Self-Test Roundtrip ---
         new_parameters = self.key_derivation_service.default_parameters()
         new_salt = self.key_derivation_service.generate_salt(new_parameters.salt_length)
         new_encryption_service = self._build_encryption_service(new_password, new_salt, new_parameters)
 
         encrypted_vault_id = new_encryption_service.encrypt(decrypted_vault_id)
-        
-        # Verify the new key works properly before committing
         verify_decrypted = new_encryption_service.decrypt(encrypted_vault_id)
         if verify_decrypted != decrypted_vault_id:
-            raise RuntimeError("New encryption service failed validation. Aborting.")
+            raise RuntimeError("New encryption service failed validation self-test. Aborting rotation.")
 
+        # --- Phase 3: In-Memory Re-Encryption with New Key ---
         encrypted_entries_data = []
-        entries = self.repository.list_all_entries()
-        for entry in entries:
-            dec_password = old_encryption_service.decrypt(entry.password)
+        now = self.repository._timestamp()
+        for entry_id, dec_password, dec_notes in decrypted_entries:
             enc_password = new_encryption_service.encrypt(dec_password)
-            
-            enc_notes = ""
-            if entry.notes:
-                dec_notes = old_encryption_service.decrypt(entry.notes)
-                enc_notes = new_encryption_service.encrypt(dec_notes)
-                
-            updated_at = self.repository._timestamp()
-            encrypted_entries_data.append((entry.id, enc_password, enc_notes, updated_at))
+            enc_notes = new_encryption_service.encrypt(dec_notes) if dec_notes else ""
+            encrypted_entries_data.append((entry_id, enc_password, enc_notes, now))
 
         encrypted_history_data = []
-        for entry in entries:
-            history = self.repository.list_password_history(entry.id)
-            for h in history:
-                dec_h_password = old_encryption_service.decrypt(h.password)
-                enc_h_password = new_encryption_service.encrypt(dec_h_password)
-                encrypted_history_data.append((h.id, enc_h_password))
+        for history_id, dec_h_password in decrypted_history:
+            enc_h_password = new_encryption_service.encrypt(dec_h_password)
+            encrypted_history_data.append((history_id, enc_h_password))
 
+        # --- Phase 4: Atomic Single-Connection Database Transaction ---
+        # The database transaction updates metadata, entries, history, and biometric metadata atomically.
         self.repository.update_vault_crypto_transaction(
             version=SCHEMA_VERSION,
             vault_id=encrypted_vault_id,
@@ -167,13 +186,13 @@ class MasterPasswordService:
             encrypted_history_data=encrypted_history_data,
         )
 
-        # Invalidate biometric credential if any, since it wraps the old key
-        self.repository.update_biometric_metadata(
-            enabled=False,
-            platform=None,
-            enrolled_at=None,
-            wrapped_key=None,
-        )
+        # --- Phase 5: Post-Commit Biometric Cleanup ---
+        # Only after database transaction has committed successfully, purge the OS biometric secret.
+        if auth_service is not None:
+            try:
+                auth_service.delete_secret()
+            except Exception:
+                pass
 
         backup_salt = b"mypass_backup_static_salt_v1_000"
         backup_encryption_service = self._build_encryption_service(new_password, backup_salt, new_parameters)

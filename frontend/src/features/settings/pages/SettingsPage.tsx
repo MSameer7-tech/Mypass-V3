@@ -23,8 +23,11 @@ import {
   Check,
   X,
   Loader2,
+  KeyRound,
 } from "lucide-react";
 import { Icon, IconProps } from "../../../components/core/Icon";
+import { useAuthStore } from "../../../stores/auth/useAuthStore";
+import { ChangeMasterPasswordModal } from "../components/ChangeMasterPasswordModal";
 
 export type SettingsTab =
   | "general"
@@ -62,6 +65,16 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
   const [biometricAvailable, setBiometricAvailable] = useState(false);
   const [biometricEnabled, setBiometricEnabled] = useState(false);
   const [biometricLoading, setBiometricLoading] = useState(false);
+
+  // Master Password Rotation Modal State
+  const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false);
+  const lockVault = useAuthStore((s) => s.lockVault);
+
+  const handlePasswordChangeSuccess = () => {
+    onShowToast?.("success", "Master Password Changed", "Vault re-encrypted. Please unlock with your new password.");
+    onClose();
+    lockVault();
+  };
 
   React.useEffect(() => {
     AuthRepository.biometricStatus().then((res) => {
@@ -335,6 +348,27 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
               <h3 className="text-[14px] font-semibold text-[var(--text-primary)] px-1">Security & Access</h3>
               
               <div className="flex flex-col rounded-xl overflow-hidden border border-[var(--border-subtle)] bg-[var(--surface-card)]">
+                {/* Master Password Rotation Row */}
+                <div className="flex items-center justify-between p-4 border-b border-[var(--border-subtle)]">
+                  <div className="flex items-center gap-4">
+                    <div className="w-8 h-8 rounded-lg bg-[var(--surface-sidebar)] flex items-center justify-center shrink-0 border border-[var(--border-subtle)]">
+                      <KeyRound size={16} className="text-[var(--text-primary)]" />
+                    </div>
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-[13px] font-medium text-[var(--text-primary)]">Master Password</span>
+                      <span className="text-[12px] text-[var(--text-muted)]">Re-encrypt your vault with a new master password.</span>
+                    </div>
+                  </div>
+                  
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => setIsChangePasswordModalOpen(true)}
+                  >
+                    Change Password
+                  </Button>
+                </div>
+
                 {/* Biometric Unlock Row */}
                 <div className="flex items-center justify-between p-4 border-b border-[var(--border-subtle)]">
                   <div className="flex items-center gap-4">
@@ -778,6 +812,13 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onClose, onShowToast
           </Button>
         </div>
       </main>
+
+      {/* Change Master Password Modal */}
+      <ChangeMasterPasswordModal
+        open={isChangePasswordModalOpen}
+        onClose={() => setIsChangePasswordModalOpen(false)}
+        onSuccess={handlePasswordChangeSuccess}
+      />
     </div>
   );
 };
