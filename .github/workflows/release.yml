@@ -107,11 +107,12 @@ jobs:
       - name: Verify Binary Architecture
         run: |
           echo "Verifying Mach-O ARM64 architecture..."
-          APP_BIN=$(find frontend/src-tauri/target -path "*/Contents/MacOS/MyPass" | head -n 1)
+          APP_BIN=$(find frontend/src-tauri/target -path "*/Contents/MacOS/*" -type f | head -n 1)
           if [ -z "$APP_BIN" ]; then
-            echo "Binary MyPass not found!"
+            echo "App binary not found!"
             exit 1
           fi
+          echo "Found binary at: $APP_BIN"
           file "$APP_BIN" | grep "arm64"
 
       - name: Stage macOS Release Artifact
