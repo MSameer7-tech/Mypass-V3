@@ -89,13 +89,14 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   createVault: async (masterPassword) => {
-    set({ sessionState: "UNLOCKING", authError: null });
+    set({ authError: null });
     const res = await AuthRepository.unlock(masterPassword);
-    if (res.success) {
+    if (res.success && res.data.success) {
       set({ sessionState: "UNLOCKED", lastActivityTimestamp: Date.now() });
       return true;
     }
-    set({ sessionState: "NO_VAULT", authError: "Failed to create vault." });
+    const errorMsg = res.success ? "Failed to initialize vault." : res.error.message;
+    set({ sessionState: "NO_VAULT", authError: errorMsg });
     return false;
   },
 

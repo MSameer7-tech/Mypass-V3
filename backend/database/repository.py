@@ -83,11 +83,12 @@ class VaultRepository:
     def update_vault_crypto_transaction(self, version, vault_id, argon_parameters, salt, encrypted_entries_data, encrypted_history_data) -> None:
         with self.database_manager.connect() as connection:
             cursor = connection.cursor()
-            # 1. Update metadata
+            # 1. Update metadata including resetting biometric wrapper
             cursor.execute(
                 """
                 UPDATE app_metadata
-                SET version = ?, vault_id = ?, argon_parameters = ?, salt = ?, last_master_password_change = ?
+                SET version = ?, vault_id = ?, argon_parameters = ?, salt = ?, last_master_password_change = ?,
+                    biometric_enabled = 0, biometric_platform = NULL, biometric_enrolled_at = NULL, biometric_wrapped_key = NULL
                 WHERE id = 1
                 """,
                 (version, vault_id, argon_parameters, salt, self._timestamp()),

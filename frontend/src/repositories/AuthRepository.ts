@@ -38,4 +38,14 @@ export class AuthRepository {
   static async disableBiometrics(): Promise<Result<{ success: boolean }>> {
     return sendIPCRequest<{ success: boolean }>("auth.disable_biometrics");
   }
+
+  static async changeMasterPassword(
+    currentPassword: string,
+    newPassword: string
+  ): Promise<Result<{ success: boolean }>> {
+    return sendIPCRequest<{ success: boolean }>("auth.change_master_password", {
+      currentPassword,
+      newPassword,
+    });
+  }
 }

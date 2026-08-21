@@ -24,6 +24,9 @@ class DatabaseManager:
             connection.execute("PRAGMA synchronous = NORMAL")
             yield connection
             connection.commit()
+        except Exception:
+            connection.rollback()
+            raise
         finally:
             connection.close()
 

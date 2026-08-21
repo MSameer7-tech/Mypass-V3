@@ -18,6 +18,7 @@ export const CreateVaultScreen: React.FC<CreateVaultScreenProps> = ({
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [localLoading, setLocalLoading] = useState(false);
 
   const calculateScore = (pwd: string) => {
     if (!pwd) return 0;
@@ -42,7 +43,17 @@ export const CreateVaultScreen: React.FC<CreateVaultScreenProps> = ({
     }
 
     setError(null);
-    await onCreateVault(password);
+    setLocalLoading(true);
+    try {
+      const ok = await onCreateVault(password);
+      if (!ok) {
+        setError("Failed to create vault. Please try again.");
+      }
+    } catch (err: any) {
+      setError(err?.message || "Failed to create vault.");
+    } finally {
+      setLocalLoading(false);
+    }
   };
 
   return (
@@ -100,7 +111,7 @@ export const CreateVaultScreen: React.FC<CreateVaultScreenProps> = ({
             type="submit"
             variant="primary"
             size="lg"
-            isLoading={isCreating}
+            isLoading={isCreating || localLoading}
             disabled={!passwordsMatch || password.length < 8}
             className="w-full font-bold mt-2"
           >

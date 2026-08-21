@@ -20,13 +20,27 @@ fn python_ipc(payload: String, state: State<'_, AppState>, app: AppHandle) -> Re
     if proc_guard.is_none() {
         use tauri::Manager;
         let resource_dir = app.path().resource_dir().map_err(|e| e.to_string())?;
-        let sidecar_path = resource_dir.join("resources").join("ipc_bridge_app").join("ipc_bridge");
+        let exe_name = if cfg!(target_os = "windows") {
+            "ipc_bridge.exe"
+        } else {
+            "ipc_bridge"
+        };
+        let sidecar_path = resource_dir
+            .join("resources")
+            .join("ipc_bridge_app")
+            .join(exe_name);
         
         let mut child = Command::new(sidecar_path);
         
         child.stdin(Stdio::piped())
             .stdout(Stdio::piped())
-            .stderr(Stdio::inherit());
+            .stderr(Stdio::null());
+
+        #[cfg(target_os = "windows")]
+        {
+            use std::os::windows::process::CommandExt;
+            child.creation_flags(0x08000000);
+        }
         
         let mut child = child.spawn()
             .map_err(|e| format!("Failed to spawn Python bridge: {}", e))?;
@@ -40,6 +54,7 @@ fn python_ipc(payload: String, state: State<'_, AppState>, app: AppHandle) -> Re
     let process = proc_guard.as_mut().unwrap();
 
     writeln!(process.stdin, "{}", payload).map_err(|e| format!("Failed to write to stdin: {}", e))?;
+    process.stdin.flush().map_err(|e| format!("Failed to flush stdin: {}", e))?;
 
     let mut line = String::new();
     process.stdout.read_line(&mut line).map_err(|e| format!("Failed to read line: {}", e))?;

@@ -8,7 +8,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from database.database import DatabaseManager
 from database.repository import VaultRepository
-from services.master_password_service import MasterPasswordService
+from services.master_password_service import MasterPasswordService, InvalidMasterPasswordError
 from services.authentication_service import AuthenticationService
 from services.vault_service import VaultService, EncryptionAdapter
 from services.password_generator import PasswordGenerator, PasswordGeneratorOptions
@@ -54,13 +54,18 @@ def main():
       db_manager = DatabaseManager(db_file)
       repo = VaultRepository(db_manager)
       master_pwd_service = MasterPasswordService(repo)
-      auth_service = AuthenticationService(repo)
   except sqlite3.DatabaseError as e:
       db_error = "Database is corrupted or malformed."
   except sqlite3.OperationalError as e:
       db_error = "Database is locked or inaccessible."
   except Exception as e:
       db_error = "Failed to initialize database."
+
+  def get_auth_service():
+      nonlocal auth_service
+      if auth_service is None and repo is not None:
+          auth_service = AuthenticationService(repo)
+      return auth_service
   vault_service = None
   generator = PasswordGenerator()
   backup_service = BackupService()
@@ -123,15 +128,41 @@ def main():
         else:
           response = {"jsonrpc": "2.0", "id": req_id, "result": {"success": False, "error": {"code": "AUTH_INVALID_PASSWORD", "message": "Invalid master password."}}}
 
+      elif method == "auth.change_master_password":
+        current_pwd = params.get("currentPassword", "")
+        new_pwd = params.get("newPassword", "")
+        if "currentPassword" in params:
+          del params["currentPassword"]
+        if "newPassword" in params:
+          del params["newPassword"]
+
+        try:
+          master_pwd_service.change_master_password(current_pwd, new_pwd, get_auth_service())
+          vault_service = None
+          response = {"jsonrpc": "2.0", "id": req_id, "result": {"success": True, "data": {"success": True}}}
+        except InvalidMasterPasswordError as e:
+          response = {"jsonrpc": "2.0", "id": req_id, "result": {"success": False, "error": {"code": "AUTH_INVALID_PASSWORD", "message": str(e)}}}
+        except ValueError as e:
+          msg = str(e)
+          code = "AUTH_SAME_PASSWORD" if "different" in msg.lower() else "AUTH_INVALID_LENGTH"
+          response = {"jsonrpc": "2.0", "id": req_id, "result": {"success": False, "error": {"code": code, "message": msg}}}
+        except Exception as e:
+          logging.error("Failed to rotate master password: %s", type(e).__name__)
+          response = {"jsonrpc": "2.0", "id": req_id, "result": {"success": False, "error": {"code": "INTERNAL_ERROR", "message": "Failed to change master password."}}}
+        finally:
+          del current_pwd
+          del new_pwd
+
       elif method == "auth.lock":
         vault_service = None
         response = {"jsonrpc": "2.0", "id": req_id, "result": {"success": True, "data": {"success": True}}}
 
       elif method == "auth.biometric_unlock":
-        if not auth_service.is_biometric_enabled():
+        svc = get_auth_service()
+        if not svc.is_biometric_enabled():
             response = {"jsonrpc": "2.0", "id": req_id, "result": {"success": False, "error": {"code": "AUTH_BIOMETRIC_DISABLED", "message": "Touch ID / Biometrics is not enabled in Settings."}}}
         else:
-            vs = auth_service.unlock_vault_with_biometrics("Unlock MyPass Vault")
+            vs = svc.unlock_vault_with_biometrics("Unlock MyPass Vault")
             if vs is not None:
                 vault_service = vs
                 response = {"jsonrpc": "2.0", "id": req_id, "result": {"success": True, "data": {"success": True}}}
@@ -139,22 +170,24 @@ def main():
                 response = {"jsonrpc": "2.0", "id": req_id, "result": {"success": False, "error": {"code": "AUTH_BIOMETRIC_FAILED", "message": "Biometric authentication failed or canceled."}}}
 
       elif method == "auth.biometric_status":
-        available = auth_service.is_biometric_available()
-        enabled = auth_service.is_biometric_enabled()
+        svc = get_auth_service()
+        available = svc.is_biometric_available()
+        enabled = svc.is_biometric_enabled()
         response = {"jsonrpc": "2.0", "id": req_id, "result": {"success": True, "data": {"available": available, "enabled": enabled}}}
 
       elif method == "auth.enable_biometrics":
         if vault_service is None:
             response = {"jsonrpc": "2.0", "id": req_id, "result": {"success": False, "error": {"code": "UNAUTHORIZED", "message": "Vault is locked."}}}
         else:
-            success = auth_service.setup_biometrics("Enable Touch ID for MyPass", vault_service)
+            svc = get_auth_service()
+            success = svc.setup_biometrics("Enable Touch ID for MyPass", vault_service)
             if success:
                 response = {"jsonrpc": "2.0", "id": req_id, "result": {"success": True, "data": {"success": True}}}
             else:
                 response = {"jsonrpc": "2.0", "id": req_id, "result": {"success": False, "error": {"code": "AUTH_BIOMETRIC_FAILED", "message": "Failed to configure biometrics. Canceled or unavailable."}}}
 
       elif method == "auth.disable_biometrics":
-        auth_service.disable_biometrics()
+        get_auth_service().disable_biometrics()
         response = {"jsonrpc": "2.0", "id": req_id, "result": {"success": True, "data": {"success": True}}}
 
       elif method == "vault.list_entries":
