@@ -34,7 +34,13 @@ fn python_ipc(payload: String, state: State<'_, AppState>, app: AppHandle) -> Re
         
         child.stdin(Stdio::piped())
             .stdout(Stdio::piped())
-            .stderr(Stdio::inherit());
+            .stderr(Stdio::null());
+
+        #[cfg(target_os = "windows")]
+        {
+            use std::os::windows::process::CommandExt;
+            child.creation_flags(0x08000000);
+        }
         
         let mut child = child.spawn()
             .map_err(|e| format!("Failed to spawn Python bridge: {}", e))?;
