@@ -102,7 +102,7 @@ jobs:
           echo "{\"version\":\"${{ env.RELEASE_VERSION }}\"}" > frontend/src-tauri/tauri.release.json
           cd frontend
           pnpm install --frozen-lockfile
-          pnpm tauri build --target aarch64-apple-darwin --config tauri.release.json
+          pnpm tauri build --target aarch64-apple-darwin --config src-tauri/tauri.release.json
 
       - name: Verify Binary Architecture
         run: |
@@ -183,7 +183,7 @@ jobs:
           Set-Content -Path frontend/src-tauri/tauri.release.json -Value (@{ version = $env:RELEASE_VERSION } | ConvertTo-Json)
           cd frontend
           pnpm install --frozen-lockfile
-          pnpm tauri build --target x86_64-pc-windows-msvc --config tauri.release.json
+          pnpm tauri build --target x86_64-pc-windows-msvc --config src-tauri/tauri.release.json
 
       - name: Verify PE x64 Binary Architecture
         shell: pwsh
@@ -266,7 +266,7 @@ jobs:
           Set-Content -Path frontend/src-tauri/tauri.release.json -Value (@{ version = $env:RELEASE_VERSION } | ConvertTo-Json)
           cd frontend
           pnpm install --frozen-lockfile
-          pnpm tauri build --target aarch64-pc-windows-msvc --config tauri.release.json
+          pnpm tauri build --target aarch64-pc-windows-msvc --config src-tauri/tauri.release.json
 
       - name: Verify PE ARM64 Binary Architecture
         shell: pwsh
