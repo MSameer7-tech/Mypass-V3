@@ -235,8 +235,15 @@ Download the appropriate installer from the [Releases](https://github.com/MSamee
 | **Windows** | `MyPass_3.1.0_arm64-setup.exe` | Windows 11 (ARM64 Snapdragon/Ampere) |
 | **Checksums** | `SHA256SUMS.txt` | Cryptographic file hashes |
 
-> **macOS Gatekeeper Note:** Because MyPass is not code-signed with a paid Apple Developer certificate, macOS will display an unrecognized developer notice on first run. To open: Right-click `MyPass.app` $\rightarrow$ **Open** $\rightarrow$ Click **Open**.
-
+> **macOS Gatekeeper Note:** Because MyPass is not code-signed with a paid Apple Developer certificate, macOS will display an unrecognized developer notice on first run.
+> 
+> To bypass Gatekeeper quarantine, you can either:
+> 1. Right-click `MyPass.app` in Finder $\rightarrow$ Click **Open** $\rightarrow$ Click **Open** in the dialog.
+> 2. Or run this command in Terminal after moving the app to Applications:
+>    ```bash
+>    xattr -cr /Applications/MyPass.app
+>    ```
+>
 > **Windows SmartScreen Note:** Windows may prompt a SmartScreen warning for new unsigned installers. Click **More info** $\rightarrow$ **Run anyway**.
 
 ---
