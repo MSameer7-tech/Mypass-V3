@@ -48,6 +48,7 @@ fn python_ipc(payload: String, state: State<'_, AppState>, app: AppHandle) -> Re
     let process = proc_guard.as_mut().unwrap();
 
     writeln!(process.stdin, "{}", payload).map_err(|e| format!("Failed to write to stdin: {}", e))?;
+    process.stdin.flush().map_err(|e| format!("Failed to flush stdin: {}", e))?;
 
     let mut line = String::new();
     process.stdout.read_line(&mut line).map_err(|e| format!("Failed to read line: {}", e))?;
