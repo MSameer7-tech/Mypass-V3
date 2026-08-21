@@ -32,7 +32,9 @@
     "macOS": {
       "minimumSystemVersion": "10.15"
     },
-    "nsis": {},
+    "windows": {
+      "nsis": {}
+    },
     "fileAssociations": [
       {
         "ext": ["mypass"],
