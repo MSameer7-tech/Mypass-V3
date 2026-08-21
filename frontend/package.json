@@ -54,7 +54,7 @@
   "optionalDependencies": {
     "@rollup/rollup-win32-arm64-msvc": "^4.62.4",
     "@tailwindcss/oxide-win32-arm64-msvc": "^4.1.18",
-    "@tauri-apps/cli-win32-arm64-msvc": "^2.11.4",
+    "@tauri-apps/cli-win32-arm64-msvc": "^2.2.0",
     "lightningcss-win32-arm64-msvc": "^1.30.2"
   }
 }
